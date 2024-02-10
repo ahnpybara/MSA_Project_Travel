@@ -2,10 +2,10 @@ package travel.domain;
 
 import java.util.*;
 import lombok.*;
-import travel.domain.*;
 import travel.infra.AbstractEvent;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 @ToString
 public class PaymentCnlRequested extends AbstractEvent {
 
