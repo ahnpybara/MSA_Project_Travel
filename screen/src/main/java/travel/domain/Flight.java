@@ -1,34 +1,38 @@
 package travel.domain;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Data;
 import travel.ScreenApplication;
-import travel.domain.FlightBookRequested;
 
 @Entity
-@Table(name = "Flight_table")
 @Data
-//<<< DDD / Aggregate Root
 public class Flight {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @JsonProperty("airlineNm")
     private String airLine;
 
+    @JsonProperty("arrAirportNm")
     private String arrAirport;
 
+    @JsonProperty("depAirportNm")
     private String depAirport;
 
-    private Date arrTime;
+    @JsonProperty("arrPlandTime")
+    private Long arrTime;
 
-    private Date depTime;
+    @JsonProperty("depPlandTime")
+    private Long depTime;
 
-    private Long charge;
+    private Long economyCharge;
+
+    private Long prestigeCharge;
 
     private String vihicleId;
 
