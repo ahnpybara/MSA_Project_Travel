@@ -35,7 +35,7 @@ public class FlightReservation {
 
     private String vihicleId;
 
-    private String status;
+    private Status status;
 
     private Long userId;
 
@@ -112,36 +112,6 @@ public class FlightReservation {
 
             FlightbookCancelled flightbookCancelled = new FlightbookCancelled(flightReservation);
             flightbookCancelled.publishAfterCommit();
-
-         });
-        */
-
-    }
-
-    //>>> Clean Arch / Port Method
-    //<<< Clean Arch / Port Method
-    public static void requestFlightReservtion(
-        FlightBookRequested flightBookRequested
-    ) {
-        //implement business logic here:
-
-        /** Example 1:  new item 
-        FlightReservation flightReservation = new FlightReservation();
-        repository().save(flightReservation);
-
-        PaymentRequested paymentRequested = new PaymentRequested(flightReservation);
-        paymentRequested.publishAfterCommit();
-        */
-
-        /** Example 2:  finding and process
-        
-        repository().findById(flightBookRequested.get???()).ifPresent(flightReservation->{
-            
-            flightReservation // do something
-            repository().save(flightReservation);
-
-            PaymentRequested paymentRequested = new PaymentRequested(flightReservation);
-            paymentRequested.publishAfterCommit();
 
          });
         */

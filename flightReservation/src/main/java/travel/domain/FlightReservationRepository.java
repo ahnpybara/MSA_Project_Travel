@@ -10,4 +10,10 @@ import travel.domain.*;
     path = "flightReservations"
 )
 public interface FlightReservationRepository
-    extends PagingAndSortingRepository<FlightReservation, Long> {}
+    extends PagingAndSortingRepository<FlightReservation, Long> {
+
+        
+
+    }
+
+
