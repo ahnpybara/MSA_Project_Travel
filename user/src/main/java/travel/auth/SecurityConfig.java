@@ -24,9 +24,6 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
-
-    @Value("${jwt.secret}")
-    private String jwtSecret;
    
     private final UserRepository userRepository;
 
@@ -56,7 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
             .and()
             // httpBasic 방식 비활성화
             .httpBasic().disable()
-            .addFilter(new JwtAuthenticationFilter(authenticationManager(), userRepository, jwtSecret))//생성자 
+            .addFilter(new JwtAuthenticationFilter(authenticationManager(), userRepository))//생성자 
             .exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint())
                 .accessDeniedHandler(accessDeniedHandler())

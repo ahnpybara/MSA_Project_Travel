@@ -1,5 +1,4 @@
-jwt:
-  secret: travel
+
   
 server:
   port: 8088

@@ -6,6 +6,6 @@ public interface JwtProperties {
     int AJ_TIME=10;// jwt
     int RT_TIME=10080; //refresh
     String TOKENNAME = "COS토큰";
-    String SECRET = "mcos"; //비밀값
+    String SECRET = "travelProjectCode"; //비밀값
 
 }

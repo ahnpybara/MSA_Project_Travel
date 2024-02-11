@@ -30,18 +30,14 @@ import travel.domain.UserRepository;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-
-    private String jwtSecret;
-
     @Autowired
     private AuthenticationManager authenticationManager;
 
     private final UserRepository userRepository;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, UserRepository userRepository, String jwtSecret) {// 생성자
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {// 생성자
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
-        this.jwtSecret = jwtSecret;
         // 로그인 주소를 변경합니다.
         this.setFilterProcessesUrl("/users/login");
     }
@@ -97,7 +93,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     // access 토큰 생성 메소드
-    public String createAccessToken(PrincipalDetails principalDetails) {
+    public static String createAccessToken(PrincipalDetails principalDetails) {
         String accessToken = JWT.create()
                 .withSubject(JwtProperties.TOKENNAME)
                 .withExpiresAt(Date.from(Instant.now().plus(JwtProperties.AJ_TIME, ChronoUnit.MINUTES)))
@@ -107,7 +103,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                         .map(GrantedAuthority::getAuthority)
                         .map(String::trim)
                         .collect(Collectors.toList()))
-                .sign(Algorithm.HMAC512(jwtSecret));
+                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
 
         return accessToken;
     }
@@ -119,7 +115,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .withExpiresAt(Date.from(Instant.now().plus(JwtProperties.RT_TIME, ChronoUnit.MINUTES)))
                 .withClaim("id", principalDetails.getUser().getId())
                 .withClaim("username", principalDetails.getUser().getUsername())
-                .sign(Algorithm.HMAC512(jwtSecret));
+                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
         return refreshToken;
     }
 }

@@ -45,8 +45,7 @@ import travel.domain.*;
                 //사용자 인증 정보 클래스 객체 생성
                 PrincipalDetails principalDetails = new PrincipalDetails(user);
                                 //accessToken 발급
-                JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(null, null, null);
-                String newAccessToken = jwtAuthenticationFilter.createAccessToken(principalDetails);
+                String newAccessToken = JwtAuthenticationFilter.createAccessToken(principalDetails);
                 return ResponseEntity.ok(newAccessToken);
             } else{
                 return ResponseEntity.ok("refresh Token 불일치");

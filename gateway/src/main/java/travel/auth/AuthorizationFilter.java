@@ -20,8 +20,6 @@ import java.util.Map;
 @Component
 public class AuthorizationFilter extends AbstractGatewayFilterFactory<AuthorizationFilter.Config> {
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
 
     public AuthorizationFilter() {
         super(Config.class);
@@ -56,7 +54,7 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
         try {
             token = token.substring(7);
 
-            JWT.require(Algorithm.HMAC512(jwtSecret.getBytes()))
+            JWT.require(Algorithm.HMAC512(JwtProperties.SECRET.getBytes()))
                     .build()
                     .verify(token)//검증 
                     .getClaims();//검증된 토큰의 claims를 가져옴
