@@ -1,3 +1,6 @@
+jwt:
+  secret: travel
+  
 server:
   port: 8088
 
@@ -7,6 +10,9 @@ spring:
   profiles: default
   cloud:
     gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+
 #<<< API Gateway / Routes
       routes:
         - id: payment
@@ -52,6 +58,9 @@ spring:
   profiles: docker
   cloud:
     gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+
       routes:
         - id: payment
           uri: http://payment:8080
