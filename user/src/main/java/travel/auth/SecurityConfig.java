@@ -47,10 +47,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
             //.addFilter(corsFilter)
             // formLogin 방식 비활성화
             .formLogin().disable()
-            .logout()
-            .logoutUrl("/logout") // 로그아웃 URL 설정
-            .invalidateHttpSession(true) // 세션 무효화
-            .and()
             // httpBasic 방식 비활성화
             .httpBasic().disable()
             .addFilter(new JwtAuthenticationFilter(authenticationManager(), userRepository))//생성자 
