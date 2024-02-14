@@ -7,6 +7,7 @@ import javax.naming.NameParser;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 import travel.config.kafka.KafkaProcessor;
@@ -52,5 +53,6 @@ public class PolicyHandler {
         // Sample Logic //
         FlightReservation.paymentCancel(event);
     }
+    
 }
 //>>> Clean Arch / Inbound Adaptor

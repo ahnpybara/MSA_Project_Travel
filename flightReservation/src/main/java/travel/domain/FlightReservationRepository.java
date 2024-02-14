@@ -12,8 +12,6 @@ import travel.domain.*;
 public interface FlightReservationRepository
     extends PagingAndSortingRepository<FlightReservation, Long> {
 
-        
-
     }
 
 

@@ -1,8 +1,5 @@
 package travel.infra;
 
-import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,17 +21,21 @@ public class FlightReservationController {
     @Autowired
     FlightReservationService flightReservationService;
 
+
     @PostMapping("/flightReservation")
     public ResponseEntity<FlightReservation> createFlightReservation(@RequestBody FlightReservation flightReservation) {
         if(flightReservation == null){              
          return ResponseEntity.badRequest().build();    // 예약을 제대로 못받으면 bad 리턴   
         }
+
         
-        flightReservation.setStatus(Status.예약전);
-        FlightReservation savedReservation = flightReservationService.saveFlightReservation(flightReservation);
+        flightReservation.setStatus(Status.결제대기);
+        FlightReservation savedReservation = flightReservationService.saveFlightReservation(flightReservation);      
         
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedReservation);
-    }
-    
+        flightReservationService.scheduleReservationTimeoutCheck(savedReservation.getId());
+
+     return ResponseEntity.status(HttpStatus.CREATED).body(savedReservation);  
+
+}
 }
 //>>> Clean Arch / Inbound Adaptor
