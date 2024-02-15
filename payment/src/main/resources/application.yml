@@ -1,3 +1,8 @@
+iamport:
+  api:
+    key: 2856107387457213
+    secret: 2D9JtjtT1J580UBkkxQYi7iSL7XaGuEHBlaQetL68iMbzDpBErlVe2sazg6lfKlCnnJ212UquziL3ST7
+
 server:
   port: 8080
 

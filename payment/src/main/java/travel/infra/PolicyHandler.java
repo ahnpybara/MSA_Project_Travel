@@ -1,9 +1,5 @@
 package travel.infra;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import javax.naming.NameParser;
-import javax.naming.NameParser;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.StreamListener;
@@ -12,34 +8,12 @@ import org.springframework.stereotype.Service;
 import travel.config.kafka.KafkaProcessor;
 import travel.domain.*;
 
-//<<< Clean Arch / Inbound Adaptor
 @Service
 @Transactional
 public class PolicyHandler {
 
     @Autowired
     PaymentRepository paymentRepository;
-
-    @StreamListener(KafkaProcessor.INPUT)
-    public void whatever(@Payload String eventString) {}
-
-    @StreamListener(
-        value = KafkaProcessor.INPUT,
-        condition = "headers['type']=='PaymentCnlRequested'"
-    )
-    public void wheneverPaymentCnlRequested_ReservtionCancelRequset(
-        @Payload PaymentCnlRequested paymentCnlRequested
-    ) {
-        PaymentCnlRequested event = paymentCnlRequested;
-        System.out.println(
-            "\n\n##### listener ReservtionCancelRequset : " +
-            paymentCnlRequested +
-            "\n\n"
-        );
-
-        // Sample Logic //
-        Payment.reservtionCancelRequset(event);
-    }
 
     @StreamListener(
         value = KafkaProcessor.INPUT,
@@ -53,8 +27,6 @@ public class PolicyHandler {
             "\n\n##### listener ReservtionInfo : " + paymentRequested + "\n\n"
         );
 
-        // Sample Logic //
-        Payment.reservtionInfo(event);
+        Payment.reservationInfo(event);
     }
 }
-//>>> Clean Arch / Inbound Adaptor
