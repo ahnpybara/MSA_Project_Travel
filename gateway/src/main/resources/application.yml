@@ -31,9 +31,9 @@ spring:
         - id: user
           uri: http://localhost:8084
           predicates:
-            - Path=/users/**
-          filters:
-            - AuthorizationFilter
+            - Path=/users/**,
+          # filters:
+          #   - AuthorizationFilter
             
         - id: myPage
           uri: http://localhost:8085
@@ -46,8 +46,6 @@ spring:
           uri: http://localhost:8086
           predicates:
             - Path=/flights/**
-          filters:
-            - AuthorizationFilter
             
         - id: frontend
           uri: http://localhost:8080
@@ -63,6 +61,8 @@ spring:
               - "*"
             allowedHeaders:
               - "*"
+            exposedHeaders:
+              - "Authorization"
             allowCredentials: true
 
 
@@ -79,11 +79,17 @@ spring:
         - id: payment
           uri: http://payment:8080
           predicates:
-            - Path=/payments/**, 
+            - Path=/payments/**
+          filters:
+            - AuthorizationFilter
+
         - id: flightReservation
           uri: http://flightReservation:8080
           predicates:
-            - Path=/flightReservations/**, 
+            - Path=/flightReservations/**
+          filters:
+            - AuthorizationFilter
+
         - id: user
           uri: http://user:8080
           predicates:
@@ -91,11 +97,15 @@ spring:
         - id: myPage
           uri: http://myPage:8080
           predicates:
-            - Path=, 
+            - Path=
+          filters:
+            - AuthorizationFilter
+
         - id: screen
           uri: http://screen:8080
           predicates:
             - Path=/flights/**, 
+
         - id: frontend
           uri: http://frontend:8080
           predicates:
@@ -109,6 +119,9 @@ spring:
               - "*"
             allowedHeaders:
               - "*"
+            exposedHeaders:
+              - "Authorization"
+
             allowCredentials: true
 
 server:

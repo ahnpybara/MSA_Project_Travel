@@ -31,6 +31,8 @@ public class User {
 
     private String username;
 
+    private String nickname;
+
     private String password;
 
     private String refreshToken;
@@ -60,13 +62,10 @@ public class User {
     }
 
     public void register(SignedUp signedUp) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        String hashPassword = passwordEncoder.encode(signedUp.getPassword());
-
         validateDuplicate(signedUp.getUsername());
 
         setName(signedUp.getName());
-        setPassword(hashPassword);
+        setPassword(signedUp.getPassword());
         setUsername(signedUp.getUsername());
 
         if (signedUp.getUsername().equals("admin")) {

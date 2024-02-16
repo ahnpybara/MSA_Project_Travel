@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,11 +30,15 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+ 
     @PostMapping("/users/register")
     public ResponseEntity<User> createUser(@RequestBody SignedUp signedUp) {
+        String hashpassword = passwordEncoder.encode(signedUp.getPassword());
         User user = new User();
         user.register(signedUp);
+        user.setPassword(hashpassword);
         userRepository.save(user);
         return ResponseEntity.ok(user);
     }
@@ -56,6 +61,7 @@ public class UserController {
 
     @PostMapping("/users/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
+        System.out.println("로그아웃 요청이 들어옴");
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         DecodedJWT decodedJWT = JWT.decode(token);
         String username = decodedJWT.getClaim("username").asString();

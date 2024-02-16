@@ -76,10 +76,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         // access 토큰 발급
         String accessToken = createAccessToken(principalDetails);
-
+        System.out.println("accessToken 발급됨"+accessToken);
         // refresh 토큰 발급
         String refreshToken = createRefreshToken(principalDetails);
-
+        System.out.println("refreshToken 발급됨"+refreshToken);        
         // 리프레시 토큰으로 사용자 업데이트
         Optional<User> optionalUser = userRepository.findByUsername(principalDetails.getUser().getUsername());
         optionalUser.ifPresent(user -> {
@@ -90,6 +90,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // 헤더에 토큰 추가
         response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessToken);
         response.setHeader("Access-Control-Expose-Headers", JwtProperties.HEADER_STRING);
+        System.out.println("로그인 완료");
     }
 
     // access 토큰 생성 메소드
