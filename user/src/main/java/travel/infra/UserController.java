@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -18,8 +16,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import travel.auth.JwtAuthenticationFilter;
 import travel.auth.PrincipalDetails;
 import travel.domain.*;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 //<<< Clean Arch / Inbound Adaptor
 
@@ -32,15 +28,25 @@ public class UserController {
     private UserRepository userRepository;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
- 
+
     @PostMapping("/users/register")
     public ResponseEntity<User> createUser(@RequestBody SignedUp signedUp) {
+        System.out.println("회원가입 진행 중");
         String hashpassword = passwordEncoder.encode(signedUp.getPassword());
         User user = new User();
         user.register(signedUp);
         user.setPassword(hashpassword);
         userRepository.save(user);
+
+        System.out.println("회원가입 정보 " + user);
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/users/{username}/refreshToken")
+    public ResponseEntity<String> getRefresh(@PathVariable String username) {
+        User user = userRepository.findByUsername(username).get();
+        String token = user.getRefreshToken();
+        return ResponseEntity.ok(token);
     }
 
     @PostMapping("/users/token/refresh")
