@@ -46,6 +46,8 @@ spring:
           uri: http://localhost:8086
           predicates:
             - Path=/flights/**
+          filters:
+            - AuthorizationFilter
             
         - id: frontend
           uri: http://localhost:8080
