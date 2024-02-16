@@ -53,7 +53,6 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
                         return chain.filter(exchange);
                     });
             }
-
             return chain.filter(exchange);
         };
     }

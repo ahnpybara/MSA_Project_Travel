@@ -96,6 +96,7 @@ spring:
           uri: http://user:8080
           predicates:
             - Path=/users/**, 
+            
         - id: myPage
           uri: http://myPage:8080
           predicates:
@@ -106,7 +107,9 @@ spring:
         - id: screen
           uri: http://screen:8080
           predicates:
-            - Path=/flights/**, 
+            - Path=/flights/**,
+          filters:
+            - AuthorizationFilter
 
         - id: frontend
           uri: http://frontend:8080

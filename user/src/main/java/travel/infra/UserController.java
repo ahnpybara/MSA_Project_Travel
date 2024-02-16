@@ -5,7 +5,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +20,11 @@ import travel.auth.JwtAuthenticationFilter;
 import travel.auth.PrincipalDetails;
 import travel.domain.*;
 
-//<<< Clean Arch / Inbound Adaptor
-
 @RestController
-// @RequestMapping(value="/users")
 @Transactional()
 public class UserController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -30,16 +32,20 @@ public class UserController {
     private BCryptPasswordEncoder passwordEncoder;
 
     @PostMapping("/users/register")
-    public ResponseEntity<User> createUser(@RequestBody SignedUp signedUp) {
-        System.out.println("회원가입 진행 중");
-        String hashpassword = passwordEncoder.encode(signedUp.getPassword());
-        User user = new User();
-        user.register(signedUp);
-        user.setPassword(hashpassword);
-        userRepository.save(user);
+    public ResponseEntity<?> createUser(@RequestBody SignedUp signedUp) {
+        try {
+            String hashpassword = passwordEncoder.encode(signedUp.getPassword());
+            User user = new User();
+            user.register(signedUp);
+            user.setPassword(hashpassword);
+            userRepository.save(user);
 
-        System.out.println("회원가입 정보 " + user);
-        return ResponseEntity.ok(user);
+            logger.info("회원가입 정보 " + user.getUsername());
+            return ResponseEntity.ok(user);
+        } catch (IllegalArgumentException e) {
+            logger.error("회원가입 요청 처리 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping("/users/{username}/refreshToken")
@@ -50,38 +56,49 @@ public class UserController {
     }
 
     @PostMapping("/users/token/refresh")
-    public ResponseEntity<String> createToken(@RequestBody String refreshToken) {
-        Optional<User> optionalUser = userRepository.findByRefreshToken(refreshToken);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            // 사용자 인증 정보 클래스 객체 생성
-            PrincipalDetails principalDetails = new PrincipalDetails(user);
-            // accessToken 발급
-            String newAccessToken = JwtAuthenticationFilter.createAccessToken(principalDetails);
-            return ResponseEntity.ok(newAccessToken);
-        } else {
-            return ResponseEntity.ok("refresh Token 불일치");
+    public ResponseEntity<?> createToken(@RequestBody String refreshToken) {
+        try {
+            Optional<User> optionalUser = userRepository.findByRefreshToken(refreshToken);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                PrincipalDetails principalDetails = new PrincipalDetails(user);
+                String newAccessToken = JwtAuthenticationFilter.createAccessToken(principalDetails);
+                return ResponseEntity.ok(newAccessToken);
+            } else {
+                throw new IllegalArgumentException("유효하지 않은 Token입니다.");
+            }
+        } catch (IllegalArgumentException e) {
+            logger.error("토큰 생성 요청 처리 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            logger.error("토큰 생성 요청 처리 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("오류가 발생했습니다.");
         }
-
     }
 
     @PostMapping("/users/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request) {
-        System.out.println("로그아웃 요청이 들어옴");
-        String token = request.getHeader("Authorization").replace("Bearer ", "");
-        DecodedJWT decodedJWT = JWT.decode(token);
-        String username = decodedJWT.getClaim("username").asString();
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        try {
+            logger.info("로그아웃 요청이 들어옴");
+            String token = request.getHeader("Authorization").replace("Bearer ", "");
+            DecodedJWT decodedJWT = JWT.decode(token);
+            String username = decodedJWT.getClaim("username").asString();
 
-        Optional<User> optionalUser = userRepository.findByUsername(username);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            user.setRefreshToken(null);
-            userRepository.save(user);
-            return ResponseEntity.ok("로그아웃 성공");
-        } else {
-            return ResponseEntity.ok("토큰이 일치하지 않음");
+            Optional<User> optionalUser = userRepository.findByUsername(username);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                user.setRefreshToken(null);
+                userRepository.save(user);
+                return ResponseEntity.ok("로그아웃 성공");
+            } else {
+                throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+            }
+        } catch (IllegalArgumentException e) {
+            logger.error("로그아웃 요청 처리 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            logger.error("로그아웃 요청 처리 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("오류가 발생했습니다.");
         }
     }
-
 }
-// >>> Clean Arch / Inbound Adaptor

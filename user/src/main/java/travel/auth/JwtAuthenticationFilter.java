@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -49,15 +48,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         try {
             ObjectMapper om = new ObjectMapper();// 객체 매핑
             User user = om.readValue(request.getInputStream(), User.class);
-            System.out.println(user);
-
+            logger.info(user);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     user.getUsername(), user.getPassword());
 
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
             PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-            System.out.println(principalDetails.getUser().getUsername());
+            logger.info(principalDetails.getUser().getUsername());
 
             return authentication;
         } catch (IOException e) {
@@ -76,10 +74,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         // access 토큰 발급
         String accessToken = createAccessToken(principalDetails);
-        System.out.println("accessToken 발급됨"+accessToken);
+        logger.info("엑세스 토큰=========================="+accessToken);
         // refresh 토큰 발급
         String refreshToken = createRefreshToken(principalDetails);
-        System.out.println("refreshToken 발급됨"+refreshToken);        
+        logger.info("리프레쉬 토큰=========================="+refreshToken);
         // 리프레시 토큰으로 사용자 업데이트
         Optional<User> optionalUser = userRepository.findByUsername(principalDetails.getUser().getUsername());
         optionalUser.ifPresent(user -> {
@@ -90,7 +88,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // 헤더에 토큰 추가
         response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessToken);
         response.setHeader("Access-Control-Expose-Headers", JwtProperties.HEADER_STRING);
-        System.out.println("로그인 완료");
+        logger.info("로그인 완료");
     }
 
     // access 토큰 생성 메소드
