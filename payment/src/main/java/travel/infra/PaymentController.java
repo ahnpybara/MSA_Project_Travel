@@ -27,24 +27,39 @@ public class PaymentController {
     PaymentService paymentService;
 
     @PostMapping("/prepare")
-    public ResponseEntity<travel.domain.Payment> preparePayment(@RequestBody PaymentDTO request) {
-        travel.domain.Payment payment = paymentService.postPrepare(request);
-        System.out.println("Prepare payment succeeded");
-        return ResponseEntity.ok(payment);
+    public ResponseEntity<String> preparePayment(@RequestBody PaymentDTO request) {
+        try {
+            paymentService.postPrepare(request);
+            System.out.println("Prepare payment succeeded");
+            return ResponseEntity.ok("사전 검증 성공");
+        } catch (Exception e) {
+            System.out.println("Prepare payment failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("사전 검증 실패: " + e.getMessage());
+        }
     }
 
     @PostMapping("/validate")
-    public ResponseEntity<travel.domain.Payment> validatePayment(@RequestBody PaymentDTO request) {
-        travel.domain.Payment payment = paymentService.validatePayment(request);
-        System.out.println("Validate payment succeeded");
-        return ResponseEntity.ok(payment);
+    public ResponseEntity<String> validatePayment(@RequestBody PaymentDTO request) {
+        try {
+            paymentService.validatePayment(request);
+            System.out.println("Validate payment succeeded");
+            return ResponseEntity.ok("사후 검증 성공");
+        } catch (Exception e) {
+            System.out.println("Validate payment failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("사후 검증 실패: " + e.getMessage());
+        }
     }
 
     @PostMapping("/cancel")
-    public ResponseEntity<travel.domain.Payment> cancelPayment(@RequestBody PaymentDTO request) {
-        travel.domain.Payment payment = paymentService.cancelPayment(request.getMerchant_uid());
-        System.out.println("Payment cancellation succeeded");
-        return ResponseEntity.ok(payment);
+    public ResponseEntity<String> cancelPayment(@RequestBody PaymentDTO request) {
+        try {
+            paymentService.cancelPayment(request.getMerchant_uid());
+            System.out.println("Payment cancellation succeeded");
+            return ResponseEntity.ok("결제 취소 성공");
+        } catch (Exception e) {
+            System.out.println("Payment cancellation failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("결제 취소 실패: " + e.getMessage());
+        }
     }
 
     @PostMapping("/fail")
@@ -60,7 +75,7 @@ public class PaymentController {
 
             System.out.println("Payment cancellation notify succeeded");
 
-            return ResponseEntity.ok("Payment cancellation notify succeeded");
+            return ResponseEntity.ok("결제 취소됨 알림 성공");
 
         } catch (Exception e) {
             System.out.println("Error occurred while processing payment cancellation: " + e.getMessage());

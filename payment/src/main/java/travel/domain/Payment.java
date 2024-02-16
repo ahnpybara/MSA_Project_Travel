@@ -37,7 +37,7 @@ public class Payment {
         payment.setName(paymentRequested.getName());
         payment.setCharge(paymentRequested.getCharge());
         payment.setUserId(paymentRequested.getUserId());
-        payment.setStatus(PaymentStatus.결제중);
+        payment.setStatus(PaymentStatus.결제전);
         repository().save(payment);
     }
 }
