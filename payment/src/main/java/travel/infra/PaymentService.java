@@ -45,27 +45,24 @@ public class PaymentService {
         this.api = new IamportClient(apiKey, apiSecret);
     }
 
-    public void postPrepare(PaymentDTO request) throws Exception {
+    public PaymentStatus postPrepare(PaymentDTO request) {
         String reservationId = getReservationNumber(request.getMerchant_uid());
         try {
             PrepareData prepareData = new PrepareData(request.getMerchant_uid(), request.getAmount());
-            api.postPrepare(prepareData);
-        } catch (IamportResponseException e) {
-            handlePaymentFailed(reservationId, "Iamport API error during prepare payment: " + e.getMessage(),
-                    PaymentStatus.결제실패);
-            throw new Exception("Iamport API error during prepare payment: " + e.getMessage());
-        } catch (IOException e) {
-            handlePaymentFailed(reservationId, "IO error during prepare payment: " + e.getMessage(),
-                    PaymentStatus.결제실패);
-            throw new Exception("IO error during prepare payment: " + e.getMessage());
+            api.postPrepare(prepareData); // 사전 등록 API
+            return PaymentStatus.성공;
+        } catch (IamportResponseException | IOException e) {
+            return handlePaymentFailed(reservationId, e.getMessage(), PaymentStatus.결제실패);
         }
     }
 
     @Transactional
-    public void validatePayment(PaymentDTO request) {
+    public PaymentStatus validatePayment(PaymentDTO request) {
         String reservationId = getReservationNumber(request.getMerchant_uid());
+        travel.domain.Payment postPayment = null;
         try {
-            travel.domain.Payment postPayment = paymentRepository.findByReservationId(Long.valueOf(reservationId))
+            postPayment = paymentRepository
+                    .findByReservationId(Long.valueOf(reservationId))
                     .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
 
             BigDecimal postAmount = BigDecimal.valueOf(postPayment.getCharge());
@@ -86,20 +83,21 @@ public class PaymentService {
             Paid paid = new Paid(postPayment);
             paid.publishAfterCommit();
 
-        } catch (IamportResponseException e) {
-            handlePaymentFailed(reservationId, e.getMessage(), PaymentStatus.결제실패);
-            throw new RuntimeException("Iamport API error during payment validation: " + e.getMessage());
-        } catch (IOException | IllegalStateException e) {
-            handlePaymentFailed(reservationId, e.getMessage(), PaymentStatus.결제실패);
-            throw new RuntimeException(e.getMessage());
+            return PaymentStatus.성공;
+
+        } catch (IamportResponseException | IOException | IllegalStateException | IllegalArgumentException e) {
+            return handlePaymentFailed(reservationId, e.getMessage(), PaymentStatus.결제실패);
         }
     }
 
     @Transactional
-    public void cancelPayment(String merchant_uid) {
-        String reservationId = getReservationNumber(merchant_uid);
+    public PaymentStatus cancelPayment(PaymentDTO request) {
+        String reservationId = getReservationNumber(request.getMerchant_uid());
+        travel.domain.Payment postPayment = null;
+        System.out.println();
         try {
-            travel.domain.Payment postPayment = paymentRepository.findByReservationId(Long.valueOf(reservationId))
+            postPayment = paymentRepository
+                    .findByReservationId(Long.valueOf(reservationId))
                     .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
             IamportResponse<Payment> iamportResponse = api.paymentByImpUid(postPayment.getImp_uid());
             Payment payment = iamportResponse.getResponse();
@@ -114,15 +112,13 @@ public class PaymentService {
                 PaymentCancelled paymentCancelled = new PaymentCancelled(postPayment);
                 paymentCancelled.publishAfterCommit();
 
+                return PaymentStatus.성공;
+
             } else {
                 throw new IllegalStateException("Payment is not completed yet");
             }
-        } catch (IamportResponseException e) {
-            handlePaymentFailed(reservationId, e.getMessage(), PaymentStatus.결제취소실패);
-            throw new RuntimeException("Iamport API error during payment validation: " + e.getMessage());
-        } catch (IOException | IllegalStateException e) {
-            handlePaymentFailed(reservationId, e.getMessage(), PaymentStatus.결제취소실패);
-            throw new RuntimeException(e.getMessage());
+        } catch (IamportResponseException | IOException | IllegalArgumentException | IllegalStateException e) {
+            return handlePaymentFailed(reservationId, e.getMessage(), PaymentStatus.결제취소실패);
         }
     }
 
@@ -134,7 +130,7 @@ public class PaymentService {
         return ""; // "_"가 없는 경우 빈 문자열 반환
     }
 
-    private void handlePaymentFailed(String reservationId, String errorMessage, PaymentStatus status) {
+    private PaymentStatus handlePaymentFailed(String reservationId, String errorMessage, PaymentStatus status) {
         AbstractEvent event;
         switch (status) {
             case 결제실패:
@@ -150,8 +146,8 @@ public class PaymentService {
             default:
                 throw new IllegalArgumentException("Invalid payment status: " + status);
         }
-
         event.publishAfterCommit();
         System.out.println(errorMessage);
+        return PaymentStatus.실패;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import travel.domain.PaymentRepository;
+import travel.domain.PaymentStatus;
 import travel.domain.PaymentCancelled;
 import travel.domain.PaymentDTO;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,38 +29,41 @@ public class PaymentController {
 
     @PostMapping("/prepare")
     public ResponseEntity<String> preparePayment(@RequestBody PaymentDTO request) {
-        try {
-            paymentService.postPrepare(request);
-            System.out.println("Prepare payment succeeded");
-            return ResponseEntity.ok("사전 검증 성공");
-        } catch (Exception e) {
-            System.out.println("Prepare payment failed: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("사전 검증 실패: " + e.getMessage());
+        PaymentStatus paymentResult = paymentService.postPrepare(request);
+
+        if (paymentResult == PaymentStatus.실패) {
+            System.out.println("Prepare payment failed");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사전 검증 실패");
         }
+
+        System.out.println("Prepare payment Testing Processing...");
+        return ResponseEntity.ok("사전 검증 진행 성공");
     }
 
     @PostMapping("/validate")
     public ResponseEntity<String> validatePayment(@RequestBody PaymentDTO request) {
-        try {
-            paymentService.validatePayment(request);
-            System.out.println("Validate payment succeeded");
-            return ResponseEntity.ok("사후 검증 성공");
-        } catch (Exception e) {
-            System.out.println("Validate payment failed: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("사후 검증 실패: " + e.getMessage());
+        PaymentStatus paymentResult = paymentService.validatePayment(request);
+
+        if (paymentResult == PaymentStatus.실패) {
+            System.out.println("Validate payment failed");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사후 검증 실패");
         }
+
+        System.out.println("Validate payment succeeded");
+        return ResponseEntity.ok("사후 검증 성공");
     }
 
     @PostMapping("/cancel")
     public ResponseEntity<String> cancelPayment(@RequestBody PaymentDTO request) {
-        try {
-            paymentService.cancelPayment(request.getMerchant_uid());
-            System.out.println("Payment cancellation succeeded");
-            return ResponseEntity.ok("결제 취소 성공");
-        } catch (Exception e) {
-            System.out.println("Payment cancellation failed: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("결제 취소 실패: " + e.getMessage());
+        PaymentStatus paymentResult = paymentService.cancelPayment(request);
+
+        if (paymentResult == PaymentStatus.실패) {
+            System.out.println("Payment cancellation failed");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("결제 취소 실패");
         }
+
+        System.out.println("Payment cancellation succeeded");
+        return ResponseEntity.ok("결제 취소 성공");
     }
 
     @PostMapping("/fail")
@@ -75,12 +79,11 @@ public class PaymentController {
 
             System.out.println("Payment cancellation notify succeeded");
 
-            return ResponseEntity.ok("결제 취소됨 알림 성공");
+            return ResponseEntity.ok("Payment cancellation notify succeeded");
 
         } catch (Exception e) {
             System.out.println("Error occurred while processing payment cancellation: " + e.getMessage());
-            return new ResponseEntity<>("Error occurred while processing payment cancellation: " + e.getMessage(),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("결제 취소 요청 알림 실패");
         }
     }
 }
