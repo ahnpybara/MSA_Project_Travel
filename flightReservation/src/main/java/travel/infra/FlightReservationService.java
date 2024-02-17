@@ -89,7 +89,7 @@ public void validateAndProcessReservation(String reservationHash, FlightReservat
         // 새로운 상태로 업데이트
         reservation.setStatus(newStatus);
         
-        // 업데이트된 예약 정보 저장
+        // 업데이트된 예약 정보 저장 test
         return flightReservationRepository.save(reservation);
     }
 }
