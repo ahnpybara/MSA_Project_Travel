@@ -30,7 +30,7 @@ public class FlightController {
         Long startTimestamp = Long.parseLong(depPlandTime + "0000");
         Long endTimestamp = Long.parseLong(depPlandTime + "2359");
 
-        // 출발 공항 ID, 도착 공항 ID, 출발 시간, 도착 시간을 조건으로 하는 항공편을 찾습니다.
+        // 출발 공항 ID, 도착 공항 ID, 출발 시간, 도착 시간을 조건으로 하는 항공편을 찾습니다..
         List<Flight> flights = flightService.findFlights(depAirportId, arrAirportId, startTimestamp, endTimestamp);
 
         // 파라미터 유효성 검사 필요?? 감이 안옴..
