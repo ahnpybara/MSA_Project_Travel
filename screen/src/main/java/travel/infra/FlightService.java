@@ -66,7 +66,7 @@ public class FlightService {
         String depAirportNm = convertAirportIdToNm(depAirportId);
         String arrAirportNm = convertAirportIdToNm(arrAirportId);
         // 출발 공항 이름, 도착 공항 이름, 출발 시간, 도착 시간을 조건으로 하는 항공편을 찾습니다. 만약 해당 조건에 맞는 항공편이 없다면 빈 리스트를 반환합니다
-        return (List<Flight>) Optional.ofNullable(flightRepository.findByDepAirportAndArrAirportAndDepTimeBetween(depAirportNm, arrAirportNm, startTimestamp, endTimestamp))
+        return Optional.ofNullable(flightRepository.findByDepAirportAndArrAirportAndDepTimeBetween(depAirportNm, arrAirportNm, startTimestamp, endTimestamp))
                 .orElse(Collections.emptyList());
     }
 

@@ -52,5 +52,23 @@ public class PolicyHandler {
         // Sample Logic //
         FlightReservation.paymentCancel(event);
     }
+
+    @StreamListener(
+        value = KafkaProcessor.INPUT,
+        condition = "headers['type']=='FlightBookRequested'"
+    )
+    public void wheneverFlightBookRequested_RequestFlightReservtion(
+        @Payload FlightBookRequested flightBookRequested
+    ) {
+        FlightBookRequested event = flightBookRequested;
+        System.out.println(
+            "\n\n##### listener RequestFlightReservtion : " +
+            flightBookRequested +
+            "\n\n"
+        );
+
+        // Sample Logic //
+        FlightReservation.requestFlightReservtion(event);
+    }
 }
 //>>> Clean Arch / Inbound Adaptor

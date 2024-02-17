@@ -1,40 +1,48 @@
 package travel.domain;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Data;
 import travel.ScreenApplication;
 
 @Entity
-@Table(name = "Flight_table")
 @Data
-//<<< DDD / Aggregate Root
 public class Flight {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @JsonProperty("airlineNm")
     private String airLine;
 
+    @JsonProperty("arrAirportNm")
     private String arrAirport;
 
+    @JsonProperty("depAirportNm")
     private String depAirport;
 
-    private Date arrTime;
+    @JsonProperty("arrPlandTime")
+    private Long arrTime;
 
-    private Date depTime;
+    @JsonProperty("depPlandTime")
+    private Long depTime;
 
-    private Long charge;
+    private Long economyCharge = 57900L;
+
+    private Long prestigeCharge = 87900L;
 
     private String vihicleId;
 
-    private Long seatCapacity;
+    private Long seatCapacity = 100L;
 
     @PostPersist
-    public void onPostPersist() {}
+    public void onPostPersist() {
+        FlightBookRequested flightBookRequested = new FlightBookRequested(this);
+        flightBookRequested.publishAfterCommit();
+    }
 
     public static FlightRepository repository() {
         FlightRepository flightRepository = ScreenApplication.applicationContext.getBean(
@@ -69,7 +77,7 @@ public class Flight {
     //>>> Clean Arch / Port Method
     //<<< Clean Arch / Port Method
     public static void reservationCancellationStatus(
-        FlightbookCancelled flightbookCancelled
+        PaymentCnlRequested paymentCnlRequested
     ) {
         //implement business logic here:
 
@@ -81,7 +89,7 @@ public class Flight {
 
         /** Example 2:  finding and process
         
-        repository().findById(flightbookCancelled.get???()).ifPresent(flight->{
+        repository().findById(paymentCnlRequested.get???()).ifPresent(flight->{
             
             flight // do something
             repository().save(flight);

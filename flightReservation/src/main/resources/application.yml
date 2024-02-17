@@ -45,10 +45,6 @@ logging:
     org.hibernate.type: trace
     org.springframework.cloud: debug
 
-api:
-  url: 
-    flightReservation: localhost:8083 
-    
 
 server:
   port: 8083
@@ -85,8 +81,4 @@ spring:
           destination: travel
           contentType: application/json
 
-api:
-  url: 
-    flightReservation: flightReservation:8080 
-    
 

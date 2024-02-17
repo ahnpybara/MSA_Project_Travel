@@ -46,29 +46,14 @@ public class FlightReservation {
         PaymentRequested paymentRequested = new PaymentRequested(this);
         paymentRequested.publishAfterCommit();
 
-        // PaymentCnlRequested paymentCnlRequested = new PaymentCnlRequested(this);
-        // paymentCnlRequested.publishAfterCommit();
+        PaymentCnlRequested paymentCnlRequested = new PaymentCnlRequested(this);
+        paymentCnlRequested.publishAfterCommit();
 
-        // FlightBookCompleted flightBookCompleted = new FlightBookCompleted(this);
-        // flightBookCompleted.publishAfterCommit();
+        FlightBookCompleted flightBookCompleted = new FlightBookCompleted(this);
+        flightBookCompleted.publishAfterCommit();
 
-        // FlightbookCancelled flightbookCancelled = new FlightbookCancelled(this);
-        // flightbookCancelled.publishAfterCommit();
-        // Get request from FlightReservation
-        //travel.external.FlightReservation flightReservation =
-        //    Application.applicationContext.getBean(travel.external.FlightReservationService.class)
-        //    .getFlightReservation(/** mapping value needed */);
-
-    }
-
-    public void reserve(FlightBookCompleted flightBookCompleted){
-        setAirLine(flightBookCompleted.getAirLine());
-        setArrAirport(flightBookCompleted.getArrAirport());
-        setDepAirport(flightBookCompleted.getDepAirport());
-        setArrTime(flightBookCompleted.getArrTime());
-        setDepTime(flightBookCompleted.getDepTime());
-        setCharge(flightBookCompleted.getCharge());
-        setVihicleId(flightBookCompleted.getVihicleId());
+        FlightbookCancelled flightbookCancelled = new FlightbookCancelled(this);
+        flightbookCancelled.publishAfterCommit();
     }
 
     public static FlightReservationRepository repository() {
@@ -127,6 +112,36 @@ public class FlightReservation {
 
             FlightbookCancelled flightbookCancelled = new FlightbookCancelled(flightReservation);
             flightbookCancelled.publishAfterCommit();
+
+         });
+        */
+
+    }
+
+    //>>> Clean Arch / Port Method
+    //<<< Clean Arch / Port Method
+    public static void requestFlightReservtion(
+        FlightBookRequested flightBookRequested
+    ) {
+        //implement business logic here:
+
+        /** Example 1:  new item 
+        FlightReservation flightReservation = new FlightReservation();
+        repository().save(flightReservation);
+
+        PaymentRequested paymentRequested = new PaymentRequested(flightReservation);
+        paymentRequested.publishAfterCommit();
+        */
+
+        /** Example 2:  finding and process
+        
+        repository().findById(flightBookRequested.get???()).ifPresent(flightReservation->{
+            
+            flightReservation // do something
+            repository().save(flightReservation);
+
+            PaymentRequested paymentRequested = new PaymentRequested(flightReservation);
+            paymentRequested.publishAfterCommit();
 
          });
         */
