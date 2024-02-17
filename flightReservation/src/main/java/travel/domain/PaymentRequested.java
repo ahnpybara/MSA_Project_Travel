@@ -19,9 +19,10 @@ public class PaymentRequested extends AbstractEvent {
     private Date depTime;
     private Long charge;
     private String vihicleId;
-    private String status;
+    private Status status;
     private Long userId;
     private String passenger;
+    private String reservationHash;
 
     public PaymentRequested(FlightReservation aggregate) {
         super(aggregate);

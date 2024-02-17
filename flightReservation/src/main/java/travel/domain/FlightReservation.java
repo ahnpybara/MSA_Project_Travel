@@ -41,6 +41,8 @@ public class FlightReservation {
 
     private String name;
 
+    private String reservationHash;
+
     @PostPersist
     public void onPostPersist() {
         PaymentRequested paymentRequested = new PaymentRequested(this);

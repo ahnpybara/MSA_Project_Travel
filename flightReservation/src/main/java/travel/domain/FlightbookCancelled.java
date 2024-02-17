@@ -22,6 +22,7 @@ public class FlightbookCancelled extends AbstractEvent {
     private Status status;
     private Long userId;
     private String passenger;
+    private String reservationHash;
 
     public FlightbookCancelled(FlightReservation aggregate) {
         super(aggregate);
