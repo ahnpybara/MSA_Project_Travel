@@ -10,7 +10,7 @@ import travel.infra.AbstractEvent;
 @Data
 @ToString
 public class LoggedIn extends AbstractEvent {
-
+//.
     private Long id;
     private String password;
     private String name;

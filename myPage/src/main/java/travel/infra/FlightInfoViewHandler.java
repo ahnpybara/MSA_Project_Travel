@@ -55,7 +55,7 @@ public class FlightInfoViewHandler {
 
             List<FlightInfo> flightInfoList = flightInfoRepository.findByUserId(
                 flightbookCancelled.getUserId()
-            );
+            ); 
             for (FlightInfo flightInfo : flightInfoList) {
                 // view 객체에 이벤트의 eventDirectValue 를 set 함
                 flightInfo.setStatus("예약취소");
