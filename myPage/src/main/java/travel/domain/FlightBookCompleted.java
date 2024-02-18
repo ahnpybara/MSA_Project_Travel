@@ -19,5 +19,5 @@ public class FlightBookCompleted extends AbstractEvent {
     private String vihicleId;
     private String status;
     private Long userId;
-    private String passenger;
+    private String name;
 }

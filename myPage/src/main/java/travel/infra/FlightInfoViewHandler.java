@@ -22,7 +22,7 @@ public class FlightInfoViewHandler {
             FlightInfo flightInfo = new FlightInfo();
             flightInfo.setId(flightBookCompleted.getId());
             flightInfo.setUserId(flightBookCompleted.getUserId());
-            flightInfo.setName(flightBookCompleted.getPassenger());
+            flightInfo.setName(flightBookCompleted.getName());
             flightInfo.setAirLine(flightBookCompleted.getAirLine());
             flightInfo.setArrAirport(flightBookCompleted.getArrAirport());
             flightInfo.setDepAirport(flightBookCompleted.getDepAirport());
