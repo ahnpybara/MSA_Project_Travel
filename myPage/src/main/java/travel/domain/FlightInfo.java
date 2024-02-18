@@ -1,12 +1,9 @@
 package travel.domain;
 
-import java.time.LocalDate;
 import java.util.Date;
-import java.util.List;
 import javax.persistence.*;
 import lombok.Data;
 
-//<<< EDA / CQRS
 @Entity
 @Table(name = "FlightInfo_table")
 @Data
@@ -25,5 +22,5 @@ public class FlightInfo {
     private Date depTime;
     private Long charge;
     private String vihicleId;
-    private String status;
+    private FlightStatus status;
 }
