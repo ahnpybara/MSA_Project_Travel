@@ -1,11 +1,12 @@
 package travel.domain;
 
-import java.time.LocalDate;
 import java.util.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import travel.infra.AbstractEvent;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class FlightBookCompleted extends AbstractEvent {
 
     private Long id;
