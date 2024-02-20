@@ -20,9 +20,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import feign.FeignException;
 import net.bytebuddy.implementation.bytecode.Throw;
 import travel.domain.*;
-
+import travel.external.*;
 @Service
 public class FlightReservationService {
     
@@ -30,14 +31,32 @@ public class FlightReservationService {
     private FlightReservationRepository flightReservationRepository;
 
     @Autowired
-    private Scheduler scheduler;
+    private FlightService flightService;
 
 
-    public FlightReservation saveFlightReservation(FlightReservation flightReservation){            // 예약 저장 로직
-        return flightReservationRepository.save(flightReservation);
+    // 비행기 좌석을 가져오는 로직
+    public Long searchFlights(String airLine, String arrAirport , String depAirpost, String vihicleId){
+        try {
+            Flight flight = flightService.searchFlights(airLine, arrAirport, depAirpost, vihicleId); 
+            return flight.getSeatCapacity();
+        } catch (FeignException.NotFound e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "비행 일정을 찾을수 없습니다.");
+        } catch ( FeignException e){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error accessing flight service");
+        }
     }
-    
-public void validateAndProcessReservation(String reservationHash, FlightReservation flightReservation) throws ResponseStatusException {
+    public void checkSeatCapacity(FlightReservation flightReservation){
+        
+        Long seatCapacity =searchFlights(flightReservation.getAirLine(), flightReservation.getArrAirport(), flightReservation.getDepAirport(), flightReservation.getVihicleId());
+        
+        if (seatCapacity <= 0){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "좌석이 부족합니다.");
+        }
+        
+    }
+
+    //예약과정을 검증하고 상태변환 시키는  비지니스 로직
+    public void validateAndProcessReservation(String reservationHash, FlightReservation flightReservation) throws ResponseStatusException {
     Optional<FlightReservation> existingReservation = flightReservationRepository.findByReservationHash(reservationHash);
     
     if (existingReservation.isPresent()) {
@@ -48,7 +67,7 @@ public void validateAndProcessReservation(String reservationHash, FlightReservat
             case 결제완료:
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 예매 내역이 존재 합니다.");
             case 취소완료:
-                // 취소된 예약에 대한 처리: 상태 변경 또는 다른 처리
+                // 취소된 예약에 대한 처리
                 existing.setStatus(Status.결제대기);
                 flightReservationRepository.save(existing);
                 throw new ResponseStatusException(HttpStatus.OK, "취소 완료된 예약이 재활성화되었습니다.");
@@ -62,7 +81,7 @@ public void validateAndProcessReservation(String reservationHash, FlightReservat
 }
 
     
-    
+    // 해쉬값을 생성하는 로직
     public String createHashKey(FlightReservation flightReservation) throws NoSuchAlgorithmException {           // 해쉬값 생성
         
         String input = flightReservation.getUserId() + flightReservation.getAirLine() + flightReservation.getDepAirport()
@@ -81,6 +100,7 @@ public void validateAndProcessReservation(String reservationHash, FlightReservat
 
         return hexString.toString();
     }
+    
     public FlightReservation updateReservationStatus(Long reservationId, Status newStatus) {
         // 예약 ID로 예약 객체를 찾음
         FlightReservation reservation = flightReservationRepository.findById(reservationId)

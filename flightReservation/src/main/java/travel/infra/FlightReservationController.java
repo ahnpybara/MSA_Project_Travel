@@ -32,12 +32,12 @@ public class FlightReservationController {
         if (flightReservation == null) {              
             return ResponseEntity.badRequest().body("Invalid reservation data.");
         }
+        flightReservationService.checkSeatCapacity(flightReservation);
         
         String flightReservationHash = flightReservationService.createHashKey(flightReservation);
     
         try {
             flightReservationService.validateAndProcessReservation(flightReservationHash, flightReservation);
-            // 이후 로직은 validateAndProcessReservation 메서드 내에서 예외 발생 시 중단됩니다.
         } catch (ResponseStatusException e) {
             // 예외 발생 시 프론트엔드로부터 받은 메시지와 상태 코드 반환
             return ResponseEntity.status(e.getStatus()).body(e.getMessage());
@@ -46,6 +46,7 @@ public class FlightReservationController {
         // 모든 검증을 통과한 경우, 생성된 예약 정보 반환
         return ResponseEntity.status(HttpStatus.CREATED).body(flightReservation);
     }
+
     // 요청하기위해 상태변경 * 임시 추가* 
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateReservationStatus(@PathVariable Long id, @RequestBody Status status) {
