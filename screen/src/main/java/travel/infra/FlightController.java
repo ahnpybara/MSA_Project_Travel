@@ -22,10 +22,12 @@ public class FlightController {
     @Autowired
     private FlightService flightService;
 
-    @GetMapping("/flights/search")
-    public List<Flight> getAndSaveFlightData(@RequestParam String depAirportId, @RequestParam String arrAirportId,
-            @RequestParam String depPlandTime) {
+    @PostMapping("/flights/search")
+    public List<Flight> getAndSaveFlightData(@RequestBody FlightDTO request) {
 
+        String depAirportId = request.getDepAirport();
+        String arrAirportId = request.getArrAirport();
+        String depPlandTime = request.getDepTime();
         // DB에는 년/월/일/시/분 단위로 저장되지만, 전달되는 데이터는 년/월/일 단위로 전달되기 때문에 DB 조회를 위해서 형식을 맞춤
         Long startTimestamp = Long.parseLong(depPlandTime + "0000");
         Long endTimestamp = Long.parseLong(depPlandTime + "2359");

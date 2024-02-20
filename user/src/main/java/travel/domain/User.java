@@ -62,8 +62,6 @@ public class User {
     }
 
     public void register(SignedUp signedUp) {
-        validateDuplicate(signedUp.getUsername());
-
         setName(signedUp.getName());
         setPassword(signedUp.getPassword());
         setUsername(signedUp.getUsername());
@@ -74,12 +72,6 @@ public class User {
             setRoles("ROLE_USER");
         }
     }
-    //중복 검사
-    public void validateDuplicate(String username){
-        Optional<User> optionalUser = repository().findByUsername(username);
-        if(optionalUser.isPresent()){
-            throw new IllegalArgumentException("이미 사용 중인 아이디 입니다.");
-        }
-    }
+   
 }
 // >>> DDD / Aggregate Root
