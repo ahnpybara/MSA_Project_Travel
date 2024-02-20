@@ -38,7 +38,7 @@ spring:
         - id: myPage
           uri: http://localhost:8085
           predicates:
-            - Path=
+            - Path=/flightInfos/**,
           filters:
             - AuthorizationFilter
 

@@ -43,17 +43,8 @@ public class FlightReservation {
 
     @PostPersist
     public void onPostPersist() {
-        PaymentRequested paymentRequested = new PaymentRequested(this);
-        paymentRequested.publishAfterCommit();
-
-        PaymentCnlRequested paymentCnlRequested = new PaymentCnlRequested(this);
-        paymentCnlRequested.publishAfterCommit();
-
         FlightBookCompleted flightBookCompleted = new FlightBookCompleted(this);
         flightBookCompleted.publishAfterCommit();
-
-        FlightbookCancelled flightbookCancelled = new FlightbookCancelled(this);
-        flightbookCancelled.publishAfterCommit();
     }
 
     public static FlightReservationRepository repository() {

@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {// 생성자
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
-        // 로그인 주소를 변경합니다.
+        // 로그인 주소를 변경합니다
         this.setFilterProcessesUrl("/users/login");
     }
 
