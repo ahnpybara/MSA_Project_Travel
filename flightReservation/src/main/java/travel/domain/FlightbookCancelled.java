@@ -10,7 +10,7 @@ import travel.infra.AbstractEvent;
 @Data
 @ToString
 public class FlightbookCancelled extends AbstractEvent {
-
+    
     private Long id;
     private String airLine;
     private String arrAirport;
