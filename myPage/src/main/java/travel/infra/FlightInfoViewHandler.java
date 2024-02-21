@@ -34,7 +34,7 @@ public class FlightInfoViewHandler {
 
             flightInfoRepository.save(flightInfo);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("예약정보를 저장하는 도중 문제가 발생했습니다. : " + e);
         }
     }
 
@@ -50,7 +50,7 @@ public class FlightInfoViewHandler {
                 flightInfoRepository.save(flightInfo);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("예약정보를 저장하는 도중 문제가 발생했습니다. : " + e);
         }
     }
 }

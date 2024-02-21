@@ -1,26 +1,16 @@
 package travel.domain;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
 import javax.persistence.*;
-
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import lombok.Builder;
 import lombok.Data;
 import travel.UserApplication;
-import travel.domain.LoggedIn;
-import travel.domain.SignedUp;
 
 @Entity
 @Table(name = "User_table")
 @Data
-// <<< DDD / Aggregate Root
 public class User {
 
     @Id
@@ -82,4 +72,3 @@ public class User {
         }
     }
 }
-// >>> DDD / Aggregate Root
