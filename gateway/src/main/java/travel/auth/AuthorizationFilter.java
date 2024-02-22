@@ -23,7 +23,7 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
     public AuthorizationFilter() {
 
         super(Config.class);
-        this.webClient = WebClient.create("http://localhost:8088");
+        this.webClient = WebClient.create("http://34.69.178.156:8080");
     }
 
     @Override
