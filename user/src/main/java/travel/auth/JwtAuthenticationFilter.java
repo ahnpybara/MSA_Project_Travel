@@ -65,7 +65,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
             logger.info(principalDetails.getUser().getUsername());
 
-            return authentication;
+            return authentication;  
         } catch (IOException e) {
             throw new RuntimeException("로그인 정보 읽기 실패", e);
         } catch (AuthenticationException e) {
@@ -120,7 +120,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // 응답 데이터에 ID 추가
         Map<String, String> data = new HashMap<>();
         data.put("userId", principalDetails.getUser().getId().toString());
-
+        data.put("name",principalDetails.getUser().getName());
+        data.put("username", principalDetails.getUser().getUsername());
         // JSON 형식으로 응답 작성
         response.setContentType("application/json");
         new ObjectMapper().writeValue(response.getOutputStream(), data);
