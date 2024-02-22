@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import reactor.core.publisher.Mono;
@@ -33,7 +32,7 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
     // 생성자에서 WebClient 인스턴스를 초기화
     public AuthorizationFilter() {
         super(Config.class);
-        this.webClient = WebClient.create("http://localhost:8088");
+        this.webClient = WebClient.create("http://34.69.178.156:8080");
     }
 
     // GatewayFilter를 반환하는 메소드

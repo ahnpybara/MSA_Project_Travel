@@ -2,9 +2,7 @@ package travel.infra;
 
 import travel.domain.Flight;
 import travel.domain.FlightRepository;
-
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,8 +68,9 @@ public class FlightService {
             String arrAirportNm = convertAirportIdToNm(arrAirportId);
             return flightRepository.findByDepAirportAndArrAirportAndDepTimeBetween(depAirportNm, arrAirportNm,
                     startTimestamp, endTimestamp);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            System.out.println("공항Id의 정보가 잘못되었습니다 : " + e);
+            throw new IllegalArgumentException(e);
         }
     }
 
@@ -92,16 +91,16 @@ public class FlightService {
 
             // RestTemplate를 사용하여 API를 호출하고, 그 결과를 문자열 형태로 반환합니다.
             return restTemplate.getForObject(uri, String.class);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException("Invalid URL: " + url, e); // 원래의 예외를 감싸는 새로운 예외를 던집니다.
+        } catch (Exception e) {
+            System.out.println("항공편 api를 호출하는 도중 예상치 못한 오류가 발생했습니다 : " + e);
+            throw new IllegalArgumentException("Failed Flight API Call : " + e); 
         }
     }
 
-    // 항공편 API에서 받아온 JSON 형태의 문자열을 Flight 객체로 변환하고, 그 결과를 데이터베이스에 저장한 뒤 저장된 Flight
-    // 객체들을 반환하는 메서드입니다
-    @Transactional(rollbackFor = Exception.class)
+    // 항공편 API에서 받아온 JSON 형태의 문자열을 Flight 객체로 변환하고, 그 결과를 데이터베이스에 저장한 뒤 저장된 Flight 객체들을 반환하는 메서드입니다
+    @Transactional(rollbackFor = RollBackException.class)
     public List<Flight> saveFlightData(String jsonData) {
-        ObjectMapper objectMapper = new ObjectMapper(); // JSON 파싱에 사용되는 클래스의 인스턴스를 생성
+        ObjectMapper objectMapper = new ObjectMapper(); // JSON 파싱에 사용되는 클래스의 인스턴스를 생성합니다
         List<Flight> savedFlights = new ArrayList<>(); // 데이터베이스에 저장된 Flight 객체들을 담을 리스트를 생성합니다
 
         try {
@@ -120,14 +119,13 @@ public class FlightService {
                 for (Flight flight : flights) {
                     Flight savedFlight = flightRepository.save(flight);
                     savedFlights.add(savedFlight); // 저장된 Flight 객체를 리스트에 추가합니다.
-
                 }
             } else {
                 System.out.println("항공편 정보가 존재하지 않습니다");
             }
         } catch (Exception e) {
             System.out.println("Failed to save Flights : " + e);
-            return null;
+            throw new RollBackException("롤백 트랜잭션"); // DB와 상화작용하는 메서드이므로 예외 발생시 트랜잭션을 롤백시키도록 합니다
         }
         return savedFlights; // 데이터베이스에 저장된 Flight 객체들을 반환합니다.
     }

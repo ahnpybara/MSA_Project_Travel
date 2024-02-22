@@ -8,6 +8,17 @@ spring:
 
 spring:
   profiles: default
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ahnpybara7627@gmail.com
+    password: xwal fsih otqg ophi
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   jpa:
     properties:
       hibernate:

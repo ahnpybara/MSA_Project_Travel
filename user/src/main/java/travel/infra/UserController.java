@@ -1,7 +1,6 @@
 package travel.infra;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
