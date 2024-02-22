@@ -2,12 +2,16 @@ package travel.auth;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.StandardCharsets;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpStatus;
@@ -15,95 +19,133 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-
 @Component
+// 토큰을 검증하고 필요한 경우 재발급하는 필터
 public class AuthorizationFilter extends AbstractGatewayFilterFactory<AuthorizationFilter.Config> {
 
+    // 로그를 위한 Logger 인스턴스
+    private static final Logger logger = LoggerFactory.getLogger(AuthorizationFilter.class);
+
+    // HTTP 요청을 보내기 위한 WebClient 인스턴스
     private WebClient webClient;
 
+    // 생성자에서 WebClient 인스턴스를 초기화
     public AuthorizationFilter() {
-
         super(Config.class);
-        this.webClient = WebClient.create("http://localhost:8088");
+        this.webClient = WebClient.create("http://34.69.178.156:8080");
     }
 
+    // GatewayFilter를 반환하는 메소드
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
+            // 요청 헤더에서 "Authorization" 헤더를 가져옴
             String authorizationHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
 
+            // "Authorization" 헤더가 없거나 "Bearer "로 시작하지 않으면 로그를 남기고 401 Unauthorized 응답을 반환
             if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-                System.out.println("============================================================================ 토큰을 다시 확인할 것 ");
+                logger.error("로그인 상태 및 토큰을 다시 확인할 것");
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().setComplete();
             }
 
-            String token = authorizationHeader.substring(7);
+            // "Bearer " 다음에 오는 문자열을 토큰으로 사용
+            String token = authorizationHeader.substring(JwtProperties.TOKEN_PREFIX.length());
 
-            if (isTokenExpired(token)) {
+            try {
+                // 토큰을 검증
+                verifyToken(token);
+                // 검증이 성공하면 필터 체인을 계속 실행
+                return chain.filter(exchange);
+            } catch (TokenExpiredException e) {
+                // 토큰이 만료된 경우
+                String username;
+                try {
+                    // 토큰에서 "username" 클레임을 추출
+                    DecodedJWT decodedJWT = JWT.decode(token);
+                    Claim usernameClaim = decodedJWT.getClaim("username");
+                    if (usernameClaim.isNull()) {
+                        throw new JWTVerificationException("username claim이 없습니다.");
+                    }
+                    username = usernameClaim.asString();
+                } catch (Exception ex) {
+                    // 토큰 디코딩에 실패한 경우 로그를 남기고 401 Unauthorized 응답을 반환
+                    logger.error("토큰 디코딩 실패", ex);
+                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                    return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory()
+                            .wrap("토큰 디코딩에 실패했습니다.".getBytes(StandardCharsets.UTF_8))));
+                }
 
-                DecodedJWT decodedJWT = JWT.decode(token); 
-                String username = decodedJWT.getClaim("username").asString();
-
-
-                return getRefreshToken(username)
-                    .flatMap(this::requestNewToken)
-                    .flatMap(newToken -> {
-                        exchange.getResponse().getHeaders().set("authorization", "Bearer " + newToken);
-                        return chain.filter(exchange);
-                    });
+                try {
+                    // 리프레시 토큰을 가져와서 새 토큰을 발급받음
+                    return getRefreshToken(username)
+                            .flatMap(this::requestNewToken)
+                            .flatMap(newToken -> {
+                                // 새 토큰을 응답 헤더에 설정하고 필터 체인을 계속 실행
+                                exchange.getResponse().getHeaders().set("authorization", "Bearer " + newToken);
+                                return chain.filter(exchange);
+                            });
+                } catch (Exception ex) {
+                    // 토큰 재발급에 실패한 경우 로그를 남기고 500 Internal Server Error 응답을 반환
+                    logger.error("토큰 재발급 실패", ex);
+                    exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+                    return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory()
+                            .wrap("토큰 재발급에 실패했습니다.".getBytes(StandardCharsets.UTF_8))));
+                }
+            } catch (Exception e) {
+                // 토큰 검증에 실패한 경우 로그를 남기고 401 Unauthorized 응답을 반환
+                logger.error("토큰 검증 실패", e);
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory()
+                        .wrap("토큰 검증에 실패했습니다.".getBytes(StandardCharsets.UTF_8))));
             }
-            return chain.filter(exchange);
         };
     }
 
-    private boolean isTokenExpired(String token) {
+    // 토큰을 검증하는 메소드
+    private void verifyToken(String token) throws Exception {
         try {
             JWT.require(Algorithm.HMAC512(JwtProperties.SECRET.getBytes()))
                     .build()
-                    .verify(token)// 검증
-                    .getClaims();// 검증된 토큰의 claims를 가져옴
-            System.out.println("토큰이 유효함 ");
-            return false;
+                    .verify(token) // 토큰 검증
+                    .getClaims(); // 검증된 토큰의 클레임을 가져옴
+            logger.info("토큰 유효함");
         } catch (TokenExpiredException e) {
-            return true;
+            logger.error("토큰이 만료됨", e);
+            throw e;
+        } catch (JWTVerificationException e) {
+            logger.error("토큰 검증 실패", e);
+            throw e;
         } catch (Exception e) {
-            return true;
+            throw e;
         }
     }
 
-    // 리프레쉬 토큰 알아내기 위한 것
+    // 사용자 이름으로 리프레시 토큰을 가져오는 메소드
     private Mono<String> getRefreshToken(String username) {
         return webClient.get()
                 .uri("/users/{username}/refreshToken", username)
                 .retrieve()
+                .onStatus(HttpStatus::isError, clientResponse -> {
+                    return Mono.error(new RuntimeException("리프레쉬 토큰을 가져오는데 실패하였습니다."));
+                })
                 .bodyToMono(String.class);
     }
-
+    
+    // 리프레시 토큰으로 새 토큰을 발급받는 메소드
     private Mono<String> requestNewToken(String refreshToken) {
-        System.out.println("재발급 요청");
+        logger.info("토큰 재발급 요청");
         return webClient.post()
                 .uri("/users/token/refresh")
                 .body(BodyInserters.fromValue(refreshToken))
                 .retrieve()
+                .onStatus(HttpStatus::isError, clientResponse -> {
+                    return Mono.error(new RuntimeException("토큰 재발급 요청에 실패하였습니다."));
+                })
                 .bodyToMono(String.class);
     }
-    // 리액티브 프로그래밍 라이브러리의 핵심 타입 중 하나입니다
-    //Mono가 가지고 있는 '데이터 단일성' 때문입니다. 
-    //Mono는 0개 또는 1개의 결과만을 반환하는 스트림이라는 특징을
-    // 가지고 있습니다. 
-    //Mono를 사용하면, 결과가 필요한 시점에만 데이터를 처리하게 됩니다. 
-    //이렇게 되면 자원을 효율적으로 사용할 수 있게 됩니다.
-    // Mono는 비동기적인 작업의 결과를 나타낼 때 주로 사용됩니다.
-    // 예를 들어, 파일에서 데이터를 읽거나 원격 서비스에서 데이터를 가져오는 등의 작업에서 Mono를 사용할 수 있습니다.
 
-
-
-
-//     효율성: 비동기 프로그래밍을 사용하면, 오래 걸리는 작업을 기다리는 동안 다른 작업을 수행할 수 있습니다. 이로 인해 프로그램의 효율성을 높일 수 있습니다.
-// 응답성: 비동기 프로그래밍을 사용하면, 오래 걸리는 작업을 처리하는 동안도 사용자 인터페이스와 같은 것을 계속해서 업데이트할 수 있습니다. 이로 인해 프로그램의 응답성을 높일 수 있습니다.
-// 병렬성: 비동기 프로그래밍을 사용하면, 여러 작업을 동시에 병렬로 처리할 수 있습니다. 이로 인해 프로그램의 성능을 높일 수 있습니다.
-
+    // 필터 설정을 위한 빈 클래스
     public static class Config {
     }
 }

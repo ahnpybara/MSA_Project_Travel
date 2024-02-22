@@ -1,26 +1,16 @@
 package travel.domain;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
 import javax.persistence.*;
-
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import lombok.Builder;
 import lombok.Data;
 import travel.UserApplication;
-import travel.domain.LoggedIn;
-import travel.domain.SignedUp;
 
 @Entity
 @Table(name = "User_table")
 @Data
-// <<< DDD / Aggregate Root
 public class User {
 
     @Id
@@ -62,8 +52,6 @@ public class User {
     }
 
     public void register(SignedUp signedUp) {
-        validateDuplicate(signedUp.getUsername());
-
         setName(signedUp.getName());
         setPassword(signedUp.getPassword());
         setUsername(signedUp.getUsername());
@@ -74,12 +62,5 @@ public class User {
             setRoles("ROLE_USER");
         }
     }
-    //중복 검사
-    public void validateDuplicate(String username){
-        Optional<User> optionalUser = repository().findByUsername(username);
-        if(optionalUser.isPresent()){
-            throw new IllegalArgumentException("이미 사용 중인 아이디 입니다.");
-        }
-    }
+   
 }
-// >>> DDD / Aggregate Root

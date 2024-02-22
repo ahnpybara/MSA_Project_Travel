@@ -4,7 +4,6 @@ import java.util.*;
 import lombok.*;
 import travel.infra.AbstractEvent;
 
-//<<< DDD / Domain Event
 @Data
 @EqualsAndHashCode(callSuper=false)
 @ToString
@@ -28,4 +27,3 @@ public class FlightBookRequested extends AbstractEvent {
         super();
     }
 }
-//>>> DDD / Domain Event

@@ -26,10 +26,8 @@ public class PrincipalDetailsService implements UserDetailsService {
             User user = optionalUser.get();
             return new PrincipalDetails(user);
         } else {
-            System.out.println("로그인 실패");
+            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username);
         }
-        return null;
-
     }
     
 }
