@@ -1,8 +1,9 @@
-/* package travel.external;
+package travel.external;
 
 import java.util.Date;
 import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,11 +17,9 @@ public interface FlightService {
     public Flight getFlight(@PathVariable("id") Long id);
     //경로 확인해 볼것
     @GetMapping(path = "/flights/search")
-    public Flight searchFlights(@RequestParam("airLine") String airLine,
+    public ResponseEntity<Flight> searchFlights(@RequestParam("airLine") String airLine,
                                 @RequestParam("arrAirport") String arrAirport,
                                 @RequestParam("depAirport") String depAirport,
                                 @RequestParam("vihicleId") String vihicleId);                            
 
-
 }
- */

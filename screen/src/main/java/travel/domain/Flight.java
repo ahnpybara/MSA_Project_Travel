@@ -30,13 +30,13 @@ public class Flight {
     @JsonProperty("depPlandTime")
     private Long depTime;
 
-    private Long economyCharge;
+    private Long economyCharge = 57900L;
 
-    private Long prestigeCharge;
+    private Long prestigeCharge = 87900L;
 
     private String vihicleId;
 
-    private Long seatCapacity;
+    private Long seatCapacity = 100L;
 
     @PostPersist
     public void onPostPersist() {

@@ -10,7 +10,7 @@ import travel.infra.AbstractEvent;
 @Data
 @ToString
 public class FlightBookCompleted extends AbstractEvent {
-
+    
     private Long id;
     private String airLine;
     private String arrAirport;
@@ -21,7 +21,7 @@ public class FlightBookCompleted extends AbstractEvent {
     private String vihicleId;
     private Status status;
     private Long userId;
-    private String passenger;
+    private String name;
     private String reservationHash;
 
     public FlightBookCompleted(FlightReservation aggregate) {

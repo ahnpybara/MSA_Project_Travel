@@ -1,4 +1,4 @@
-/* package travel.external;
+package travel.external;
 
 import java.util.Date;
 import lombok.Data;
@@ -16,4 +16,3 @@ public class Flight {
     private String vihicleId;
     private Long seatCapacity;
 }
- */

@@ -21,8 +21,8 @@ public class PaymentCnlRequested extends AbstractEvent {
     private String vihicleId;
     private Status status;
     private Long userId;
-    private String passenger;
     private String reservationHash;
+    private String name;
 
     public PaymentCnlRequested(FlightReservation aggregate) {
         super(aggregate);

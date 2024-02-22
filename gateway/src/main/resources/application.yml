@@ -1,3 +1,5 @@
+
+  
 server:
   port: 8088
 
@@ -7,28 +9,46 @@ spring:
   profiles: default
   cloud:
     gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+
 #<<< API Gateway / Routes
       routes:
         - id: payment
           uri: http://localhost:8082
           predicates:
-            - Path=/payments/**, 
+            - Path=/payments/**
+          filters:
+            - AuthorizationFilter
+             
         - id: flightReservation
           uri: http://localhost:8083
           predicates:
-            - Path=/flightReservations/**, 
+            - Path=/flightReservations/**
+          filters:
+            - AuthorizationFilter
+
         - id: user
           uri: http://localhost:8084
           predicates:
-            - Path=/users/**, 
+            - Path=/users/**,
+          # filters:
+          #   - AuthorizationFilter
+            
         - id: myPage
           uri: http://localhost:8085
           predicates:
-            - Path=, 
+            - Path=/flightInfos/**,
+          filters:
+            - AuthorizationFilter
+
         - id: screen
           uri: http://localhost:8086
           predicates:
-            - Path=/flights/**, 
+            - Path=/flights/**
+          filters:
+            - AuthorizationFilter
+            
         - id: frontend
           uri: http://localhost:8080
           predicates:
@@ -43,6 +63,8 @@ spring:
               - "*"
             allowedHeaders:
               - "*"
+            exposedHeaders:
+              - "Authorization"
             allowCredentials: true
 
 
@@ -52,27 +74,43 @@ spring:
   profiles: docker
   cloud:
     gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+
       routes:
         - id: payment
           uri: http://payment:8080
           predicates:
-            - Path=/payments/**, 
+            - Path=/payments/**
+          filters:
+            - AuthorizationFilter
+
         - id: flightReservation
           uri: http://flightReservation:8080
           predicates:
-            - Path=/flightReservations/**, 
+            - Path=/flightReservations/**
+          filters:
+            - AuthorizationFilter
+
         - id: user
           uri: http://user:8080
           predicates:
             - Path=/users/**, 
+            
         - id: myPage
           uri: http://myPage:8080
           predicates:
-            - Path=, 
+            - Path=
+          filters:
+            - AuthorizationFilter
+
         - id: screen
           uri: http://screen:8080
           predicates:
-            - Path=/flights/**, 
+            - Path=/flights/**,
+          filters:
+            - AuthorizationFilter
+
         - id: frontend
           uri: http://frontend:8080
           predicates:
@@ -86,6 +124,9 @@ spring:
               - "*"
             allowedHeaders:
               - "*"
+            exposedHeaders:
+              - "Authorization"
+
             allowCredentials: true
 
 server:

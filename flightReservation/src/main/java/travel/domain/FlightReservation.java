@@ -25,7 +25,7 @@ public class FlightReservation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
+    
     private String airLine;
 
     private String arrAirport;
@@ -52,17 +52,8 @@ public class FlightReservation {
     
     @PostPersist
     public void onPostPersist() {
-        PaymentRequested paymentRequested = new PaymentRequested(this);
-        paymentRequested.publishAfterCommit();
-
-        PaymentCnlRequested paymentCnlRequested = new PaymentCnlRequested(this);
-        paymentCnlRequested.publishAfterCommit();
-
         FlightBookCompleted flightBookCompleted = new FlightBookCompleted(this);
         flightBookCompleted.publishAfterCommit();
-
-        FlightbookCancelled flightbookCancelled = new FlightbookCancelled(this);
-        flightbookCancelled.publishAfterCommit();
     }
 
     public static FlightReservationRepository repository() {
@@ -77,7 +68,7 @@ public class FlightReservation {
     public static void paymentComplete(Paid paid) {
         try {
             repository().findById(paid.getReservationId()).ifPresentOrElse(flightReservation->{
-                flightReservation.setStatus(Status.취소완료);
+                flightReservation.setStatus(Status.결제완료);
                 repository().save(flightReservation);
 
                 FlightBookCompleted flightBookCompleted = new FlightBookCompleted(flightReservation);
