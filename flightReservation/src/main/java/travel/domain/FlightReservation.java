@@ -4,6 +4,11 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.*;
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import lombok.Data;
 import travel.FlightReservationApplication;
 import travel.domain.FlightBookCompleted;
@@ -20,7 +25,7 @@ public class FlightReservation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
+    
     private String airLine;
 
     private String arrAirport;
@@ -35,12 +40,16 @@ public class FlightReservation {
 
     private String vihicleId;
 
-    private String status;
+    private Status status;
 
     private Long userId;
 
     private String name;
 
+    private String reservationHash;
+
+    private static final Logger log = LoggerFactory.getLogger(FlightReservation.class);
+    
     @PostPersist
     public void onPostPersist() {
         FlightBookCompleted flightBookCompleted = new FlightBookCompleted(this);
@@ -54,89 +63,80 @@ public class FlightReservation {
         return flightReservationRepository;
     }
 
+
     //<<< Clean Arch / Port Method
     public static void paymentComplete(Paid paid) {
-        //implement business logic here:
+        try {
+            repository().findById(paid.getReservationId()).ifPresentOrElse(flightReservation->{
+                flightReservation.setStatus(Status.결제완료);
+                repository().save(flightReservation);
 
-        /** Example 1:  new item 
-        FlightReservation flightReservation = new FlightReservation();
-        repository().save(flightReservation);
-
-        FlightBookCompleted flightBookCompleted = new FlightBookCompleted(flightReservation);
-        flightBookCompleted.publishAfterCommit();
-        */
-
-        /** Example 2:  finding and process
-        
-        repository().findById(paid.get???()).ifPresent(flightReservation->{
-            
-            flightReservation // do something
-            repository().save(flightReservation);
-
-            FlightBookCompleted flightBookCompleted = new FlightBookCompleted(flightReservation);
-            flightBookCompleted.publishAfterCommit();
-
-         });
-        */
+                FlightBookCompleted flightBookCompleted = new FlightBookCompleted(flightReservation);
+                flightBookCompleted.publishAfterCommit();
+    
+            }, () -> {
+                log.error("don't find flightReservation : ", paid.getReservationId());
+    
+            }); 
+            } catch (Exception e) {
+                log.error("paid event is failed" , e);
+                throw e;
+            }
 
     }
 
     //>>> Clean Arch / Port Method
     //<<< Clean Arch / Port Method
     public static void paymentCancel(PaymentCancelled paymentCancelled) {
-        //implement business logic here:
+        try {
+            repository().findById(paymentCancelled.getReservationId()).ifPresentOrElse(flightReservation->{
+                flightReservation.setStatus(Status.취소완료);
+                repository().save(flightReservation);
 
-        /** Example 1:  new item 
-        FlightReservation flightReservation = new FlightReservation();
-        repository().save(flightReservation);
-
-        FlightbookCancelled flightbookCancelled = new FlightbookCancelled(flightReservation);
-        flightbookCancelled.publishAfterCommit();
-        */
-
-        /** Example 2:  finding and process
-        
-        repository().findById(paymentCancelled.get???()).ifPresent(flightReservation->{
-            
-            flightReservation // do something
-            repository().save(flightReservation);
-
-            FlightbookCancelled flightbookCancelled = new FlightbookCancelled(flightReservation);
-            flightbookCancelled.publishAfterCommit();
-
-         });
-        */
-
+                FlightbookCancelled flightbookCancelled = new FlightbookCancelled(flightReservation);
+                flightbookCancelled.publishAfterCommit();
+    
+            }, () -> {
+                log.error("don't find flightReservation : ", paymentCancelled.getReservationId());
+    
+            }); 
+            } catch (Exception e) {
+                log.error("paymentCancelled event is failed" , e);
+                throw e;
+            }
     }
+     
 
-    //>>> Clean Arch / Port Method
-    //<<< Clean Arch / Port Method
-    public static void requestFlightReservtion(
-        FlightBookRequested flightBookRequested
-    ) {
-        //implement business logic here:
-
-        /** Example 1:  new item 
-        FlightReservation flightReservation = new FlightReservation();
-        repository().save(flightReservation);
-
-        PaymentRequested paymentRequested = new PaymentRequested(flightReservation);
-        paymentRequested.publishAfterCommit();
-        */
-
-        /** Example 2:  finding and process
-        
-        repository().findById(flightBookRequested.get???()).ifPresent(flightReservation->{
-            
-            flightReservation // do something
+    
+    @Transactional
+    public static void paymentFailed(PaymentFailed paymentFailed){
+        try {
+        repository().findById(paymentFailed.getReservationId()).ifPresentOrElse(flightReservation->{
+            flightReservation.setStatus(Status.결제실패);
             repository().save(flightReservation);
+        }, () -> {
+            log.error("don't find flightReservation : ", paymentFailed.getReservationId());
 
-            PaymentRequested paymentRequested = new PaymentRequested(flightReservation);
-            paymentRequested.publishAfterCommit();
-
-         });
-        */
-
+        }); 
+        } catch (Exception e) {
+            log.error("paymentFailed event is failed" , e);
+            throw e;
+        }
+    }
+    @Transactional
+    public static void paymentCancelFailed(PaymentCancelFailed paymentCancelFailed){
+        try {
+            repository().findById(paymentCancelFailed.getReservationId()).ifPresentOrElse(flightReservation->{
+                flightReservation.setStatus(Status.취소실패);
+                repository().save(flightReservation);
+            }, () -> {
+                log.error("don't find flightReservation : ", paymentCancelFailed.getReservationId());
+    
+            }); 
+            } catch (Exception e) {
+                log.error("paymentCancelFailed event is failed" , e);
+                throw e;
+            }
     }
     //>>> Clean Arch / Port Method
 

@@ -1,9 +1,5 @@
 package travel.infra;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import javax.naming.NameParser;
-import javax.naming.NameParser;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.StreamListener;
@@ -52,23 +48,6 @@ public class PolicyHandler {
         // Sample Logic //
         FlightReservation.paymentCancel(event);
     }
-
-    @StreamListener(
-        value = KafkaProcessor.INPUT,
-        condition = "headers['type']=='FlightBookRequested'"
-    )
-    public void wheneverFlightBookRequested_RequestFlightReservtion(
-        @Payload FlightBookRequested flightBookRequested
-    ) {
-        FlightBookRequested event = flightBookRequested;
-        System.out.println(
-            "\n\n##### listener RequestFlightReservtion : " +
-            flightBookRequested +
-            "\n\n"
-        );
-
-        // Sample Logic //
-        FlightReservation.requestFlightReservtion(event);
-    }
+    
 }
 //>>> Clean Arch / Inbound Adaptor
