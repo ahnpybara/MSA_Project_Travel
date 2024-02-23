@@ -37,15 +37,15 @@ public class PolicyHandler {
 
     @StreamListener(
         value = KafkaProcessor.INPUT,
-        condition = "headers['type']=='PaymentCnlRequested'"
+        condition = "headers['type']=='FlightbookCancelled'"
     )
     public void wheneverPaymentCnlRequested_ReservationCancellationStatus(
-        @Payload PaymentCnlRequested paymentCnlRequested
+        @Payload FlightbookCancelled flightbookCancelled
     ) {
-        PaymentCnlRequested event = paymentCnlRequested;
+        FlightbookCancelled event = flightbookCancelled;
         System.out.println(
             "\n\n##### listener ReservationCancellationStatus : " +
-            paymentCnlRequested +
+            flightbookCancelled +
             "\n\n"
         );
 

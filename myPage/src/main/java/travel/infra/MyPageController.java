@@ -2,12 +2,15 @@ package travel.infra;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,11 +27,15 @@ public class MyPageController {
     FlightInfoRepository flightInfoRepository;
 
     @PostMapping("/flightInfos")
-    public ResponseEntity<?> getAndSaveFlightData(@RequestBody FlightInfoDTO request) {
+    public ResponseEntity<?> getAndSaveFlightData(@Valid @RequestBody FlightInfoDTO request, BindingResult bindingResult) {
+        
+        // 클라이언트에서 전달된 파라미터들이 NULL인지 EMPTY인지 검증을 수행합니다
+        if (bindingResult.hasErrors()) {
+            bindingResult.getAllErrors().forEach(error -> {System.out.println(error.getDefaultMessage());});
+            return ResponseEntity.badRequest().body("Invalid request parameters");
+        }
+
         try {
-            if (request == null || request.getUserId() == null) {
-                return ResponseEntity.badRequest().body("요청 파라미터가 잘못되었습니다.");
-            }
 
             List<FlightInfo> userFlightInfo = flightInfoRepository.findByUserId(request.getUserId());
 
@@ -37,6 +44,7 @@ public class MyPageController {
             }
 
             return ResponseEntity.ok(userFlightInfo);
+
         } catch (Exception e) {
             System.out.println(e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 내부 오류가 발생하였습니다.");

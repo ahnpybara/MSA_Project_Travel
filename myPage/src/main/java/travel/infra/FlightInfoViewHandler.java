@@ -4,6 +4,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import travel.config.kafka.KafkaProcessor;
 import travel.domain.*;
@@ -15,6 +17,7 @@ public class FlightInfoViewHandler {
     private FlightInfoRepository flightInfoRepository;
 
     @StreamListener(KafkaProcessor.INPUT)
+    @Retryable(value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public void whenFlightBookCompleted_then_CREATE_1(@Payload FlightBookCompleted flightBookCompleted) {
         try {
             if (!flightBookCompleted.validate()) return;
@@ -41,7 +44,8 @@ public class FlightInfoViewHandler {
     @StreamListener(KafkaProcessor.INPUT)
     public void whenFlightbookCancelled_then_UPDATE_1(@Payload FlightbookCancelled flightbookCancelled) {
         try {
-            if (!flightbookCancelled.validate()) return;
+            if (!flightbookCancelled.validate())
+                return;
 
             List<FlightInfo> flightInfoList = flightInfoRepository.findByUserId(
                     flightbookCancelled.getUserId());

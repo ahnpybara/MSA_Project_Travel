@@ -3,7 +3,8 @@ package travel.infra;
 import travel.domain.Flight;
 import travel.domain.FlightRepository;
 import java.net.URI;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,11 +64,18 @@ public class FlightService {
 
     // 출발 공항 ID, 도착 공항 ID, 출발 시간, 도착 시간을 인자로 받아 해당 조건에 맞는 항공편을 찾아 리스트로 반환하는 메서드입니다
     public List<Flight> findFlights(String depAirportId, String arrAirportId, Long startTimestamp, Long endTimestamp) {
+
+        // 현재 시간 정보를 가져와서 타입에 맞게 변환
+        LocalDateTime currentTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+        Long currentTimestamp = Long.parseLong(currentTime.format(formatter));
+        if (startTimestamp <= currentTimestamp) startTimestamp = currentTimestamp;
+
         try {
             String depAirportNm = convertAirportIdToNm(depAirportId);
             String arrAirportNm = convertAirportIdToNm(arrAirportId);
-            return flightRepository.findByDepAirportAndArrAirportAndDepTimeBetween(depAirportNm, arrAirportNm,
-                    startTimestamp, endTimestamp);
+            return flightRepository.findByDepAirportAndArrAirportAndDepTimeBetweenAndSeatCapacityGreaterThanEqual(
+                    depAirportNm, arrAirportNm, startTimestamp, endTimestamp, 0L);
         } catch (Exception e) {
             System.out.println("공항Id의 정보가 잘못되었습니다 : " + e);
             throw new IllegalArgumentException(e);
@@ -93,15 +101,14 @@ public class FlightService {
             return restTemplate.getForObject(uri, String.class);
         } catch (Exception e) {
             System.out.println("항공편 api를 호출하는 도중 예상치 못한 오류가 발생했습니다 : " + e);
-            throw new IllegalArgumentException("Failed Flight API Call : " + e); 
+            throw new IllegalArgumentException("Failed Flight API Call : " + e);
         }
     }
 
-    // 항공편 API에서 받아온 JSON 형태의 문자열을 Flight 객체로 변환하고, 그 결과를 데이터베이스에 저장한 뒤 저장된 Flight 객체들을 반환하는 메서드입니다
+    // 항공편 API에서 받아온 JSON 형태의 문자열을 Flight 객체로 변환하고, 그 결과를 데이터베이스에 저장합니다
     @Transactional(rollbackFor = RollBackException.class)
-    public List<Flight> saveFlightData(String jsonData) {
+    public void saveFlightData(String jsonData) {
         ObjectMapper objectMapper = new ObjectMapper(); // JSON 파싱에 사용되는 클래스의 인스턴스를 생성합니다
-        List<Flight> savedFlights = new ArrayList<>(); // 데이터베이스에 저장된 Flight 객체들을 담을 리스트를 생성합니다
 
         try {
             // JSON 문자열을 JsonNode 객체로 변환함으로써, JSON 데이터를 쉽게 다룰 수 있습니다.
@@ -109,17 +116,15 @@ public class FlightService {
             // JsonNode 객체에서 "response" -> "body" -> "items" -> "item" 순서로 데이터를 추출합니다.
             JsonNode itemsNode = rootNode.path("response").path("body").path("items").path("item");
 
-
             if (!itemsNode.isMissingNode() && !itemsNode.isEmpty()) {
                 // 배열 형태의 데이터를 Flight 객체의 리스트로 변환합니다.
                 List<Flight> flights = objectMapper.readValue(itemsNode.toString(), new TypeReference<List<Flight>>() {
                 });
 
                 // Flight 객체의 리스트를 순회하며 각각의 Flight 객체를 데이터베이스에 저장합니다.
-                for (Flight flight : flights) {
-                    Flight savedFlight = flightRepository.save(flight);
-                    savedFlights.add(savedFlight); // 저장된 Flight 객체를 리스트에 추가합니다.
-                }
+                for (Flight flight : flights)
+                    flightRepository.save(flight);
+
             } else {
                 System.out.println("항공편 정보가 존재하지 않습니다");
             }
@@ -127,6 +132,5 @@ public class FlightService {
             System.out.println("Failed to save Flights : " + e);
             throw new RollBackException("롤백 트랜잭션"); // DB와 상화작용하는 메서드이므로 예외 발생시 트랜잭션을 롤백시키도록 합니다
         }
-        return savedFlights; // 데이터베이스에 저장된 Flight 객체들을 반환합니다.
     }
 }

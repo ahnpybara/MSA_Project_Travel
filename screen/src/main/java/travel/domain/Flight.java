@@ -1,9 +1,7 @@
 package travel.domain;
 
 import javax.persistence.*;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Data;
 import travel.ScreenApplication;
 
@@ -38,68 +36,27 @@ public class Flight {
 
     private Long seatCapacity = 100L;
 
-    @PostPersist
-    public void onPostPersist() {
-        FlightBookRequested flightBookRequested = new FlightBookRequested(this);
-        flightBookRequested.publishAfterCommit();
-    }
-
     public static FlightRepository repository() {
         FlightRepository flightRepository = ScreenApplication.applicationContext.getBean(
-            FlightRepository.class
-        );
+                FlightRepository.class);
         return flightRepository;
     }
 
-    //<<< Clean Arch / Port Method
     public static void reservationStatus(PaymentRequested paymentRequested) {
-        //implement business logic here:
 
-        /** Example 1:  new item 
-        Flight flight = new Flight();
-        repository().save(flight);
-
-        */
-
-        /** Example 2:  finding and process
-        
-        repository().findById(paymentRequested.get???()).ifPresent(flight->{
-            
-            flight // do something
+        repository().findById(paymentRequested.getFlightId()).ifPresent(flight -> {
+            if (flight.seatCapacity <= 0) throw new IllegalArgumentException("No more seats available");
+            flight.setSeatCapacity(flight.seatCapacity - 1);
             repository().save(flight);
-
-
-         });
-        */
-
+        });
     }
 
-    //>>> Clean Arch / Port Method
-    //<<< Clean Arch / Port Method
-    public static void reservationCancellationStatus(
-        PaymentCnlRequested paymentCnlRequested
-    ) {
-        //implement business logic here:
+    public static void reservationCancellationStatus(FlightbookCancelled flightbookCancelled) {
 
-        /** Example 1:  new item 
-        Flight flight = new Flight();
-        repository().save(flight);
-
-        */
-
-        /** Example 2:  finding and process
-        
-        repository().findById(paymentCnlRequested.get???()).ifPresent(flight->{
-            
-            flight // do something
+        repository().findById(flightbookCancelled.getFlightId()).ifPresent(flight -> {
+            if (flight.seatCapacity >= 100) throw new IllegalArgumentException("Seat capacity exceeded");
+            flight.setSeatCapacity(flight.seatCapacity - 1);
             repository().save(flight);
-
-
-         });
-        */
-
+        });
     }
-    //>>> Clean Arch / Port Method
-
 }
-//>>> DDD / Aggregate Root

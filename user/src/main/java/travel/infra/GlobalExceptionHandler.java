@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 
-import feign.FeignException.Unauthorized;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
