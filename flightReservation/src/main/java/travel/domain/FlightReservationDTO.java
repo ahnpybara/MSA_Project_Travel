@@ -1,6 +1,5 @@
 package travel.domain;
 
-import java.util.Date;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -18,9 +17,9 @@ public class FlightReservationDTO {
     @NotBlank(message = "depAirport cannot be null or empty")
     private String depAirport;
     @NotNull(message = "arrTime cannot be null or empty")
-    private Date arrTime;
+    private Long arrTime;
     @NotNull(message = "depTime cannot be null or empty")
-    private Date depTime;
+    private Long depTime;
     @NotNull(message = "charge cannot be null or empty")
     private Long charge;
     @NotBlank(message = "vihicleId cannot be null or empty")
@@ -29,4 +28,6 @@ public class FlightReservationDTO {
     private Long userId;
     @NotBlank(message = "name cannot be null or empty")
     private String name;
+    @NotNull(message = "flightId cannot be null or empty")
+    private Long flightId;
 }

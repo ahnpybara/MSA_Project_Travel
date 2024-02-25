@@ -1,20 +1,16 @@
 package travel.domain;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
+
+
 import javax.persistence.*;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 import lombok.Data;
 import travel.FlightReservationApplication;
-import travel.domain.FlightBookCompleted;
-import travel.domain.FlightbookCancelled;
-import travel.domain.PaymentCnlRequested;
-import travel.domain.PaymentRequested;
 
 @Entity
 @Table(name = "FlightReservation_table")
@@ -27,14 +23,14 @@ public class FlightReservation {
     private Long id;
     
     private String airLine;
-
+    
     private String arrAirport;
 
     private String depAirport;
 
-    private Date arrTime;
+    private Long arrTime;
 
-    private Date depTime;
+    private Long depTime;
 
     private Long charge;
 
@@ -47,6 +43,8 @@ public class FlightReservation {
     private String name;
 
     private String reservationHash;
+    
+    private Long flightId;
 
     private static final Logger log = LoggerFactory.getLogger(FlightReservation.class);
     
@@ -65,6 +63,7 @@ public class FlightReservation {
 
 
     //<<< Clean Arch / Port Method
+    @Transactional
     public static void paymentComplete(Paid paid) {
         try {
             repository().findById(paid.getReservationId()).ifPresentOrElse(flightReservation->{
@@ -87,6 +86,7 @@ public class FlightReservation {
 
     //>>> Clean Arch / Port Method
     //<<< Clean Arch / Port Method
+    @Transactional
     public static void paymentCancel(PaymentCancelled paymentCancelled) {
         try {
             repository().findById(paymentCancelled.getReservationId()).ifPresentOrElse(flightReservation->{
@@ -106,7 +106,7 @@ public class FlightReservation {
             }
     }
      
-
+    
     
     @Transactional
     public static void paymentFailed(PaymentFailed paymentFailed){

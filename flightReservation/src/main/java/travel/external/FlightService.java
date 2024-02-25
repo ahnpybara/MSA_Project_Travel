@@ -1,6 +1,5 @@
 package travel.external;
 
-import java.util.Date;
 import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;

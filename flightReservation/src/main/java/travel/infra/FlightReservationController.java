@@ -1,8 +1,6 @@
 package travel.infra;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -15,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import travel.domain.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 //<<< Clean Arch / Inbound Adaptor
@@ -33,7 +34,7 @@ public class FlightReservationController {
     public ResponseEntity<?> createFlightReservation(@Valid @RequestBody FlightReservationDTO flightReservationDTO, BindingResult bindingResult) {
          // 클라이언트에서 전달된 파라미터들이 NULL인지 EMPTY인지 검증을 수행합니다
          if (bindingResult.hasErrors()) {
-            bindingResult.getAllErrors().forEach(error -> {
+                bindingResult.getAllErrors().forEach(error -> {
                 System.out.println(error.getDefaultMessage());
             });
             return ResponseEntity.badRequest().body("Invalid request parameters");
@@ -42,8 +43,9 @@ public class FlightReservationController {
         try {
         
             String flightReservationHash = flightReservationService.createHashKey(flightReservationDTO);
-            flightReservationService.validateAndProcessReservation(flightReservationHash, flightReservationDTO);
-        } catch (ResponseStatusException e) {
+            FlightReservation flightReservation = flightReservationService.validateAndProcessReservation(flightReservationHash, flightReservationDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(flightReservation);
+        }   catch (ResponseStatusException e) {
             // 예외 발생 시 프론트엔드로부터 받은 메시지와 상태 코드 반환
             return ResponseEntity.status(e.getStatus()).body(e.getMessage());
         }   catch (RollBackException e){
@@ -52,9 +54,26 @@ public class FlightReservationController {
         }   catch(NoSuchAlgorithmException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("NoSuchAlgorithmException");
         }
-        // 모든 검증을 통과한 경우, 생성된 예약 정보 반환
-        return ResponseEntity.status(HttpStatus.CREATED).body(flightReservationDTO);
+
     }
+/*     @PostMapping("/flightReservationsCancleRequest")
+    public ResponseEntity<?> cancleFlightReservation(@Valid @RequestBody FlightReservationDTO flightReservationDTO, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            bindingResult.getAllErrors().forEach(error -> {
+                System.out.println(error.getDefaultMessage());
+            });
+            return ResponseEntity.badRequest().body("Invalid request parameters");
+        } 
+        try {
+            FlightReservationService.cancelFlightReservation(flightReservationDTO.getId());
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return null;
+
+    } */
+    
 
     // 요청하기위해 상태변경 * 임시 추가* 
     @Transactional

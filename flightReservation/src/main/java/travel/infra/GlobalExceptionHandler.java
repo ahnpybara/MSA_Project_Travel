@@ -21,4 +21,6 @@ public class GlobalExceptionHandler {
         // RollBackException 발생했을 때 HTTP 상태 코드 400과 함께 메시지를 반환합니다.
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("예상치 못한 오류로 예약이 롤백 되었습니다"+ e.getMessage());
     }
+
+    // 다른 예외 처리 메서드들...
 }
