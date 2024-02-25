@@ -10,6 +10,7 @@ import travel.infra.AbstractEvent;
 public class PaymentRequested extends AbstractEvent {
 
     private Long id;
+    private Long flightId;
     private String airLine;
     private String arrAirport;
     private String depAirport;
@@ -17,7 +18,6 @@ public class PaymentRequested extends AbstractEvent {
     private Date depTime;
     private Long charge;
     private String vihicleId;
-    private String status;
     private Long userId;
-    private String passenger;
+    private String name;
 }

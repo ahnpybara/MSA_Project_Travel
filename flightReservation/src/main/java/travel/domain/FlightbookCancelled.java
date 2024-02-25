@@ -11,6 +11,7 @@ import travel.infra.AbstractEvent;
 public class FlightbookCancelled extends AbstractEvent {
     
     private Long id;
+    private Long flightId;
     private String airLine;
     private String arrAirport;
     private String depAirport;

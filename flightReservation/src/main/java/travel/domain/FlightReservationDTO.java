@@ -10,6 +10,7 @@ import lombok.Data;
 public class FlightReservationDTO {
     
     private Long id;
+    private Long flightId;
     @NotBlank(message = "airLine cannot be null or empty")
     private String airLine;
     @NotBlank(message = "arrAirport cannot be null or empty")

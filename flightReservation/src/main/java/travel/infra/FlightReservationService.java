@@ -95,6 +95,7 @@ public class FlightReservationService {
             //checkSeatCapacity(flightReservationDTO);           // 자리 확인.
             FlightReservation flightReservation = new FlightReservation();
             flightReservation.setAirLine(flightReservationDTO.getAirLine());
+            flightReservation.setFlightId(flightReservationDTO.getFlightId());
             flightReservation.setArrAirport(flightReservationDTO.getArrAirport());
             flightReservation.setDepAirport(flightReservationDTO.getDepAirport());
             flightReservation.setArrTime(flightReservationDTO.getArrTime());

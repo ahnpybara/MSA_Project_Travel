@@ -19,5 +19,6 @@ public class FlightbookCancelled extends AbstractEvent {
     private String vihicleId;
     private String status;
     private Long userId;
-    private String passenger;
+    private String name;
+    private String email;
 }
