@@ -12,7 +12,7 @@ public class FlightInfo {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
-
+    private Long reservationId;
     private Long userId;
     private String name;
     private String airLine;

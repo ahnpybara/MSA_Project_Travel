@@ -13,6 +13,7 @@ import travel.domain.PaymentCancelled;
 import travel.domain.PaymentDTO;
 import travel.domain.PaymentFailed;
 import travel.domain.PaymentRepository;
+import travel.domain.PaymentRequested;
 import travel.domain.PaymentStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -196,5 +197,30 @@ public class PaymentService {
         event.publishAfterCommit(); // TODO 재시도 로직 추가
         System.out.println(errorMessage);
         return PaymentStatus.실패;
+    }
+
+    // 예약 정보를 토대로 결제 정보를 저장하는 메서드
+    @Transactional(rollbackFor = Exception.class)
+    public void createPayment(PaymentRequested paymentRequested) {
+        try {
+            travel.domain.Payment exsistPayment = paymentRepository.findByReservationId(paymentRequested.getId());
+            
+            // 결제 정보 중복 확인 -> 없다면 저장 -> 이미 있다면 상태만 변경
+            if(exsistPayment == null) {
+                // 결제 정보를 저장할 객체 생성
+                travel.domain.Payment payment = new travel.domain.Payment();
+                payment.setReservationId(paymentRequested.getId());
+                payment.setName(paymentRequested.getName());
+                payment.setCharge(paymentRequested.getCharge());
+                payment.setUserId(paymentRequested.getUserId());
+                payment.setStatus(PaymentStatus.결제전);
+                paymentRepository.save(payment);
+            } else {
+                exsistPayment.setStatus(PaymentStatus.결제전);
+            }
+
+        } catch (Exception e) {
+            throw new RollBackException("예약 정보를 저장하는 도중 예상치 못한 오류가 발생 : " + e);
+        }
     }
 }

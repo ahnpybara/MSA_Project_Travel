@@ -6,6 +6,6 @@ import lombok.Data;
 
 @Data
 public class FlightInfoDTO {
-    @NotNull(message = "depAirport cannot be null")
+    @NotNull(message = "userId cannot be null")
     private Long userId;
 }

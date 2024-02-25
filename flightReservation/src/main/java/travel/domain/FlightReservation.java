@@ -25,7 +25,9 @@ public class FlightReservation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    
+
+    private Long flightId;
+
     private String airLine;
 
     private String arrAirport;

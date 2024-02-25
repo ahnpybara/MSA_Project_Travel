@@ -21,7 +21,6 @@ import travel.auth.PrincipalDetails;
 import travel.domain.SignedUp;
 import travel.domain.User;
 import travel.domain.UserRepository;
-import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional(readOnly = true)

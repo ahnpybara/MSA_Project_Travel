@@ -38,17 +38,17 @@ public class FlightController {
         String depAirportId = request.getDepAirport();
         String arrAirportId = request.getArrAirport();
         String depPlandTime = request.getDepTime();
-
+        
         // DB에는 년/월/일/시/분 단위로 저장되지만, 전달되는 데이터는 년/월/일 단위로 전달되기 때문에 DB 조회를 위해서 형식을 맞춤
         Long startTimestamp = Long.parseLong(depPlandTime + "0000");
         Long endTimestamp = Long.parseLong(depPlandTime + "2359");
-
+        
         try {
             // 출발 공항 ID, 도착 공항 ID, 출발 시간, 도착 시간을 조건으로 하는 항공편을 찾습니다.
             List<Flight> flights = flightService.findFlights(depAirportId, arrAirportId, startTimestamp, endTimestamp);
 
             // 만약 사용자가 요청한 항공편 정보가 없다면 API를 호출하고, 데이터베이스에 저장한 뒤, 저장된 항공편 정보를 반환합니다.
-            if (flights.isEmpty()) { 
+            if (flights.isEmpty()) {
                 // 사용자로 부터 전달된 도착공항, 출발공항, 출발날짜를 이용해서 항공편 API를 호출합니다
                 String flightData = flightService.callApi(depAirportId, arrAirportId, depPlandTime);
 
@@ -56,16 +56,18 @@ public class FlightController {
                     throw new Exception("항공편 데이터를 가져오는 데 실패했습니다.");
 
                 System.out.println("++++++++++++++++++++++++++++저장로직 실행!!");
-                List<Flight> savedFlights = flightService.saveFlightData(flightData); // 항공편 API로 부터  받은 정보를 DB에 저장합니다
+                flightService.saveFlightData(flightData); // 항공편 API로 부터 받은 정보를 DB에 저장합니다
+                flights = flightService.findFlights(depAirportId, arrAirportId, startTimestamp, endTimestamp); // 저장된 항공편의 정보를 필터링해서 가져옵니다
 
-                return ResponseEntity.ok(savedFlights); // 저장된 정보를 사용자에게 응답으로 줍니다
+                return ResponseEntity.ok(flights); // 저장된 정보를 사용자에게 응답으로 줍니다
+
             } else { // 사용자가 요청한 항공편 정보가 이미 DB에 있다면 해당 정보를 바로 응답으로 줍니다
                 System.out.println("++++++++++++++++++++++++++++조회로직 실행!!");
-                return ResponseEntity.ok(flights); 
+                return ResponseEntity.ok(flights);
             }
         } catch (RollBackException e) { // 서비스 계층에서 발생한 롤백이 수행되어지는 예외를 잡습니다
             throw new RuntimeException(e); // 스프링에게 RuntimeException을 전달합니다 -> 롤백수행
-        } catch (Exception e) { // 서비스 계층에서 발생한 롤백과 관련없는 예외들은 컨트롤러에서 잡아서 처리합니다 
+        } catch (Exception e) { // 서비스 계층에서 발생한 롤백과 관련없는 예외들은 컨트롤러에서 잡아서 처리합니다
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("항공편 api를 요청하고 저장하는 과정에서 오류가 발생했습니다." + e);
         }
     }

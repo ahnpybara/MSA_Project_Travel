@@ -12,4 +12,6 @@ import travel.domain.*;
 public interface FlightInfoRepository
     extends PagingAndSortingRepository<FlightInfo, Long> {
     List<FlightInfo> findByUserId(Long userId);
+
+    FlightInfo findByReservationId(Long id);
 }
