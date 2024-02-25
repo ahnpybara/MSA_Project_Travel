@@ -41,22 +41,4 @@ public class Flight {
                 FlightRepository.class);
         return flightRepository;
     }
-
-    public static void reservationStatus(PaymentRequested paymentRequested) {
-
-        repository().findById(paymentRequested.getFlightId()).ifPresent(flight -> {
-            if (flight.seatCapacity <= 0) throw new IllegalArgumentException("No more seats available");
-            flight.setSeatCapacity(flight.seatCapacity - 1);
-            repository().save(flight);
-        });
-    }
-
-    public static void reservationCancellationStatus(FlightbookCancelled flightbookCancelled) {
-
-        repository().findById(flightbookCancelled.getFlightId()).ifPresent(flight -> {
-            if (flight.seatCapacity >= 100) throw new IllegalArgumentException("Seat capacity exceeded");
-            flight.setSeatCapacity(flight.seatCapacity - 1);
-            repository().save(flight);
-        });
-    }
 }

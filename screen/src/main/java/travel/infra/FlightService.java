@@ -2,6 +2,9 @@ package travel.infra;
 
 import travel.domain.Flight;
 import travel.domain.FlightRepository;
+import travel.domain.FlightbookCancelled;
+import travel.domain.PaymentRequested;
+
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -69,6 +72,7 @@ public class FlightService {
         LocalDateTime currentTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
         Long currentTimestamp = Long.parseLong(currentTime.format(formatter));
+        // 당일날 예약시 이전 시간대 항공편은 보여주면 안되기 때문에 출발 날짜를 현재시간으로 수정합니다
         if (startTimestamp <= currentTimestamp) startTimestamp = currentTimestamp;
 
         try {
@@ -131,6 +135,33 @@ public class FlightService {
         } catch (Exception e) {
             System.out.println("Failed to save Flights : " + e);
             throw new RollBackException("롤백 트랜잭션"); // DB와 상화작용하는 메서드이므로 예외 발생시 트랜잭션을 롤백시키도록 합니다
+        }
+    }
+
+    // 예약 요청이 되었을 때 해당 항공편의 좌석수를 감소
+    @Transactional(rollbackFor = Exception.class)
+    public void bookSeatCapacity(PaymentRequested paymentRequested) {
+        try {
+            Flight flight = flightRepository.findById(paymentRequested.getFlightId())
+                    .orElseThrow(() -> new IllegalArgumentException("Flight not found"));
+            if (flight.getSeatCapacity() <= 0) throw new IllegalArgumentException("No more seats available");
+            flight.setSeatCapacity(flight.getSeatCapacity() - 1);
+            flightRepository.save(flight);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // 예약 취소가 완료 되었을 때 해당 항공편의 좌석수를 증가
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelSeatCapacity(FlightbookCancelled flightbookCancelled) {
+        try {
+            Flight flight = flightRepository.findById(flightbookCancelled.getFlightId())
+                    .orElseThrow(() -> new IllegalArgumentException("Flight not found"));
+            flight.setSeatCapacity(flight.getSeatCapacity() + 1);
+            flightRepository.save(flight);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
