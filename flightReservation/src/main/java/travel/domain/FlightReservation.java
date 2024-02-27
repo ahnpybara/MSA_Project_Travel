@@ -45,8 +45,7 @@ public class FlightReservation {
     private String name;
 
     private String reservationHash;
-    
-    private Long flightId;
+
 
     private static final Logger log = LoggerFactory.getLogger(FlightReservation.class);
     
@@ -69,7 +68,7 @@ public class FlightReservation {
     public static void paymentComplete(Paid paid) {
         try {
             repository().findById(paid.getReservationId()).ifPresentOrElse(flightReservation->{
-                flightReservation.setStatus(Status.결제완료);
+                flightReservation.setStatus(Status.예약완료);
                 repository().save(flightReservation);
 
                 FlightBookCompleted flightBookCompleted = new FlightBookCompleted(flightReservation);
@@ -92,7 +91,7 @@ public class FlightReservation {
     public static void paymentCancel(PaymentCancelled paymentCancelled) {
         try {
             repository().findById(paymentCancelled.getReservationId()).ifPresentOrElse(flightReservation->{
-                flightReservation.setStatus(Status.취소완료);
+                flightReservation.setStatus(Status.결제취소);
                 repository().save(flightReservation);
 
                 FlightbookCancelled flightbookCancelled = new FlightbookCancelled(flightReservation);

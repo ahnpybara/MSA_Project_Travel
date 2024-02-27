@@ -71,4 +71,13 @@ public class FlightController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("항공편 api를 요청하고 저장하는 과정에서 오류가 발생했습니다." + e);
         }
     }
+    @GetMapping("/flights/search")
+    public ResponseEntity<Flight> searchFlight(
+            @RequestParam("flightId") Long flightId) {
+
+        Flight flight = flightService.findFlightById(flightId);
+        return ResponseEntity.ok(flight);
+    }
+
+
 }

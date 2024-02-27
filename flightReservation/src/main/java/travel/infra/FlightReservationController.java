@@ -56,7 +56,7 @@ public class FlightReservationController {
         }
 
     }
-/*     @PostMapping("/flightReservationsCancleRequest")
+    @PostMapping("/flightReservations/cancel")
     public ResponseEntity<?> cancleFlightReservation(@Valid @RequestBody FlightReservationDTO flightReservationDTO, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
@@ -66,13 +66,15 @@ public class FlightReservationController {
             return ResponseEntity.badRequest().body("Invalid request parameters");
         } 
         try {
-            FlightReservationService.cancelFlightReservation(flightReservationDTO.getId());
-        } catch (Exception e) {
-            // TODO: handle exception
+            flightReservationService.cancelFlightReservation(flightReservationDTO.getId());
+            return ResponseEntity.ok("예약 취소 완료");
+        } catch (RollBackException e) {
+            throw new RuntimeException(e);
+        }catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatus()).body(e.getMessage());
         }
-        return null;
-
-    } */
+        
+    }
     
 
     // 요청하기위해 상태변경 * 임시 추가* 

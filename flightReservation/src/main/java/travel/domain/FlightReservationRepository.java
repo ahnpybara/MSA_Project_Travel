@@ -18,6 +18,8 @@ public interface FlightReservationRepository
     extends PagingAndSortingRepository<FlightReservation, Long> {
 
         Optional<FlightReservation> findByReservationHash(String id);
+
+        Optional<FlightReservation> findById(Long Id);
     }
 
 
