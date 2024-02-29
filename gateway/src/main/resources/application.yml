@@ -32,8 +32,6 @@ spring:
           uri: http://localhost:8084
           predicates:
             - Path=/users/**,
-          # filters:
-          #   - AuthorizationFilter
             
         - id: myPage
           uri: http://localhost:8085
@@ -49,10 +47,10 @@ spring:
           filters:
             - AuthorizationFilter
             
-        - id: frontend
-          uri: http://localhost:8080
+        - id: lodging
+          uri: http://localhost:8087
           predicates:
-            - Path=/**
+            - Path=/lodgings/**
 #>>> API Gateway / Routes
       globalcors:
         corsConfigurations:
@@ -111,7 +109,7 @@ spring:
           filters:
             - AuthorizationFilter
 
-        - id: frontend
+        - id: lodging
           uri: http://frontend:8080
           predicates:
             - Path=/**
