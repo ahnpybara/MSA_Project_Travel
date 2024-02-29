@@ -1,17 +1,14 @@
 package travel.domain;
 
-
 import lombok.*;
 import travel.infra.AbstractEvent;
 
-//<<< DDD / Domain Event
 @Data
 @EqualsAndHashCode(callSuper=false)
 @ToString
-public class FlightbookCancelled extends AbstractEvent {
+public class FlightCancelRequested extends AbstractEvent{
     
     private Long id;
-    private Long flightId;
     private String airLine;
     private String arrAirport;
     private String depAirport;
@@ -24,12 +21,11 @@ public class FlightbookCancelled extends AbstractEvent {
     private String name;
     private String reservationHash;
 
-    public FlightbookCancelled(FlightReservation aggregate) {
+    public FlightCancelRequested(FlightReservation aggregate) {
         super(aggregate);
     }
 
-    public FlightbookCancelled() {
+    public FlightCancelRequested() {
         super();
     }
 }
-//>>> DDD / Domain Event

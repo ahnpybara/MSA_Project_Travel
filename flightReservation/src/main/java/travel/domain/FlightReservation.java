@@ -1,20 +1,16 @@
 package travel.domain;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
+
+
 import javax.persistence.*;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 import lombok.Data;
 import travel.FlightReservationApplication;
-import travel.domain.FlightBookCompleted;
-import travel.domain.FlightbookCancelled;
-import travel.domain.PaymentCnlRequested;
-import travel.domain.PaymentRequested;
 
 @Entity
 @Table(name = "FlightReservation_table")
@@ -29,14 +25,14 @@ public class FlightReservation {
     private Long flightId;
 
     private String airLine;
-
+    
     private String arrAirport;
 
     private String depAirport;
 
-    private Date arrTime;
+    private Long arrTime;
 
-    private Date depTime;
+    private Long depTime;
 
     private Long charge;
 
@@ -49,6 +45,7 @@ public class FlightReservation {
     private String name;
 
     private String reservationHash;
+
 
     private static final Logger log = LoggerFactory.getLogger(FlightReservation.class);
     
@@ -67,10 +64,11 @@ public class FlightReservation {
 
 
     //<<< Clean Arch / Port Method
+    @Transactional
     public static void paymentComplete(Paid paid) {
         try {
             repository().findById(paid.getReservationId()).ifPresentOrElse(flightReservation->{
-                flightReservation.setStatus(Status.결제완료);
+                flightReservation.setStatus(Status.예약완료);
                 repository().save(flightReservation);
 
                 FlightBookCompleted flightBookCompleted = new FlightBookCompleted(flightReservation);
@@ -89,10 +87,11 @@ public class FlightReservation {
 
     //>>> Clean Arch / Port Method
     //<<< Clean Arch / Port Method
+    @Transactional
     public static void paymentCancel(PaymentCancelled paymentCancelled) {
         try {
             repository().findById(paymentCancelled.getReservationId()).ifPresentOrElse(flightReservation->{
-                flightReservation.setStatus(Status.취소완료);
+                flightReservation.setStatus(Status.결제취소);
                 repository().save(flightReservation);
 
                 FlightbookCancelled flightbookCancelled = new FlightbookCancelled(flightReservation);
@@ -108,7 +107,7 @@ public class FlightReservation {
             }
     }
      
-
+    
     
     @Transactional
     public static void paymentFailed(PaymentFailed paymentFailed){
