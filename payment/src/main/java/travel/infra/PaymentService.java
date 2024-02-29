@@ -7,6 +7,8 @@ import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.request.PrepareData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
+
+import travel.domain.FlightCancelRequested;
 import travel.domain.Paid;
 import travel.domain.PaymentCancelFailed;
 import travel.domain.PaymentCancelled;
@@ -217,6 +219,25 @@ public class PaymentService {
                 paymentRepository.save(payment);
             } else {
                 exsistPayment.setStatus(PaymentStatus.결제전);
+            }
+
+        } catch (Exception e) {
+            throw new RollBackException("예약 정보를 저장하는 도중 예상치 못한 오류가 발생 : " + e);
+        }
+    }
+
+    // 예약 취소시 결제 상태를 예약취소로 변경하는 메서드
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePayment(FlightCancelRequested flightCancelRequested) {
+        try {
+            travel.domain.Payment paymentInfo = paymentRepository.findByReservationId(flightCancelRequested.getId());
+            
+            // 결제 정보 중복 확인 -> 없다면 저장 -> 이미 있다면 상태만 변경
+            if(paymentInfo == null) {
+                System.out.println("해당 예약건에 대한 결제 정보가 존재하지 않습니다");
+            } else {
+                paymentInfo.setStatus(PaymentStatus.결제취소);
+                paymentRepository.save(paymentInfo);
             }
 
         } catch (Exception e) {

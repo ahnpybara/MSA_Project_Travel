@@ -19,7 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 import feign.FeignException;
 import travel.domain.*;
 import travel.external.*;
-import travel.external.Flight;
 @Service
 public class FlightReservationService {
     
@@ -137,16 +136,25 @@ public class FlightReservationService {
             Optional<FlightReservation> findReservation = flightReservationRepository.findById(reservationId);
             if(findReservation.isPresent()){
             FlightReservation flightReservation = findReservation.get();
+            if(flightReservation.getStatus() != Status.예약취소){
             flightReservation.setStatus(Status.예약취소);
             flightReservationRepository.save(flightReservation);
 
-            FlightCancelRequest flightCancelRequest = new FlightCancelRequest(flightReservation);
-            flightCancelRequest.publishAfterCommit();
+            FlightCancelRequested flightCancelRequested = new FlightCancelRequested(flightReservation);
+            flightCancelRequested.publishAfterCommit();
+
+            FlightbookCancelled flightbookCancelled = new FlightbookCancelled(flightReservation);
+            flightbookCancelled.publishAfterCommit();
+            }
+            else{
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "예약 취소된 상태 입니다.");
+            }
             }
             else{
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "예약 취소 내역을 찾지 못했습니다.");
             }
         } catch (Exception e) {
+
             throw new RollBackException("예약 저장중에 롤백이 발생" + e.getMessage());
         }
     

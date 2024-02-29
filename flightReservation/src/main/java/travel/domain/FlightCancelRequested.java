@@ -6,7 +6,7 @@ import travel.infra.AbstractEvent;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @ToString
-public class FlightCancelRequest extends AbstractEvent{
+public class FlightCancelRequested extends AbstractEvent{
     
     private Long id;
     private String airLine;
@@ -21,11 +21,11 @@ public class FlightCancelRequest extends AbstractEvent{
     private String name;
     private String reservationHash;
 
-    public FlightCancelRequest(FlightReservation aggregate) {
+    public FlightCancelRequested(FlightReservation aggregate) {
         super(aggregate);
     }
 
-    public FlightCancelRequest() {
+    public FlightCancelRequested() {
         super();
     }
 }
