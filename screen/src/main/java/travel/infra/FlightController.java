@@ -37,7 +37,7 @@ public class FlightController {
         // 사용자로 부터 받은 DTO(항공편 API 요청 정보) 객체에서 각 데이터를 꺼내서 변수에 저장
         String depAirportId = request.getDepAirport();
         String arrAirportId = request.getArrAirport();
-        String depPlandTime = request.getDepTime();
+        String depPlandTime = request.getDepTime(); // TODO 현재 날짜 보다 이전인 경우 막아야함
         
         // DB에는 년/월/일/시/분 단위로 저장되지만, 전달되는 데이터는 년/월/일 단위로 전달되기 때문에 DB 조회를 위해서 형식을 맞춤
         Long startTimestamp = Long.parseLong(depPlandTime + "0000");

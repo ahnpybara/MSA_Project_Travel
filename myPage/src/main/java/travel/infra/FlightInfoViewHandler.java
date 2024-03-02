@@ -17,13 +17,16 @@ public class FlightInfoViewHandler {
     @Autowired
     private FlightService flightService;
 
+    @Autowired
+    private FlightInfoRepository flightInfoRepository;
+
     // 예약된 항공편의 정보를 저장하는 메서드
     @StreamListener(KafkaProcessor.INPUT)
     @Retryable(value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public void whenFlightBookCompleted_then_CREATE_1(@Payload FlightBookCompleted flightBookCompleted) {
 
-        if (!flightBookCompleted.validate())
-            return;
+        FlightInfo flightInfo = flightInfoRepository.findByReservationId(flightBookCompleted.getId());
+        if (!flightBookCompleted.validate() || flightInfo != null) return;
         System.out.println("예약된 항공편의 정보를 저장합니다");
         flightService.saveFlightInfo(flightBookCompleted);
     }

@@ -40,6 +40,8 @@ public class FlightService {
     // 공항의 ID와 공항의 이름을 연결하는 맵을 선언합니다. 이 맵은 서비스가 초기화될 때 채워집니다.
     private Map<String, String> airportIdToNmMap;
 
+    ObjectMapper objectMapper = new ObjectMapper(); // JSON 파싱에 사용되는 클래스의 인스턴스를 생성합니다
+
     // 이 메서드는 이 클래스의 인스턴스 생성 후에 자동으로 호출되며, 공항의 ID와 이름을 맵에 채워넣습니다.
     @PostConstruct
     public void init() {
@@ -93,7 +95,7 @@ public class FlightService {
         String url = "http://apis.data.go.kr/1613000/DmstcFlightNvgInfoService/getFlightOpratInfoList"
                 + "?serviceKey=" + serviceKey
                 + "&pageNo=1"
-                + "&numOfRows=10"
+                + "&numOfRows=20"
                 + "&_type=json"
                 + "&depAirportId=" + depAirportId
                 + "&arrAirportId=" + arrAirportId
@@ -114,7 +116,6 @@ public class FlightService {
     // 항공편 API에서 받아온 JSON 형태의 문자열을 Flight 객체로 변환하고, 그 결과를 데이터베이스에 저장합니다
     @Transactional(rollbackFor = RollBackException.class)
     public void saveFlightData(String jsonData) {
-        ObjectMapper objectMapper = new ObjectMapper(); // JSON 파싱에 사용되는 클래스의 인스턴스를 생성합니다
 
         try {
             // JSON 문자열을 JsonNode 객체로 변환함으로써, JSON 데이터를 쉽게 다룰 수 있습니다.
@@ -124,19 +125,15 @@ public class FlightService {
 
             if (!itemsNode.isMissingNode() && !itemsNode.isEmpty()) {
                 // 배열 형태의 데이터를 Flight 객체의 리스트로 변환합니다.
-                List<Flight> flights = objectMapper.readValue(itemsNode.toString(), new TypeReference<List<Flight>>() {
-                });
-
-                // Flight 객체의 리스트를 순회하며 각각의 Flight 객체를 데이터베이스에 저장합니다.
-                for (Flight flight : flights)
-                    flightRepository.save(flight);
+                List<Flight> flights = objectMapper.readValue(itemsNode.toString(), new TypeReference<List<Flight>>() {});
+                flightRepository.saveAll(flights); // 모든 항공편 객체를 한 번에 저장합니다.
 
             } else {
                 System.out.println("항공편 정보가 존재하지 않습니다");
             }
         } catch (Exception e) {
             System.out.println("Failed to save Flights : " + e);
-            throw new RollBackException("롤백 트랜잭션"); // DB와 상화작용하는 메서드이므로 예외 발생시 트랜잭션을 롤백시키도록 합니다
+            throw new RollBackException("롤백 트랜잭션"); // DB와 상호작용하는 메서드이므로 예외 발생시 트랜잭션을 롤백시키도록 합니다
         }
     }
 

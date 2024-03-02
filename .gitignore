@@ -29,3 +29,9 @@ flightReservation/*
 !flightReservation/src/
 !flightReservation/src/**
 flightReservation/src/test
+
+
+!lodging/
+lodging/*
+!lodging/src/
+!lodging/src/**
