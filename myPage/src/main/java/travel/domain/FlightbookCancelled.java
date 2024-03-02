@@ -1,6 +1,6 @@
 package travel.domain;
 
-import java.util.*;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import travel.infra.AbstractEvent;
@@ -13,8 +13,8 @@ public class FlightbookCancelled extends AbstractEvent {
     private String airLine;
     private String arrAirport;
     private String depAirport;
-    private Date arrTime;
-    private Date depTime;
+    private Long arrTime;
+    private Long depTime;
     private Long charge;
     private String vihicleId;
     private String status;

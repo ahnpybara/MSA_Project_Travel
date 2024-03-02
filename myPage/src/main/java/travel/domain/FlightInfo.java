@@ -1,6 +1,6 @@
 package travel.domain;
 
-import java.util.Date;
+
 import javax.persistence.*;
 import lombok.Data;
 
@@ -18,8 +18,8 @@ public class FlightInfo {
     private String airLine;
     private String arrAirport;
     private String depAirport;
-    private Date arrTime;
-    private Date depTime;
+    private Long arrTime;
+    private Long depTime;
     private Long charge;
     private String vihicleId;
     private FlightStatus status;
