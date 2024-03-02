@@ -28,6 +28,8 @@ myPage/*
 flightReservation/*
 !flightReservation/src/
 !flightReservation/src/**
+flightReservation/src/test
+
 
 !lodging/
 lodging/*

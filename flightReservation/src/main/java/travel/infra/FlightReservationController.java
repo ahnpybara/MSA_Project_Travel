@@ -57,7 +57,7 @@ public class FlightReservationController {
 
     }
     @PostMapping("/flightReservations/cancel")
-    public ResponseEntity<?> cancleFlightReservation(@Valid @RequestBody FlightReservationDTO flightReservationDTO, BindingResult bindingResult) {
+    public ResponseEntity<?> cancelFlightReservation(@Valid @RequestBody FlightReservationDTO flightReservationDTO, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             bindingResult.getAllErrors().forEach(error -> {
