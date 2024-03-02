@@ -30,4 +30,6 @@ public class FlightReservationDTO {
     private String name;
     @NotNull(message = "flightId cannot be null or empty")
     private Long flightId;
+    @NotBlank(message = "email cannot be null or empty")
+    private String email;
 }

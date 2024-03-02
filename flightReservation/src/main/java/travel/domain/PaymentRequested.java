@@ -22,6 +22,7 @@ public class PaymentRequested extends AbstractEvent {
     private Long userId;
     private String reservationHash;
     private String name;
+    private String email;
     private Long flightId;
 
     public PaymentRequested(FlightReservation aggregate) {

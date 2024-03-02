@@ -44,16 +44,13 @@ public class FlightReservation {
 
     private String name;
 
+    private String email;
+
     private String reservationHash;
 
 
     private static final Logger log = LoggerFactory.getLogger(FlightReservation.class);
     
-    @PostPersist
-    public void onPostPersist() {
-        FlightBookCompleted flightBookCompleted = new FlightBookCompleted(this);
-        flightBookCompleted.publishAfterCommit();
-    }
 
     public static FlightReservationRepository repository() {
         FlightReservationRepository flightReservationRepository = FlightReservationApplication.applicationContext.getBean(

@@ -19,6 +19,7 @@ public class FlightCancelRequested extends AbstractEvent{
     private Status status;
     private Long userId;
     private String name;
+    private String email;
     private String reservationHash;
 
     public FlightCancelRequested(FlightReservation aggregate) {
