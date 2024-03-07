@@ -1,7 +1,5 @@
 package travel.auth;
 
-import travel.domain.UserRepository;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import travel.domain.UserRepository;
 
 @Configuration
 @EnableWebSecurity

@@ -10,4 +10,9 @@ import travel.infra.AbstractEvent;
 public class Paid extends AbstractEvent {
 
     private Long id;
+    private Long charge;
+    private Long userId;
+    private Long reservationId;
+    private String name;
+    private String impUid;
 }

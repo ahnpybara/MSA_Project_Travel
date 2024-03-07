@@ -1,24 +1,22 @@
 package travel.domain;
 
+import java.time.LocalDate;
+import java.util.*;
 import lombok.*;
+import travel.domain.*;
 import travel.infra.AbstractEvent;
 
+//<<< DDD / Domain Event
 @Data
-@EqualsAndHashCode(callSuper=false)
 @ToString
 public class PaymentCancelled extends AbstractEvent {
 
     private Long id;
-    
-    private Long reservationId;
-
     private Long charge;
-
     private Long userId;
-
+    private Long reservationId;
     private String name;
-
-    private String imp_uid;
+    private String impUid;
 
     public PaymentCancelled(Payment aggregate) {
         super(aggregate);
@@ -28,3 +26,4 @@ public class PaymentCancelled extends AbstractEvent {
         super();
     }
 }
+//>>> DDD / Domain Event

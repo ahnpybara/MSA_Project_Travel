@@ -31,6 +31,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+
 import travel.domain.User;
 import travel.domain.UserRepository;
 
@@ -69,11 +70,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         } catch (IOException e) {
             throw new RuntimeException("로그인 정보 읽기 실패", e);
         } catch (AuthenticationException e) {
-            logger.info("아이디가 존재하지 않거나 비밀번호가 일치하지 않습니다.");
+            logger.info("아이디가 존재하지 않거나 비밀번호가 일치하지 않음");
             sendErrorMessage(response, "아이디가 존재하지 않거나 비밀번호가 일치하지 않습니다.");
             return null;
         } catch (JWTVerificationException e) {
-            System.out.println("토큰 생성에 실패했습니다.");
+            logger.info("사용자 인증 실패로 토큰 생성에 실패");
             sendErrorMessage(response, "토큰 생성에 실패했습니다.");
             return null;
         }
@@ -96,16 +97,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
             Authentication authResult) throws IOException, ServletException {
-        System.out.println("인증이 무사히 성공됨");
-
+        logger.info("로그인 아이디와 비밀번호 인증 성공");
         PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
 
         // access 토큰 발급
         String accessToken = createAccessToken(principalDetails);
-        logger.info("엑세스 토큰==========================" + accessToken);
+        logger.info("엑세스 토큰 발급");
         // refresh 토큰 발급
         String refreshToken = createRefreshToken(principalDetails);
-        logger.info("리프레쉬 토큰==========================" + refreshToken);
+        logger.info("리프레쉬 토큰 발급");
         // 리프레시 토큰으로 사용자 업데이트
         Optional<User> optionalUser = userRepository.findByUsername(principalDetails.getUser().getUsername());
         optionalUser.ifPresent(user -> {

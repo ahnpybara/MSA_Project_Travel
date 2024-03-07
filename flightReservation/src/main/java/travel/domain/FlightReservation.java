@@ -6,10 +6,13 @@ import java.util.List;
 import javax.persistence.*;
 import lombok.Data;
 import travel.FlightReservationApplication;
-import travel.domain.FlightBookCompleted;
-import travel.domain.FlightbookCancelled;
-import travel.domain.PaymentCnlRequested;
-import travel.domain.PaymentRequested;
+import travel.domain.FlightReservaionRefundFailed;
+import travel.domain.FlightReservationCancelRequested;
+import travel.domain.FlightReservationCancelled;
+import travel.domain.FlightReservationCompleted;
+import travel.domain.FlightReservationFailed;
+import travel.domain.FlightReservationRefunded;
+import travel.domain.FlightReservationRequested;
 
 @Entity
 @Table(name = "FlightReservation_table")
@@ -41,10 +44,53 @@ public class FlightReservation {
 
     private String name;
 
+    private Long flightId;
+
+    private String email;
+
+    private String reservaionHash;
+
     @PostPersist
     public void onPostPersist() {
-        FlightBookCompleted flightBookCompleted = new FlightBookCompleted(this);
-        flightBookCompleted.publishAfterCommit();
+        FlightReservationRequested flightReservationRequested = new FlightReservationRequested(
+            this
+        );
+        flightReservationRequested.publishAfterCommit();
+
+        FlightReservationCompleted flightReservationCompleted = new FlightReservationCompleted(
+            this
+        );
+        flightReservationCompleted.publishAfterCommit();
+
+        FlightReservationRefunded flightReservationRefunded = new FlightReservationRefunded(
+            this
+        );
+        flightReservationRefunded.publishAfterCommit();
+
+        FlightReservaionRefundFailed flightReservaionRefundFailed = new FlightReservaionRefundFailed(
+            this
+        );
+        flightReservaionRefundFailed.publishAfterCommit();
+
+        FlightReservationCancelRequested flightReservationCancelRequested = new FlightReservationCancelRequested(
+            this
+        );
+        flightReservationCancelRequested.publishAfterCommit();
+
+        FlightReservationFailed flightReservationFailed = new FlightReservationFailed(
+            this
+        );
+        flightReservationFailed.publishAfterCommit();
+
+        FlightReservationCancelled flightReservationCancelled = new FlightReservationCancelled(
+            this
+        );
+        flightReservationCancelled.publishAfterCommit();
+        // Get request from FlightReservation
+        //travel.external.FlightReservation flightReservation =
+        //    Application.applicationContext.getBean(travel.external.FlightReservationService.class)
+        //    .getFlightReservation(/** mapping value needed */);
+
     }
 
     public static FlightReservationRepository repository() {
@@ -62,8 +108,10 @@ public class FlightReservation {
         FlightReservation flightReservation = new FlightReservation();
         repository().save(flightReservation);
 
-        FlightBookCompleted flightBookCompleted = new FlightBookCompleted(flightReservation);
-        flightBookCompleted.publishAfterCommit();
+        FlightReservationCompleted flightReservationCompleted = new FlightReservationCompleted(flightReservation);
+        flightReservationCompleted.publishAfterCommit();
+        FlightReservationCompleted flightReservationCompleted = new FlightReservationCompleted(flightReservation);
+        flightReservationCompleted.publishAfterCommit();
         */
 
         /** Example 2:  finding and process
@@ -73,8 +121,72 @@ public class FlightReservation {
             flightReservation // do something
             repository().save(flightReservation);
 
-            FlightBookCompleted flightBookCompleted = new FlightBookCompleted(flightReservation);
-            flightBookCompleted.publishAfterCommit();
+            FlightReservationCompleted flightReservationCompleted = new FlightReservationCompleted(flightReservation);
+            flightReservationCompleted.publishAfterCommit();
+            FlightReservationCompleted flightReservationCompleted = new FlightReservationCompleted(flightReservation);
+            flightReservationCompleted.publishAfterCommit();
+
+         });
+        */
+
+    }
+
+    //>>> Clean Arch / Port Method
+    //<<< Clean Arch / Port Method
+    public static void paymentRefund(PaymentRefunded paymentRefunded) {
+        //implement business logic here:
+
+        /** Example 1:  new item 
+        FlightReservation flightReservation = new FlightReservation();
+        repository().save(flightReservation);
+
+        FlightReservationRefunded flightReservationRefunded = new FlightReservationRefunded(flightReservation);
+        flightReservationRefunded.publishAfterCommit();
+        FlightReservationRefunded flightReservationRefunded = new FlightReservationRefunded(flightReservation);
+        flightReservationRefunded.publishAfterCommit();
+        */
+
+        /** Example 2:  finding and process
+        
+        repository().findById(paymentRefunded.get???()).ifPresent(flightReservation->{
+            
+            flightReservation // do something
+            repository().save(flightReservation);
+
+            FlightReservationRefunded flightReservationRefunded = new FlightReservationRefunded(flightReservation);
+            flightReservationRefunded.publishAfterCommit();
+            FlightReservationRefunded flightReservationRefunded = new FlightReservationRefunded(flightReservation);
+            flightReservationRefunded.publishAfterCommit();
+
+         });
+        */
+
+    }
+
+    //>>> Clean Arch / Port Method
+    //<<< Clean Arch / Port Method
+    public static void paymentRefundFail(
+        PaymentRefundFailed paymentRefundFailed
+    ) {
+        //implement business logic here:
+
+        /** Example 1:  new item 
+        FlightReservation flightReservation = new FlightReservation();
+        repository().save(flightReservation);
+
+        FlightReservaionRefundFailed flightReservaionRefundFailed = new FlightReservaionRefundFailed(flightReservation);
+        flightReservaionRefundFailed.publishAfterCommit();
+        */
+
+        /** Example 2:  finding and process
+        
+        repository().findById(paymentRefundFailed.get???()).ifPresent(flightReservation->{
+            
+            flightReservation // do something
+            repository().save(flightReservation);
+
+            FlightReservaionRefundFailed flightReservaionRefundFailed = new FlightReservaionRefundFailed(flightReservation);
+            flightReservaionRefundFailed.publishAfterCommit();
 
          });
         */
@@ -90,8 +202,8 @@ public class FlightReservation {
         FlightReservation flightReservation = new FlightReservation();
         repository().save(flightReservation);
 
-        FlightbookCancelled flightbookCancelled = new FlightbookCancelled(flightReservation);
-        flightbookCancelled.publishAfterCommit();
+        FlightReservationCancelled flightReservationCancelled = new FlightReservationCancelled(flightReservation);
+        flightReservationCancelled.publishAfterCommit();
         */
 
         /** Example 2:  finding and process
@@ -101,8 +213,8 @@ public class FlightReservation {
             flightReservation // do something
             repository().save(flightReservation);
 
-            FlightbookCancelled flightbookCancelled = new FlightbookCancelled(flightReservation);
-            flightbookCancelled.publishAfterCommit();
+            FlightReservationCancelled flightReservationCancelled = new FlightReservationCancelled(flightReservation);
+            flightReservationCancelled.publishAfterCommit();
 
          });
         */
@@ -111,28 +223,26 @@ public class FlightReservation {
 
     //>>> Clean Arch / Port Method
     //<<< Clean Arch / Port Method
-    public static void requestFlightReservtion(
-        FlightBookRequested flightBookRequested
-    ) {
+    public static void paymentFailed(PaymentFailed paymentFailed) {
         //implement business logic here:
 
         /** Example 1:  new item 
         FlightReservation flightReservation = new FlightReservation();
         repository().save(flightReservation);
 
-        PaymentRequested paymentRequested = new PaymentRequested(flightReservation);
-        paymentRequested.publishAfterCommit();
+        FlightReservationFailed flightReservationFailed = new FlightReservationFailed(flightReservation);
+        flightReservationFailed.publishAfterCommit();
         */
 
         /** Example 2:  finding and process
         
-        repository().findById(flightBookRequested.get???()).ifPresent(flightReservation->{
+        repository().findById(paymentFailed.get???()).ifPresent(flightReservation->{
             
             flightReservation // do something
             repository().save(flightReservation);
 
-            PaymentRequested paymentRequested = new PaymentRequested(flightReservation);
-            paymentRequested.publishAfterCommit();
+            FlightReservationFailed flightReservationFailed = new FlightReservationFailed(flightReservation);
+            flightReservationFailed.publishAfterCommit();
 
          });
         */

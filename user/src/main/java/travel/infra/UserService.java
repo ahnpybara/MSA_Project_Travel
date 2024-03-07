@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional(readOnly = true)
+//회원 관리 책임 서비스
 public class UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);

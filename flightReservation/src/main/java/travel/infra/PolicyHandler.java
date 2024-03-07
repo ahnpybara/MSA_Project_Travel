@@ -39,6 +39,40 @@ public class PolicyHandler {
 
     @StreamListener(
         value = KafkaProcessor.INPUT,
+        condition = "headers['type']=='PaymentRefunded'"
+    )
+    public void wheneverPaymentRefunded_PaymentRefund(
+        @Payload PaymentRefunded paymentRefunded
+    ) {
+        PaymentRefunded event = paymentRefunded;
+        System.out.println(
+            "\n\n##### listener PaymentRefund : " + paymentRefunded + "\n\n"
+        );
+
+        // Sample Logic //
+        FlightReservation.paymentRefund(event);
+    }
+
+    @StreamListener(
+        value = KafkaProcessor.INPUT,
+        condition = "headers['type']=='PaymentRefundFailed'"
+    )
+    public void wheneverPaymentRefundFailed_PaymentRefundFail(
+        @Payload PaymentRefundFailed paymentRefundFailed
+    ) {
+        PaymentRefundFailed event = paymentRefundFailed;
+        System.out.println(
+            "\n\n##### listener PaymentRefundFail : " +
+            paymentRefundFailed +
+            "\n\n"
+        );
+
+        // Sample Logic //
+        FlightReservation.paymentRefundFail(event);
+    }
+
+    @StreamListener(
+        value = KafkaProcessor.INPUT,
         condition = "headers['type']=='PaymentCancelled'"
     )
     public void wheneverPaymentCancelled_PaymentCancel(
@@ -55,20 +89,18 @@ public class PolicyHandler {
 
     @StreamListener(
         value = KafkaProcessor.INPUT,
-        condition = "headers['type']=='FlightBookRequested'"
+        condition = "headers['type']=='PaymentFailed'"
     )
-    public void wheneverFlightBookRequested_RequestFlightReservtion(
-        @Payload FlightBookRequested flightBookRequested
+    public void wheneverPaymentFailed_PaymentFailed(
+        @Payload PaymentFailed paymentFailed
     ) {
-        FlightBookRequested event = flightBookRequested;
+        PaymentFailed event = paymentFailed;
         System.out.println(
-            "\n\n##### listener RequestFlightReservtion : " +
-            flightBookRequested +
-            "\n\n"
+            "\n\n##### listener PaymentFailed : " + paymentFailed + "\n\n"
         );
 
         // Sample Logic //
-        FlightReservation.requestFlightReservtion(event);
+        FlightReservation.paymentFailed(event);
     }
 }
 //>>> Clean Arch / Inbound Adaptor

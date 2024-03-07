@@ -47,7 +47,9 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
             if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
                 logger.error("로그인 상태 및 토큰을 다시 확인할 것");
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                return exchange.getResponse().setComplete();
+                // 로그인이 필요하다는 응답 메시지 추가
+                return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory()
+                        .wrap("로그인이 필요합니다.".getBytes(StandardCharsets.UTF_8))));
             }
 
             // "Bearer " 다음에 오는 문자열을 토큰으로 사용

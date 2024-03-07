@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "screen", url = "${api.url.screen}")
+@FeignClient(name = "flight", url = "${api.url.flight}")
 public interface FlightService {
     @GetMapping(path = "/flights")
     public List<Flight> getFlight();

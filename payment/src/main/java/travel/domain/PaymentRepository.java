@@ -1,13 +1,10 @@
 package travel.domain;
 
-import java.util.Optional;
-
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import travel.domain.*;
 
+//<<< PoEAA / Repository
 @RepositoryRestResource(collectionResourceRel = "payments", path = "payments")
 public interface PaymentRepository
-        extends PagingAndSortingRepository<Payment, Long> {
-
-    Optional<Payment> findByReservationId(Long reservationId);
-}
+    extends PagingAndSortingRepository<Payment, Long> {}

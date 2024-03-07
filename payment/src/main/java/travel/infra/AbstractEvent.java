@@ -1,5 +1,7 @@
 package travel.infra;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHeaders;
@@ -10,6 +12,7 @@ import org.springframework.util.MimeTypeUtils;
 import travel.PaymentApplication;
 import travel.config.kafka.KafkaProcessor;
 
+//<<< Clean Arch / Outbound Adaptor
 public class AbstractEvent {
 
     String eventType;
@@ -26,7 +29,9 @@ public class AbstractEvent {
     }
 
     public void publish() {
-
+        /**
+         * spring streams 방식
+         */
         KafkaProcessor processor = PaymentApplication.applicationContext.getBean(
             KafkaProcessor.class
         );
@@ -75,3 +80,4 @@ public class AbstractEvent {
         return getEventType().equals(getClass().getSimpleName());
     }
 }
+//>>> Clean Arch / Outbound Adaptor
