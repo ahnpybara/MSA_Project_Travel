@@ -1,12 +1,13 @@
-package travel.domain;
+package travel.event.subscribe;
 
-import java.time.LocalDate;
 import java.util.*;
 import lombok.Data;
-import travel.infra.AbstractEvent;
+import lombok.EqualsAndHashCode;
+import travel.event.publish.AbstractEvent;
 
 @Data
-public class FlightReservationRefunded extends AbstractEvent {
+@EqualsAndHashCode(callSuper=false)
+public class FlightReservationCompleted extends AbstractEvent {
 
     private Long id;
     private String airLine;
@@ -16,9 +17,7 @@ public class FlightReservationRefunded extends AbstractEvent {
     private Date depTime;
     private Long charge;
     private String vihicleId;
-    private String status;
     private Long userId;
-    private String passenger;
     private String name;
     private Long FlightId;
     private String email;
