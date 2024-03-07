@@ -1,13 +1,15 @@
 package travel.domain;
 
+import java.time.LocalDate;
 import java.util.*;
 import lombok.*;
 import travel.domain.*;
 import travel.infra.AbstractEvent;
 
+//<<< DDD / Domain Event
 @Data
 @ToString
-public class FlightReservaionRequested extends AbstractEvent {
+public class FlightReservationRequested extends AbstractEvent {
 
     private Long id;
     private String airLine;
@@ -23,4 +25,13 @@ public class FlightReservaionRequested extends AbstractEvent {
     private String name;
     private Long flightId;
     private String email;
+
+    public FlightReservationRequested(FlightReservation aggregate) {
+        super(aggregate);
+    }
+
+    public FlightReservationRequested() {
+        super();
+    }
 }
+//>>> DDD / Domain Event

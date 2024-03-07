@@ -47,11 +47,8 @@ spring:
 
 logging:
   level:
-    org.hibernate: OFF
-    org.hibernate.SQL: OFF
-    org.hibernate.type: OFF
-    org.hibernate.stat: OFF
-    org.hibernate.id.enhanced.SequenceStyleGenerator: OFF
+    org.hibernate.type: info
+    org.springframework.cloud: info
 
 server:
   port: 8086

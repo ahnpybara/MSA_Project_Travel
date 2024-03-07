@@ -1,13 +1,10 @@
-package travel.domain;
+package travel.event.publish;
 
-import java.time.LocalDate;
-import java.util.*;
 import lombok.*;
 import travel.domain.*;
-import travel.infra.AbstractEvent;
 
-//<<< DDD / Domain Event
 @Data
+@EqualsAndHashCode(callSuper=false)
 @ToString
 public class PaymentCancelled extends AbstractEvent {
 
@@ -26,4 +23,3 @@ public class PaymentCancelled extends AbstractEvent {
         super();
     }
 }
-//>>> DDD / Domain Event

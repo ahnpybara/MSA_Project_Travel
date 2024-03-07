@@ -25,7 +25,7 @@ public class PolicyHandler {
     @Autowired
     FlightService flightService;
 
-    private static final Logger logger = LoggerFactory.getLogger(FlightService.class);
+    private static final Logger logger = LoggerFactory.getLogger("MyLogger");
 
     @Retryable(value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     @StreamListener(value = KafkaProcessor.INPUT, condition = "headers['type']=='FlightReservationCancelled' or headers['type']=='FlightReservationCancelRequested' or headers['type']=='FlightReservationFailed' or headers['type']=='FlightReservationRefunded'")

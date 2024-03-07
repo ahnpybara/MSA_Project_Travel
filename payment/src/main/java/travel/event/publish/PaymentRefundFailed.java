@@ -1,15 +1,12 @@
-package travel.domain;
+package travel.event.publish;
 
-import java.time.LocalDate;
-import java.util.*;
 import lombok.*;
 import travel.domain.*;
-import travel.infra.AbstractEvent;
 
-//<<< DDD / Domain Event
 @Data
+@EqualsAndHashCode(callSuper=false)
 @ToString
-public class PaymentRefunded extends AbstractEvent {
+public class PaymentRefundFailed extends AbstractEvent {
 
     private Long id;
     private Long charge;
@@ -19,12 +16,11 @@ public class PaymentRefunded extends AbstractEvent {
     private String impUid;
     private String status;
 
-    public PaymentRefunded(Payment aggregate) {
+    public PaymentRefundFailed(Payment aggregate) {
         super(aggregate);
     }
 
-    public PaymentRefunded() {
+    public PaymentRefundFailed() {
         super();
     }
 }
-//>>> DDD / Domain Event

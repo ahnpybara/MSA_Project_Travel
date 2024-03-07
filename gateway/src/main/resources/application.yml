@@ -24,7 +24,7 @@ spring:
         - id: myPage
           uri: http://localhost:8085
           predicates:
-            - Path=, 
+            - Path=/flightInfos/**, 
         - id: flight
           uri: http://localhost:8086
           predicates:
@@ -32,15 +32,11 @@ spring:
         - id: lodging
           uri: http://localhost:8087
           predicates:
-            - Path=/lodgings/**, /lodgingDetails/**, /rooms/**, 
+            - Path=/lodgings/**
         - id: lodgingReservation
           uri: http://localhost:8088
           predicates:
-            - Path=/lodgingReservations/**, 
-        - id: frontend
-          uri: http://localhost:8080
-          predicates:
-            - Path=/**
+            - Path=/lodgingReservations/**
 #>>> API Gateway / Routes
       globalcors:
         corsConfigurations:

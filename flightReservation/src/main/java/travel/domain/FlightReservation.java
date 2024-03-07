@@ -9,7 +9,7 @@ import travel.FlightReservationApplication;
 import travel.domain.FlightReservaionCancelRequested;
 import travel.domain.FlightReservaionCancelled;
 import travel.domain.FlightReservaionFailed;
-import travel.domain.FlightReservaionRequested;
+import travel.domain.FlightReservationRequested;
 import travel.domain.FlightReservationCompleted;
 import travel.domain.FlightReservationRefunded;
 import travel.domain.PaymentRefundFailed;
@@ -50,43 +50,8 @@ public class FlightReservation {
 
     @PostPersist
     public void onPostPersist() {
-        FlightReservaionRequested flightReservaionRequested = new FlightReservaionRequested(
-            this
-        );
+        FlightReservationRequested flightReservaionRequested = new FlightReservationRequested(this);
         flightReservaionRequested.publishAfterCommit();
-
-        FlightReservationCompleted flightReservationCompleted = new FlightReservationCompleted(
-            this
-        );
-        flightReservationCompleted.publishAfterCommit();
-
-        FlightReservationRefunded flightReservationRefunded = new FlightReservationRefunded(
-            this
-        );
-        flightReservationRefunded.publishAfterCommit();
-
-        PaymentRefundFailed paymentRefundFailed = new PaymentRefundFailed(this);
-        paymentRefundFailed.publishAfterCommit();
-
-        FlightReservaionCancelRequested flightReservaionCancelRequested = new FlightReservaionCancelRequested(
-            this
-        );
-        flightReservaionCancelRequested.publishAfterCommit();
-
-        FlightReservaionFailed flightReservaionFailed = new FlightReservaionFailed(
-            this
-        );
-        flightReservaionFailed.publishAfterCommit();
-
-        FlightReservaionCancelled flightReservaionCancelled = new FlightReservaionCancelled(
-            this
-        );
-        flightReservaionCancelled.publishAfterCommit();
-        // Get request from FlightReservation
-        //travel.external.FlightReservation flightReservation =
-        //    Application.applicationContext.getBean(travel.external.FlightReservationService.class)
-        //    .getFlightReservation(/** mapping value needed */);
-
     }
 
     public static FlightReservationRepository repository() {
