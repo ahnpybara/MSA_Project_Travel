@@ -1,0 +1,100 @@
+server:
+  port: 8088
+
+---
+
+spring:
+  profiles: default
+  cloud:
+    gateway:
+#<<< API Gateway / Routes
+      routes:
+        - id: payment
+          uri: http://localhost:8082
+          predicates:
+            - Path=/payments/**, 
+        - id: flightReservation
+          uri: http://localhost:8083
+          predicates:
+            - Path=/flightReservations/**, 
+        - id: user
+          uri: http://localhost:8084
+          predicates:
+            - Path=/users/**, 
+        - id: myPage
+          uri: http://localhost:8085
+          predicates:
+            - Path=, 
+        - id: flight
+          uri: http://localhost:8086
+          predicates:
+            - Path=/flights/**, 
+        - id: lodging
+          uri: http://localhost:8087
+          predicates:
+            - Path=/lodgings/**, /lodgingDetails/**, /rooms/**, 
+        - id: frontend
+          uri: http://localhost:8080
+          predicates:
+            - Path=/**
+#>>> API Gateway / Routes
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "*"
+            allowedMethods:
+              - "*"
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+
+---
+
+spring:
+  profiles: docker
+  cloud:
+    gateway:
+      routes:
+        - id: payment
+          uri: http://payment:8080
+          predicates:
+            - Path=/payments/**, 
+        - id: flightReservation
+          uri: http://flightReservation:8080
+          predicates:
+            - Path=/flightReservations/**, 
+        - id: user
+          uri: http://user:8080
+          predicates:
+            - Path=/users/**, 
+        - id: myPage
+          uri: http://myPage:8080
+          predicates:
+            - Path=, 
+        - id: flight
+          uri: http://flight:8080
+          predicates:
+            - Path=/flights/**, 
+        - id: lodging
+          uri: http://lodging:8080
+          predicates:
+            - Path=/lodgings/**, /lodgingDetails/**, /rooms/**, 
+        - id: frontend
+          uri: http://frontend:8080
+          predicates:
+            - Path=/**
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "*"
+            allowedMethods:
+              - "*"
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+server:
+  port: 8080
