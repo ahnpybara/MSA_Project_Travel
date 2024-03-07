@@ -48,7 +48,7 @@ logging:
 api:
   url: 
     flightReservation: localhost:8083 
-    screen: localhost:8086    
+    flight: localhost:8086    
 
 server:
   port: 8083
@@ -88,5 +88,5 @@ spring:
 api:
   url: 
     flightReservation: flightReservation:8080 
-    screen: localhost:8080
+    flight: localhost:8080
 
