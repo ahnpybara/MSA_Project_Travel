@@ -1,21 +1,19 @@
 package travel.domain;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.PostPersist;
+import javax.persistence.Table;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import lombok.Builder;
 import lombok.Data;
 import travel.UserApplication;
-import travel.domain.LoggedIn;
-import travel.domain.SignedUp;
+import travel.dto.SignedUpDTO;
 
 @Entity
 @Table(name = "User_table")
@@ -61,7 +59,7 @@ public class User {
         return userRepository;
     }
 
-    public void register(SignedUp signedUp) {
+    public void register(SignedUpDTO signedUp) {
         setName(signedUp.getName());
         setPassword(signedUp.getPassword());
         setUsername(signedUp.getUsername());

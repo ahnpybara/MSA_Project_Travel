@@ -17,20 +17,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 
 import travel.domain.User;
 import travel.domain.UserRepository;
@@ -42,10 +38,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private final UserRepository userRepository;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {// 생성자
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
-        // 로그인 주소를 변경합니다
         this.setFilterProcessesUrl("/users/login");
     }
 
@@ -54,7 +49,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             throws AuthenticationException {
         System.out.println("JwtAuthenticationFilter :로그인 시도중");
         try {
-            ObjectMapper om = new ObjectMapper();// 객체 매핑
+            ObjectMapper om = new ObjectMapper();
             User user = om.readValue(request.getInputStream(), User.class);
             logger.info(user);
 

@@ -1,5 +1,10 @@
+api:
+  serviceKey: O%2B0DdibyeRPwjChz%2BqSJN%2FEurIanim0THVar8SxizDrSwO9bDs%2BJWH5YxshTVo5qudULTKjhTOOUyxZSrjD9oQ%3D%3D
+
 server:
   port: 8080
+  error:
+    include-message: always
 
 spring:
   application:
@@ -11,7 +16,7 @@ spring:
   jpa:
     properties:
       hibernate:
-        show_sql: true
+        show_sql: false
         format_sql: true
         implicit_naming_strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
   cloud:
@@ -42,9 +47,11 @@ spring:
 
 logging:
   level:
-    org.hibernate.type: trace
-    org.springframework.cloud: debug
-
+    org.hibernate: OFF
+    org.hibernate.SQL: OFF
+    org.hibernate.type: OFF
+    org.hibernate.stat: OFF
+    org.hibernate.id.enhanced.SequenceStyleGenerator: OFF
 
 server:
   port: 8086

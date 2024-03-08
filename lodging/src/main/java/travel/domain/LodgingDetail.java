@@ -1,11 +1,11 @@
 package travel.domain;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.PostPersist;
+import javax.persistence.Table;
 
 import lombok.Data;
 import travel.LodgingApplication;
@@ -14,138 +14,55 @@ import travel.repository.LodgingDetailRepository;
 @Entity
 @Table(name = "LodgingDetail_table")
 @Data
-// <<< DDD / Aggregate Root
+//<<< DDD / Aggregate Root
 public class LodgingDetail {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonProperty("contentid")
-    private Long contentId;
+    private Long contentid;
 
-    @JsonProperty("contenttypeid")
-    private Long contentTypeId;
+    private Long contenttypeid;
 
-    // @JsonProperty("createdtime")
-    // private Long createdTime;
+    private Long createdtime;
 
     private String title;
 
-    // @JsonProperty("modifiedtime")
-    // private Long modifiedTime;
+    private Long modifiedtime;
 
-    @JsonProperty("tel")
-    private String phoneNumber;
+    private String tel;
 
-    // @JsonProperty("telname")
-    // private String telName;
+    private String telname;
 
-    @JsonProperty("homepage")
     private String homePage;
 
-    @JsonProperty("firstimage")
-    private String image;
+    private String firstimage;
 
-    // private String image2;
+    private String firstimage2;
 
-    // @JsonProperty("areacode")
-    // private String areaCode;
+    private String areacode;
 
-    @JsonProperty("sigungucode")
-    private String sigunguCode;
+    private String sigungucode;
 
     private String addr1;
 
     private String addr2;
 
-    @JsonProperty("mapx")
-    private String mapX;
+    private String mapx;
 
-    @JsonProperty("mapy")
-    private String mapY;
+    private String mapy;
 
-    @JsonProperty("overview")
-    private String overView;
-
-    // @JsonProperty("roomcount")
-    // private String roomCount;
-
-    // @JsonProperty("roomtype")
-    // private String roomType;
-
-    private String refundregulation;
-
-    @JsonProperty("checkintime")
-    private String checkInTime;
-
-    @JsonProperty("checkouttime")
-    private String checkOutTime;
-
-    @JsonProperty("chkcooking")
-    private String chkCooking;
-
-    // private String seminar;
-
-    // private String sports;
-
-    // private String sauna;
-
-    // private String beauty;
-
-    // private String beverage;
-
-    // private String karaoke;
-
-    // private String barbeque;
-
-    // private String campfire;
-
-    // private String bicyde;
-
-    // private String fitness;
-
-    private String mlevel;
-
-    // @JsonProperty("publicpc")
-    // private String publicPc;
-
-    // @JsonProperty("publicbath")
-    // private String publicBath;
-
-    // private String subfadility;
-
-    // @JsonProperty("foodplace")
-    // private String foodPlace;
-
-    // @JsonProperty("reservationurl")
-    // private String reservationUrl;
-
-    // private String pickup;
-
-    // @JsonProperty("infocenterlodging")
-    // private String infoCenterLodging;
-
-    @JsonProperty("parkinglodging")
-    private String parkingLodging;
-
-    // @JsonProperty("reservationlodging")
-    // private String reservationLodging;
-
-    // @JsonProperty("scalelodging")
-    // private String scaleLodging;
-
-    // @JsonProperty("accomcountlodging")
-    // private String accomCountLodging;
+    private String overview;
 
     @PostPersist
-    public void onPostPersist() {
-    }
+    public void onPostPersist() {}
 
     public static LodgingDetailRepository repository() {
         LodgingDetailRepository lodgingDetailRepository = LodgingApplication.applicationContext.getBean(
-                LodgingDetailRepository.class);
+            LodgingDetailRepository.class
+        );
         return lodgingDetailRepository;
     }
 }
-// >>> DDD / Aggregate Root
+//>>> DDD / Aggregate Root

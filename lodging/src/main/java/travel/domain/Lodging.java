@@ -1,9 +1,11 @@
 package travel.domain;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.PostPersist;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -14,12 +16,12 @@ import travel.repository.LodgingRepository;
 @Entity
 @Table(name = "Lodging_table")
 @Data
-// <<< DDD / Aggregate Root
+//<<< DDD / Aggregate Root
 public class Lodging {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+  private Long id;
 
     private String addr1;
 
@@ -64,13 +66,13 @@ public class Lodging {
     private Long modifiedTime;
 
     @PostPersist
-    public void onPostPersist() {
-    }
+    public void onPostPersist() {}
 
     public static LodgingRepository repository() {
         LodgingRepository lodgingRepository = LodgingApplication.applicationContext.getBean(
-                LodgingRepository.class);
+            LodgingRepository.class
+        );
         return lodgingRepository;
     }
 }
-// >>> DDD / Aggregate Root
+//>>> DDD / Aggregate Root

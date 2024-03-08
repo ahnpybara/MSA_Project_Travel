@@ -2,7 +2,6 @@ package travel.service;
 
 import java.net.URI;
 import java.time.Duration;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,17 +11,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import travel.domain.Lodging;
-import travel.repository.LodgingRepository;
 import travel.exception.CustomException;
 import travel.exception.RetryExhaustedException;
+import travel.repository.LodgingRepository;
 
 @Service
 @RequiredArgsConstructor

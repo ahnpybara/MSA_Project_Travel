@@ -7,30 +7,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import travel.domain.User;
 import lombok.Data;
+import travel.domain.User;
 
 @Data
-public class PrincipalDetails implements UserDetails{
-    
+public class PrincipalDetails implements UserDetails {
+
     @Autowired
     private User user;
 
-    public PrincipalDetails(User user){
-        this.user=user;
+    public PrincipalDetails(User user) {
+        this.user = user;
     }
 
- @Override
+    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        user.getRoleList().forEach(r->{
-            authorities.add(()->r);
+        user.getRoleList().forEach(r -> {
+            authorities.add(() -> r);
         });
         return authorities;
 
     }
 
- 
     @Override
     public String getPassword() {
         return user.getPassword();
@@ -60,5 +59,5 @@ public class PrincipalDetails implements UserDetails{
     public boolean isEnabled() {
         return true;
     }
-    
+
 }

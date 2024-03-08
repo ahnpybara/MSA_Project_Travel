@@ -18,10 +18,9 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 import travel.auth.JwtAuthenticationFilter;
 import travel.auth.PrincipalDetails;
-import travel.domain.SignedUp;
 import travel.domain.User;
 import travel.domain.UserRepository;
-import lombok.RequiredArgsConstructor;
+import travel.dto.SignedUpDTO;
 
 @Service
 @Transactional(readOnly = true)
@@ -38,7 +37,7 @@ public class UserService {
 
     // 회원가입 로직
     @Transactional
-    public User save(SignedUp signedUp) {
+    public User save(SignedUpDTO signedUp) {
 
         validateDuplicate(signedUp.getUsername());
         try {
@@ -54,6 +53,7 @@ public class UserService {
         }
     }
 
+    //회원가입 중복 체크
     public void validateDuplicate(String username) {
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isPresent()) {
@@ -62,6 +62,7 @@ public class UserService {
         }
     }
 
+    //리프레시 토큰 조회 
     public String getRefreshToken(String username) {
         logger.info("리프레시 토큰 조회 시작: ", username);
         User user = userRepository.findByUsername(username)
@@ -74,6 +75,7 @@ public class UserService {
         return token;
     }
 
+    //토큰 재발급
     public String createToken(String refreshToken) {
         User user = userRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(() -> {
@@ -85,6 +87,7 @@ public class UserService {
         return newAccessToken;
     }
 
+    //로그아웃
     @Transactional
     public void logout(HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");

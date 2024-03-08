@@ -1,9 +1,7 @@
 package travel.domain;
 
-import java.time.LocalDate;
-import java.util.*;
-import lombok.*;
-import travel.domain.*;
+import lombok.Data;
+import lombok.ToString;
 import travel.infra.AbstractEvent;
 
 //<<< DDD / Domain Event

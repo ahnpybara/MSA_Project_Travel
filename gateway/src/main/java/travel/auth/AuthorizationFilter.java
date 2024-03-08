@@ -1,14 +1,5 @@
 package travel.auth;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.interfaces.Claim;
-import com.auth0.jwt.interfaces.DecodedJWT;
-
-import reactor.core.publisher.Mono;
-
 import java.nio.charset.StandardCharsets;
 
 import org.slf4j.Logger;
@@ -19,6 +10,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
+
+import reactor.core.publisher.Mono;
 
 @Component
 // 토큰을 검증하고 필요한 경우 재발급하는 필터
@@ -51,14 +51,11 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
                 return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory()
                         .wrap("로그인이 필요합니다.".getBytes(StandardCharsets.UTF_8))));
             }
-
-            // "Bearer " 다음에 오는 문자열을 토큰으로 사용
             String token = authorizationHeader.substring(JwtProperties.TOKEN_PREFIX.length());
 
             try {
                 // 토큰을 검증
                 verifyToken(token);
-                // 검증이 성공하면 필터 체인을 계속 실행
                 return chain.filter(exchange);
             } catch (TokenExpiredException e) {
                 // 토큰이 만료된 경우
@@ -84,7 +81,6 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
                     return getRefreshToken(username)
                             .flatMap(this::requestNewToken)
                             .flatMap(newToken -> {
-                                // 새 토큰을 응답 헤더에 설정하고 필터 체인을 계속 실행
                                 exchange.getResponse().getHeaders().set("authorization", "Bearer " + newToken);
                                 return chain.filter(exchange);
                             });
@@ -110,8 +106,8 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
         try {
             JWT.require(Algorithm.HMAC512(JwtProperties.SECRET.getBytes()))
                     .build()
-                    .verify(token) // 토큰 검증
-                    .getClaims(); // 검증된 토큰의 클레임을 가져옴
+                    .verify(token) 
+                    .getClaims();
             logger.info("토큰 유효함");
         } catch (TokenExpiredException e) {
             logger.error("토큰이 만료됨", e);
