@@ -93,7 +93,7 @@ public class UserService {
             String username = decodedJWT.getClaim("username").asString();
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> {
-                        logger.info("로그아웃 관련 오류가 발생");
+                        logger.error("로그아웃 관련 오류가 발생");
                         return new NoSuchElementException("사용자를 찾을 수 없습니다.");
                     });
             user.setRefreshToken(null);

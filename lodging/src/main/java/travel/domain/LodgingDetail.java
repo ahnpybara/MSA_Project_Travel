@@ -27,29 +27,30 @@ public class LodgingDetail {
     @JsonProperty("contenttypeid")
     private Long contentTypeId;
 
-    @JsonProperty("createdtime")
-    private Long createdTime;
+    // @JsonProperty("createdtime")
+    // private Long createdTime;
 
     private String title;
 
-    @JsonProperty("modifiedtime")
-    private Long modifiedTime;
+    // @JsonProperty("modifiedtime")
+    // private Long modifiedTime;
 
     @JsonProperty("tel")
     private String phoneNumber;
 
-    @JsonProperty("telname")
-    private String telName;
+    // @JsonProperty("telname")
+    // private String telName;
 
     @JsonProperty("homepage")
     private String homePage;
 
+    @JsonProperty("firstimage")
     private String image;
 
-    private String image2;
+    // private String image2;
 
-    @JsonProperty("areacode")
-    private String areaCode;
+    // @JsonProperty("areacode")
+    // private String areaCode;
 
     @JsonProperty("sigungucode")
     private String sigunguCode;
@@ -67,11 +68,11 @@ public class LodgingDetail {
     @JsonProperty("overview")
     private String overView;
 
-    @JsonProperty("roomcount")
-    private String roomCount;
+    // @JsonProperty("roomcount")
+    // private String roomCount;
 
-    @JsonProperty("roomtype")
-    private String roomType;
+    // @JsonProperty("roomtype")
+    // private String roomType;
 
     private String refundregulation;
 
@@ -84,58 +85,58 @@ public class LodgingDetail {
     @JsonProperty("chkcooking")
     private String chkCooking;
 
-    private String seminar;
+    // private String seminar;
 
-    private String sports;
+    // private String sports;
 
-    private String sauna;
+    // private String sauna;
 
-    private String beauty;
+    // private String beauty;
 
-    private String beverage;
+    // private String beverage;
 
-    private String karaoke;
+    // private String karaoke;
 
-    private String barbeque;
+    // private String barbeque;
 
-    private String campfire;
+    // private String campfire;
 
-    private String bicyde;
+    // private String bicyde;
 
-    private String fitness;
+    // private String fitness;
 
     private String mlevel;
 
-    @JsonProperty("publicpc")
-    private String publicPc;
+    // @JsonProperty("publicpc")
+    // private String publicPc;
 
-    @JsonProperty("publicbath")
-    private String publicBath;
+    // @JsonProperty("publicbath")
+    // private String publicBath;
 
-    private String subfadility;
+    // private String subfadility;
 
-    @JsonProperty("foodplace")
-    private String foodPlace;
+    // @JsonProperty("foodplace")
+    // private String foodPlace;
 
-    @JsonProperty("reservationurl")
-    private String reservationUrl;
+    // @JsonProperty("reservationurl")
+    // private String reservationUrl;
 
-    private String pickup;
+    // private String pickup;
 
-    @JsonProperty("infocenterlodging")
-    private String infoCenterLodging;
+    // @JsonProperty("infocenterlodging")
+    // private String infoCenterLodging;
 
     @JsonProperty("parkinglodging")
     private String parkingLodging;
 
-    @JsonProperty("reservationlodging")
-    private String reservationLodging;
+    // @JsonProperty("reservationlodging")
+    // private String reservationLodging;
 
-    @JsonProperty("scalelodging")
-    private String scaleLodging;
+    // @JsonProperty("scalelodging")
+    // private String scaleLodging;
 
-    @JsonProperty("accomcountlodging")
-    private String accomCountLodging;
+    // @JsonProperty("accomcountlodging")
+    // private String accomCountLodging;
 
     @PostPersist
     public void onPostPersist() {

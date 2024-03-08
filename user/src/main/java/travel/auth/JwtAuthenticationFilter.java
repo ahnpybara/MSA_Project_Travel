@@ -70,11 +70,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         } catch (IOException e) {
             throw new RuntimeException("로그인 정보 읽기 실패", e);
         } catch (AuthenticationException e) {
-            logger.info("아이디가 존재하지 않거나 비밀번호가 일치하지 않음");
+            logger.error("아이디가 존재하지 않거나 비밀번호가 일치하지 않음", e);
             sendErrorMessage(response, "아이디가 존재하지 않거나 비밀번호가 일치하지 않습니다.");
             return null;
         } catch (JWTVerificationException e) {
-            logger.info("사용자 인증 실패로 토큰 생성에 실패");
+            logger.error("사용자 인증 실패로 토큰 생성에 실패", e);
             sendErrorMessage(response, "토큰 생성에 실패했습니다.");
             return null;
         }

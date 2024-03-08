@@ -2,26 +2,22 @@ package travel.service;
 
 import java.net.URI;
 import java.time.Duration;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
-import travel.domain.Lodging;
 import travel.domain.LodgingDetail;
 import travel.exception.CustomException;
 import travel.exception.RetryExhaustedException;
@@ -70,16 +66,21 @@ public class LodgingDetailService {
                 serviceKey, contentTypeId, contentId, mobileOS, mobileApp, type);
 
         Mono<JsonNode> detailLodging = webClient.get()
-                .uri(URI.create(urlDetailLodging))  
+                .uri(URI.create(urlDetailLodging))
                 .header("Accept", "application/json")
                 .retrieve()
                 .bodyToMono(JsonNode.class)
-                .retryWhen(createRetrySpec())
-                .flatMap(jsonNode -> Mono.justOrEmpty(// Mono.justOrEmpty: 이 메소드는 주어진 객체를 이용하여 새로운 Mono를 생성하되, 객체가 null인
-                                                      // 경우에는 빈 Mono를 반환
-                        jsonNode.path("response").path("body").path("items").path("item").get(0)));// 첫번째 아이템을 가져옴
-                
-                
+                // .retryWhen(createRetrySpec())
+                .flatMap(jsonNode -> {
+                    JsonNode itemNode = jsonNode.path("response").path("body").path("items").path("item");
+                    if (itemNode.isArray() && itemNode.size() > 0) {
+                        return Mono.justOrEmpty(itemNode.get(0));
+                    } else {
+                        logger.info("detail 빈 객체 반환");
+                        return Mono.empty();
+                    }
+                });
+
         // get(0)을 호출하면, 시스템은 예외를 발생시킵니다. 이는 리스트가 비어있음을 즉시 알아챌 수 있게 해주므로, 에러를 빠르게 찾고 수정할
         // 수 있습니다.
 
@@ -88,10 +89,17 @@ public class LodgingDetailService {
                 .header("Accept", "application/json")
                 .retrieve()
                 .bodyToMono(JsonNode.class)
-                .retryWhen(createRetrySpec())
+                // .retryWhen(createRetrySpec())
 
-                .flatMap(jsonNode -> Mono.justOrEmpty(
-                        jsonNode.path("response").path("body").path("items").path("item").get(0)));// 첫번째 아이템을 가져옴
+                .flatMap(jsonNode -> {
+                    JsonNode itemNode = jsonNode.path("response").path("body").path("items").path("item");
+                    if (itemNode.isArray() && itemNode.size() > 0) {
+                        return Mono.justOrEmpty(itemNode.get(0));
+                    } else {
+                        logger.info("intro 빈 객체 반환");
+                        return Mono.empty();
+                    }
+                });
 
         return Mono.zip(detailLodging, detailIntro)
                 .flatMap(tuple -> {
@@ -110,10 +118,10 @@ public class LodgingDetailService {
                             mergedNode.set(field.getKey(), field.getValue());
                         }
                     });
-
                     return Mono.just(mergedNode);
                 })
                 .map(this::convertAndSaveLodging)
+                .timeout(Duration.ofSeconds(10))
                 .onErrorResume(this::handleError);
     }
 
@@ -135,11 +143,24 @@ public class LodgingDetailService {
         }
     }
 
+    
+
     private Mono<LodgingDetail> handleError(Throwable e) {
         if (e instanceof RetryExhaustedException) {
-            throw new CustomException("재시도 횟수를 초과하였습니다. 다시 한 번 재시도 해주세요", HttpStatus.SERVICE_UNAVAILABLE);
-        } else {
-            throw new RuntimeException("예외가 발생하였습니다.");
+            return Mono.error(new CustomException("재시도 횟수를 초과하였습니다. 다시 한 번 재시도 해주세요", HttpStatus.SERVICE_UNAVAILABLE));
+        } else if (e instanceof UnsupportedMediaTypeException) {
+            logger.error("숙소 디테일, 잘못된 주소로 요청", e);
+            return Mono.error(new UnsupportedMediaTypeException("잘못된 주소로 요청"));
+        } else if (e instanceof java.util.concurrent.TimeoutException) {
+            logger.error("api 요청 시간 초과", e);
+            return Mono.error(new java.util.concurrent.TimeoutException("요청 시간이 초과되었습니다."));
+        } else if( e instanceof NullPointerException){
+            logger.error("null값을 조회", e);
+            return Mono.error(new NullPointerException("서버 내부 오류가 발생했습니다."));
+        }
+        else {
+            logger.error("알 수 없는 에러 발생", e);
+            return Mono.error(new RuntimeException("알 수 없는 에러가 발생했습니다."));
         }
     }
 

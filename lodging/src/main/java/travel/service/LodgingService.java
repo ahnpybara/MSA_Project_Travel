@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -72,6 +73,7 @@ public class LodgingService {
             int totalCnt = totalCount.get("response").get("body").get("items").get("item").get(0).get("totalCnt").asInt(); // 전체 데이터 개수를 JsonNode에서 추출합니다
             int totalPages = (totalCnt + numOfRows - 1) / numOfRows; // 전체 페이지 수를 계산합니다.
             // 1부터 totalPages까지의 숫자를 포함하는 Flux를 생성합니다. 이때 Flux의 각 요소는 페이지 번호를 나타냅니다.
+            logger.info("두 번쨰 요청 시작");
             return Flux.range(1, totalPages)
                     .flatMap(page -> {
 
@@ -83,7 +85,6 @@ public class LodgingService {
                         // 각 페이지들에에 대한 URL을 생성하고, 이 URL에 대해 HTTP GET 요청을 보내는 WebClient를 생성하여 요청을 보낸 뒤,
                         // API 응답 본문을 Mono<JsonNode>로 변환합니다. 그리고 이 Mono<JsonNode>들은 이후의 flatMap 연산자에 의해
                         // 처리됩니다
-                        logger.info("두 번쨰 요청 시작");
                         return webClient.get()
                                 .uri(URI.create(urlForData))
                                 
@@ -129,6 +130,9 @@ public class LodgingService {
     private Mono<Lodging> handleError(Throwable e) {
         if (e instanceof RetryExhaustedException) {
             throw new CustomException("재시도 횟수를 초과하였습니다. 다시 한 번 재시도 해주세요", HttpStatus.SERVICE_UNAVAILABLE);
+        } else if(e instanceof UnsupportedMediaTypeException){
+            logger.error("전체 숙소 조희, 잘못된 주소 요청", e);;
+            return Mono.error(new UnsupportedMediaTypeException("잘못된 주소로 요청"));
         } else if (e instanceof WebClientResponseException) {
             throw new CustomException("서버와 연결할 수 없습니다 : " + e.getMessage(), HttpStatus.BAD_REQUEST);
         } else if (e instanceof RuntimeException) {
