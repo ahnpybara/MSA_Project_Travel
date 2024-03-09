@@ -50,6 +50,7 @@ public class LodgingIntroService {
     @Value("${api.arrange}")
     private String arrange;
 
+    //숙소 소개 메서드
     @Transactional
     public Mono<LodgingIntro> searchIntro(String contentid, String contenttypeid, String type) {
         String urlForDetailIntro = String.format(

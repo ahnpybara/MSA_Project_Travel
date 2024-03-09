@@ -51,6 +51,7 @@ public class RoomService {
     @Value("${api.arrange}")
     private String arrange;
 
+    // 룸 요청 메서드
     @Transactional
     public Flux<Room> searchRoom(String contentid, String contenttypeid, String type) {
         String urlForRoom = String.format(
@@ -64,10 +65,11 @@ public class RoomService {
                 .retrieve()
                 .bodyToMono(JsonNode.class)
                 .retryWhen(createRetrySpec())
-                .flatMapMany(jsonNode -> Flux // 각 페이지의 API 응답의 본문을 처리하는 부분으로, flatMapMany 연산자를 사용하여 각
-                                              // 응답 본문의 데이터들을 처리한 뒤, 이를 하나의 Flux로 변환합니다.
+                .flatMapMany(jsonNode -> Flux 
+                                              
                         .fromIterable(
-                                jsonNode.path("response").path("body").path("items").path("item")))                .map(this::convertAndSaveLodging)
+                                jsonNode.path("response").path("body").path("items").path("item")))
+                .map(this::convertAndSaveLodging)
 
                 .timeout(Duration.ofSeconds(15))
                 .onErrorResume(this::handleError);

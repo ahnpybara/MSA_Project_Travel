@@ -59,6 +59,7 @@ public class User {
         return userRepository;
     }
 
+    //회원가입 로직
     public void register(SignedUpDTO signedUp) {
         setName(signedUp.getName());
         setPassword(signedUp.getPassword());

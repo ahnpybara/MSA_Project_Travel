@@ -24,44 +24,35 @@ import reactor.core.publisher.Mono;
 // 토큰을 검증하고 필요한 경우 재발급하는 필터
 public class AuthorizationFilter extends AbstractGatewayFilterFactory<AuthorizationFilter.Config> {
 
-    // 로그를 위한 Logger 인스턴스
+    
     private static final Logger logger = LoggerFactory.getLogger(AuthorizationFilter.class);
-
-    // HTTP 요청을 보내기 위한 WebClient 인스턴스
+    
     private WebClient webClient;
 
-    // 생성자에서 WebClient 인스턴스를 초기화
     public AuthorizationFilter() {
         super(Config.class);
         this.webClient = WebClient.create("http://localhost:8088");
     }
 
-    // GatewayFilter를 반환하는 메소드
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
-            // 요청 헤더에서 "Authorization" 헤더를 가져옴
             String authorizationHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
 
-            // "Authorization" 헤더가 없거나 "Bearer "로 시작하지 않으면 로그를 남기고 401 Unauthorized 응답을 반환
             if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
                 logger.error("로그인 상태 및 토큰을 다시 확인할 것");
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                // 로그인이 필요하다는 응답 메시지 추가
                 return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory()
                         .wrap("로그인이 필요합니다.".getBytes(StandardCharsets.UTF_8))));
             }
             String token = authorizationHeader.substring(JwtProperties.TOKEN_PREFIX.length());
 
             try {
-                // 토큰을 검증
                 verifyToken(token);
                 return chain.filter(exchange);
             } catch (TokenExpiredException e) {
-                // 토큰이 만료된 경우
                 String username;
                 try {
-                    // 토큰에서 "username" 클레임을 추출
                     DecodedJWT decodedJWT = JWT.decode(token);
                     Claim usernameClaim = decodedJWT.getClaim("username");
                     if (usernameClaim.isNull()) {
@@ -69,7 +60,6 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
                     }
                     username = usernameClaim.asString();
                 } catch (Exception ex) {
-                    // 토큰 디코딩에 실패한 경우 로그를 남기고 401 Unauthorized 응답을 반환
                     logger.error("토큰 디코딩 실패", ex);
                     exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                     return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory()
@@ -77,7 +67,6 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
                 }
 
                 try {
-                    // 리프레시 토큰을 가져와서 새 토큰을 발급받음
                     return getRefreshToken(username)
                             .flatMap(this::requestNewToken)
                             .flatMap(newToken -> {
@@ -85,14 +74,12 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
                                 return chain.filter(exchange);
                             });
                 } catch (Exception ex) {
-                    // 토큰 재발급에 실패한 경우 로그를 남기고 500 Internal Server Error 응답을 반환
                     logger.error("토큰 재발급 실패", ex);
                     exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
                     return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory()
                             .wrap("토큰 재발급에 실패했습니다.".getBytes(StandardCharsets.UTF_8))));
                 }
             } catch (Exception e) {
-                // 토큰 검증에 실패한 경우 로그를 남기고 401 Unauthorized 응답을 반환
                 logger.error("토큰 검증 실패", e);
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory()
@@ -122,6 +109,7 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
 
     // 사용자 이름으로 리프레시 토큰을 가져오는 메소드
     private Mono<String> getRefreshToken(String username) {
+        logger.info("사용자 조회 요청");
         return webClient.get()
                 .uri("/users/{username}/refreshToken", username)
                 .retrieve()

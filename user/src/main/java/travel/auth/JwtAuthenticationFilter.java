@@ -44,6 +44,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         this.setFilterProcessesUrl("/users/login");
     }
 
+    //인증 시도 메서드
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
@@ -89,35 +90,35 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
     }
     
+    //인증 성공 시 실행되는 메서드
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
             Authentication authResult) throws IOException, ServletException {
         logger.info("로그인 아이디와 비밀번호 인증 성공");
         PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
 
-        // access 토큰 발급
+
         String accessToken = createAccessToken(principalDetails);
         logger.info("엑세스 토큰 발급");
-        // refresh 토큰 발급
+
         String refreshToken = createRefreshToken(principalDetails);
         logger.info("리프레쉬 토큰 발급");
-        // 리프레시 토큰으로 사용자 업데이트
+
         Optional<User> optionalUser = userRepository.findByUsername(principalDetails.getUser().getUsername());
         optionalUser.ifPresent(user -> {
             user.setRefreshToken(refreshToken);
             userRepository.save(user);
         });
 
-        // 헤더에 토큰 추가
+
         response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessToken);
         response.setHeader("Access-Control-Expose-Headers", JwtProperties.HEADER_STRING);
 
-        // 응답 데이터에 ID 추가
         Map<String, String> data = new HashMap<>();
         data.put("userId", principalDetails.getUser().getId().toString());
         data.put("name",principalDetails.getUser().getName());
         data.put("username", principalDetails.getUser().getUsername());
-        // JSON 형식으로 응답 작성
+
         response.setContentType("application/json");
         new ObjectMapper().writeValue(response.getOutputStream(), data);
         logger.info("로그인 완료");
