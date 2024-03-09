@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         this.setFilterProcessesUrl("/users/login");
     }
 
-    //인증 시도 메서드
+    //로그인 인증 시도 메서드
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
@@ -139,8 +139,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         return accessToken;
     }
 
+    //refresh 토큰 발급 메서드
     public String createRefreshToken(PrincipalDetails principalDetails) {
-        // refresh 토큰 발급
         String refreshToken = JWT.create()
                 .withSubject(JwtProperties.TOKENNAME)
                 .withExpiresAt(Date.from(Instant.now().plus(JwtProperties.RT_TIME, ChronoUnit.MINUTES)))

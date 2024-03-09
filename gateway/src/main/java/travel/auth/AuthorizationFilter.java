@@ -34,6 +34,7 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
         this.webClient = WebClient.create("http://localhost:8088");
     }
 
+    //필터 수행 메서드
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {

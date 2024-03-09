@@ -14,6 +14,8 @@ import javax.persistence.Table;
 import lombok.Data;
 import travel.UserApplication;
 import travel.dto.SignedUpDTO;
+import travel.events.publish.LoggedIn;
+import travel.events.publish.SignedUp;
 
 @Entity
 @Table(name = "User_table")
