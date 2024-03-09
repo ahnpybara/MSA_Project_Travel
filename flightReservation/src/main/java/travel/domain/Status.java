@@ -6,10 +6,7 @@ public enum Status {
     결제실패,   //PaymentFail
     결제취소,   //PaymentCancel
     예약완료,   //complete payment 
-    예약취소, 
-    취소요청,
-    취소실패,
-    취소완료,
+    예약취소,   //cancel 메서드
     환불완료,   //PaymentRefunded
     환불실패    //PaymentRefundedFailed
 }

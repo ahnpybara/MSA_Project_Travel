@@ -10,26 +10,27 @@ import lombok.Data;
 public class FlightReservationDTO {
     
     private Long id;
-    @NotBlank(message = "airLine cannot be null or empty")
+    @NotBlank(message = "\nairLine cannot be null or empty\n")
     private String airLine;
-    @NotBlank(message = "arrAirport cannot be null or empty")
+    @NotBlank(message = "\narrAirport cannot be null or empty\n")
     private String arrAirport;
-    @NotBlank(message = "depAirport cannot be null or empty")
+    @NotBlank(message = "\ndepAirport cannot be null or empty\n")
     private String depAirport;
-    @NotNull(message = "arrTime cannot be null or empty")
+    @NotNull(message = "\narrTime cannot be null or empty\n")
     private Long arrTime;
-    @NotNull(message = "depTime cannot be null or empty")
+    @NotNull(message = "\ndepTime cannot be null or empty\n")
     private Long depTime;
-    @NotNull(message = "charge cannot be null or empty")
+    @NotNull(message = "\ncharge cannot be null or empty\n")
     private Long charge;
-    @NotBlank(message = "vihicleId cannot be null or empty")
+    @NotBlank(message = "\nvihicleId cannot be null or empty\n")
     private String vihicleId;
-    @NotNull(message = "userId cannot be null or empty")
+    @NotNull(message = "\nuserId cannot be null or empty\n")
     private Long userId;
-    @NotBlank(message = "name cannot be null or empty")
+    @NotBlank(message = "\nname cannot be null or empty\n")
     private String name;
-    @NotBlank(message = "email cannot be null or empty")
+    @NotBlank(message = "\nemail cannot be null or empty\n")
     private String email;
-    @NotNull(message = "flightId cannot be null or empty")
+    @NotNull(message = "\nflightId cannot be null or empty\n")
     private Long flightId;
+
 }
