@@ -35,6 +35,14 @@
 			<artifactId>spring-boot-starter-hateoas</artifactId>
 		</dependency>
 		<dependency>
+    		<groupId>org.springframework.boot</groupId>
+    		<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+		<dependency>
+    		<groupId>org.springframework.retry</groupId>
+    		<artifactId>spring-retry</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
@@ -70,7 +78,33 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+				<!-- SLF4J API -->
+		<dependency>
+    		<groupId>org.slf4j</groupId>
+    		<artifactId>slf4j-api</artifactId>
+    		<version>1.7.30</version>
+		</dependency>
+    	<!-- Spring Boot Test Starter, 테스트를 위한 주요 의존성을 포함합니다. -->
+   		<dependency>
+        	<groupId>org.springframework.boot</groupId>
+        	<artifactId>spring-boot-starter-test</artifactId>
+        	<scope>test</scope>
+    	</dependency>
 
+    	<!-- Mockito를 사용할 경우, 필요에 따라 명시적으로 추가 -->
+    	<dependency>
+        	<groupId>org.mockito</groupId>
+        	<artifactId>mockito-core</artifactId>
+        	<version>3.3.3</version> <!-- 사용하고자 하는 Mockito 버전 -->
+        	<scope>test</scope>
+    	</dependency>
+		<!-- Logback Classic Implementation -->
+		<dependency>
+    		<groupId>ch.qos.logback</groupId>
+    		<artifactId>logback-classic</artifactId>
+    		<version>1.2.3</version> 
+		</dependency>
+		
 		<!-- cucumber test -->
 		<dependency>
 			<groupId>io.cucumber</groupId>

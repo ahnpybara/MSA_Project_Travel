@@ -34,6 +34,24 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-hateoas</artifactId>
 		</dependency>
+    	<dependency>
+        	<groupId>org.springframework.boot</groupId>
+        	<artifactId>spring-boot-starter-security</artifactId>	
+    	</dependency>
+
+    <!-- JWT (JSON Web Token) -->
+    	<dependency>
+        	<groupId>com.auth0</groupId>
+        	<artifactId>java-jwt</artifactId>
+        	<version>3.18.2</version> <!-- 최신 버전으로 업데이트하세요 -->
+    	</dependency>
+
+    <!-- Spring Web -->
+    	<dependency>
+        	<groupId>org.springframework.boot</groupId>
+        	<artifactId>spring-boot-starter-web</artifactId>
+    	</dependency>
+
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>

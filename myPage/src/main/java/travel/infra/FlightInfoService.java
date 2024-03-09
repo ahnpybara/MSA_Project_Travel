@@ -62,6 +62,7 @@ public class FlightInfoService {
     }
 
     // 만약 예약정보를 수정 및 저장하는 도중 문제 발생시 이를 메일로 전송하는 메서드
+    @SuppressWarnings("null")
     public void sendEmail(Object flightInfo) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("ahnpybara7627@gmail.com");

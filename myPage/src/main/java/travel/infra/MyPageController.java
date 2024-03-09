@@ -24,6 +24,7 @@ public class MyPageController {
     private static final Logger logger = LoggerFactory.getLogger("MyLogger");
 
     // 특정 사용자가 예약한 항공편의 정보를 반환하는 메서드입니다
+    @SuppressWarnings("null")
     @GetMapping("/flightInfos/{userId}")
     public ResponseEntity<?> getAndSaveFlightData(@PathVariable Long userId) {
 

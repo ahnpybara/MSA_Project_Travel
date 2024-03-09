@@ -1,18 +1,9 @@
 package travel.domain;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 import javax.persistence.*;
 import lombok.Data;
 import travel.FlightReservationApplication;
-import travel.domain.FlightReservaionCancelRequested;
-import travel.domain.FlightReservaionCancelled;
-import travel.domain.FlightReservaionFailed;
-import travel.domain.FlightReservationRequested;
-import travel.domain.FlightReservationCompleted;
-import travel.domain.FlightReservationRefunded;
-import travel.domain.PaymentRefundFailed;
+
 
 @Entity
 @Table(name = "FlightReservation_table")
@@ -30,15 +21,15 @@ public class FlightReservation {
 
     private String depAirport;
 
-    private Date arrTime;
+    private Long arrTime;
 
-    private Date depTime;
+    private Long depTime;
 
     private Long charge;
 
     private String vihicleId;
 
-    private String status;
+    private Status status;
 
     private Long userId;
 
@@ -47,12 +38,9 @@ public class FlightReservation {
     private Long flightId;
 
     private String email;
+    
+    private String reservationHash;
 
-    @PostPersist
-    public void onPostPersist() {
-        FlightReservationRequested flightReservaionRequested = new FlightReservationRequested(this);
-        flightReservaionRequested.publishAfterCommit();
-    }
 
     public static FlightReservationRepository repository() {
         FlightReservationRepository flightReservationRepository = FlightReservationApplication.applicationContext.getBean(
@@ -60,156 +48,4 @@ public class FlightReservation {
         );
         return flightReservationRepository;
     }
-
-    //<<< Clean Arch / Port Method
-    public static void paymentComplete(Paid paid) {
-        //implement business logic here:
-
-        /** Example 1:  new item 
-        FlightReservation flightReservation = new FlightReservation();
-        repository().save(flightReservation);
-
-        FlightReservationCompleted flightReservationCompleted = new FlightReservationCompleted(flightReservation);
-        flightReservationCompleted.publishAfterCommit();
-        FlightReservationCompleted flightReservationCompleted = new FlightReservationCompleted(flightReservation);
-        flightReservationCompleted.publishAfterCommit();
-        */
-
-        /** Example 2:  finding and process
-        
-        repository().findById(paid.get???()).ifPresent(flightReservation->{
-            
-            flightReservation // do something
-            repository().save(flightReservation);
-
-            FlightReservationCompleted flightReservationCompleted = new FlightReservationCompleted(flightReservation);
-            flightReservationCompleted.publishAfterCommit();
-            FlightReservationCompleted flightReservationCompleted = new FlightReservationCompleted(flightReservation);
-            flightReservationCompleted.publishAfterCommit();
-
-         });
-        */
-
-    }
-
-    //>>> Clean Arch / Port Method
-    //<<< Clean Arch / Port Method
-    public static void paymentRefund(PaymentRefunded paymentRefunded) {
-        //implement business logic here:
-
-        /** Example 1:  new item 
-        FlightReservation flightReservation = new FlightReservation();
-        repository().save(flightReservation);
-
-        FlightReservationRefunded flightReservationRefunded = new FlightReservationRefunded(flightReservation);
-        flightReservationRefunded.publishAfterCommit();
-        FlightReservationRefunded flightReservationRefunded = new FlightReservationRefunded(flightReservation);
-        flightReservationRefunded.publishAfterCommit();
-        */
-
-        /** Example 2:  finding and process
-        
-        repository().findById(paymentRefunded.get???()).ifPresent(flightReservation->{
-            
-            flightReservation // do something
-            repository().save(flightReservation);
-
-            FlightReservationRefunded flightReservationRefunded = new FlightReservationRefunded(flightReservation);
-            flightReservationRefunded.publishAfterCommit();
-            FlightReservationRefunded flightReservationRefunded = new FlightReservationRefunded(flightReservation);
-            flightReservationRefunded.publishAfterCommit();
-
-         });
-        */
-
-    }
-
-    //>>> Clean Arch / Port Method
-    //<<< Clean Arch / Port Method
-    public static void paymentRefundFail(
-        PaymentRefundFailed paymentRefundFailed
-    ) {
-        //implement business logic here:
-
-        /** Example 1:  new item 
-        FlightReservation flightReservation = new FlightReservation();
-        repository().save(flightReservation);
-
-        PaymentRefundFailed paymentRefundFailed = new PaymentRefundFailed(flightReservation);
-        paymentRefundFailed.publishAfterCommit();
-        */
-
-        /** Example 2:  finding and process
-        
-        repository().findById(paymentRefundFailed.get???()).ifPresent(flightReservation->{
-            
-            flightReservation // do something
-            repository().save(flightReservation);
-
-            PaymentRefundFailed paymentRefundFailed = new PaymentRefundFailed(flightReservation);
-            paymentRefundFailed.publishAfterCommit();
-
-         });
-        */
-
-    }
-
-    //>>> Clean Arch / Port Method
-    //<<< Clean Arch / Port Method
-    public static void paymentCancel(PaymentCancelled paymentCancelled) {
-        //implement business logic here:
-
-        /** Example 1:  new item 
-        FlightReservation flightReservation = new FlightReservation();
-        repository().save(flightReservation);
-
-        FlightReservaionCancelled flightReservaionCancelled = new FlightReservaionCancelled(flightReservation);
-        flightReservaionCancelled.publishAfterCommit();
-        */
-
-        /** Example 2:  finding and process
-        
-        repository().findById(paymentCancelled.get???()).ifPresent(flightReservation->{
-            
-            flightReservation // do something
-            repository().save(flightReservation);
-
-            FlightReservaionCancelled flightReservaionCancelled = new FlightReservaionCancelled(flightReservation);
-            flightReservaionCancelled.publishAfterCommit();
-
-         });
-        */
-
-    }
-
-    //>>> Clean Arch / Port Method
-    //<<< Clean Arch / Port Method
-    public static void paymentFailed(PaymentFailed paymentFailed) {
-        //implement business logic here:
-
-        /** Example 1:  new item 
-        FlightReservation flightReservation = new FlightReservation();
-        repository().save(flightReservation);
-
-        FlightReservaionFailed flightReservaionFailed = new FlightReservaionFailed(flightReservation);
-        flightReservaionFailed.publishAfterCommit();
-        */
-
-        /** Example 2:  finding and process
-        
-        repository().findById(paymentFailed.get???()).ifPresent(flightReservation->{
-            
-            flightReservation // do something
-            repository().save(flightReservation);
-
-            FlightReservaionFailed flightReservaionFailed = new FlightReservaionFailed(flightReservation);
-            flightReservaionFailed.publishAfterCommit();
-
-         });
-        */
-
-    }
-    //>>> Clean Arch / Port Method
-
 }
-//>>> DDD / Aggregate Root

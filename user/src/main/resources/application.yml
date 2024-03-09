@@ -1,3 +1,5 @@
+
+
 server:
   port: 8080
 
@@ -42,8 +44,8 @@ spring:
 
 logging:
   level:
-    org.hibernate.type: trace
-    org.springframework.cloud: debug
+    org.hibernate.type: info
+    org.springframework.cloud: info
 
 
 server:
