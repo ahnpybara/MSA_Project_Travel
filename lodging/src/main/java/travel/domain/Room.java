@@ -1,77 +1,74 @@
 package travel.domain;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 import javax.persistence.*;
 import lombok.Data;
 import travel.LodgingApplication;
+import travel.repository.RoomRepository;
 
 @Entity
 @Table(name = "Room_table")
 @Data
-//<<< DDD / Aggregate Root
 public class Room {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private Long contentId;
+    private Long contentid;
 
-    private Long contentTypeId;
+    private Long contenttypeid;
 
-    private Long roomCode;
+    private Long roomcode;
 
-    private String roomTitle;
+    private String roomtitle;
 
-    private String roomSize;
+    private String roomsize;
 
-    private String roomCount;
+    private String roomcount;
 
-    private Integer roomBaseCount;
+    private Integer roombasecount;
 
-    private Integer roomMaxCount;
+    private Integer roommaxcount;
 
-    private Long roomOffSeasonMinfee1;
+    private Long roomoffseasonminfee1;
 
-    private Long roomOffSeasonMinfee2;
+    private Long roomoffseasonminfee2;
 
-    private Long roomPeakSeasonMinfee1;
+    private Long roompeakSeasonMinfee1;
 
-    private Long roomPeakSeasonMinfee2;
+    private Long roompeakseasonminfee2;
 
-    private String roomIntro;
+    private String roomintro;
 
-    private String roomBathFadility;
+    private String roombathfadility;
 
-    private String roomBath;
+    private String roombath;
 
-    private String roomHomeTheater;
+    private String roomhometheater;
 
-    private String roomAirCondition;
+    private String roomaircondition;
 
-    private String roomTv;
+    private String roomtv;
 
-    private String roomPc;
+    private String roompc;
 
-    private String roomCable;
+    private String roomcable;
 
-    private String roomInternet;
+    private String roominternet;
 
-    private String roomRefrigerator;
+    private String roomrefrigerator;
 
-    private String roomToiletries;
+    private String roomtoiletries;
 
-    private String roomSofa;
+    private String roomsofa;
 
-    private String roomCook;
+    private String roomcook;
 
-    private String roomTable;
+    private String roomtable;
 
-    private String roomHairdryer;
+    private String roomhairdryer;
 
-    private String roomSize2;
+    private String roomsize2;
 
     private String roomImg1;
 
@@ -89,11 +86,11 @@ public class Room {
 
     private String roomImg4Alt;
 
-    private String originImgUrl;
+    private String originImgurl;
 
-    private String imgName;
+    private String imgname;
 
-    private String smallImageUrl;
+    private String smallimageurl;
 
     @PostPersist
     public void onPostPersist() {}
@@ -105,4 +102,3 @@ public class Room {
         return roomRepository;
     }
 }
-//>>> DDD / Aggregate Root

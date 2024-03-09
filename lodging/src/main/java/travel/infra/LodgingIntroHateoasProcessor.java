@@ -6,11 +6,11 @@ import org.springframework.stereotype.Component;
 import travel.domain.*;
 
 @Component
-public class LodgingDetailHateoasProcessor
-        implements RepresentationModelProcessor<EntityModel<LodgingDetail>> {
+public class LodgingIntroHateoasProcessor
+    implements RepresentationModelProcessor<EntityModel<LodgingIntro>> {
 
     @Override
-    public EntityModel<LodgingDetail> process(EntityModel<LodgingDetail> model) {
+    public EntityModel<LodgingIntro> process(EntityModel<LodgingIntro> model) {
         return model;
     }
 }

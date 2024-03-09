@@ -1,109 +1,52 @@
 package travel.domain;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 import javax.persistence.*;
 import lombok.Data;
 import travel.LodgingApplication;
+import travel.repository.LodgingDetailRepository;
 
 @Entity
 @Table(name = "LodgingDetail_table")
 @Data
-//<<< DDD / Aggregate Root
 public class LodgingDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private Long contentId;
+    private Long contentid;
 
-    private Long contentTypeId;
+    private Long contenttypeid;
 
-    private Long createdTime;
+    private Long createdtime;
 
     private String title;
 
-    private Long modifiedTime;
+    private Long modifiedtime;
 
-    private String phoneNumber;
+    private String tel;
 
-    private String telName;
+    private String telname;
 
-    private String homePage;
+    private String homepage;
 
-    private String image;
+    private String firstimage;
 
-    private String image2;
+    private String firstimage2;
 
-    private String areaCode;
+    private String areacode;
 
-    private String sigunguCode;
+    private String sigungucode;
 
     private String addr1;
 
     private String addr2;
 
-    private String mapX;
+    private String mapx;
 
-    private String mapY;
+    private String mapy;
 
-    private String overView;
-
-    private String roomCount;
-
-    private String roomType;
-
-    private String refundregulation;
-
-    private String checkInTime;
-
-    private String checkOutTime;
-
-    private String chkCooking;
-
-    private String seminar;
-
-    private String sports;
-
-    private String sauna;
-
-    private String beauty;
-
-    private String beverage;
-
-    private String karaoke;
-
-    private String barbeque;
-
-    private String campfire;
-
-    private String bicyde;
-
-    private String fitness;
-
-    private String publicPc;
-
-    private String publicBath;
-
-    private String subfadility;
-
-    private String foodPlace;
-
-    private String reservationUrl;
-
-    private String pickup;
-
-    private String infoCenterLodging;
-
-    private String parkingLodging;
-
-    private String reservationLodging;
-
-    private String scaleLodging;
-
-    private String accomCountLodging;
+    private String overview;
 
     @PostPersist
     public void onPostPersist() {}
@@ -115,4 +58,3 @@ public class LodgingDetail {
         return lodgingDetailRepository;
     }
 }
-//>>> DDD / Aggregate Root
