@@ -14,8 +14,7 @@ public class LodgingReservation {
     private Long id;
 
     public static LodgingReservationRepository repository() {
-        LodgingReservationRepository lodgingReservationRepository = LodgingReservationApplication.applicationContext
-                .getBean(LodgingReservationRepository.class);
+        LodgingReservationRepository lodgingReservationRepository = LodgingReservationApplication.applicationContext.getBean(LodgingReservationRepository.class);
         return lodgingReservationRepository;
     }
 }

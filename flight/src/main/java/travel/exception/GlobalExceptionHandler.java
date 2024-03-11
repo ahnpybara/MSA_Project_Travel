@@ -20,4 +20,15 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(e.getStatusCode()).body(errorDetails);
     }
+
+    @ExceptionHandler(RollbackException.class)
+    public ResponseEntity<?> handleRollbackException(RollbackException e) {
+        Map<String, Object> errorDetails = new HashMap<>();
+        errorDetails.put("statusCode", e.getStatusCode());
+        errorDetails.put("error", e.getError());
+        errorDetails.put("exceptionType", e.getExceptionName());
+        errorDetails.put("message", e.getMessage());
+
+        return ResponseEntity.status(e.getStatusCode()).body(errorDetails);
+    }
 }

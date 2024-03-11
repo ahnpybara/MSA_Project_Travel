@@ -20,6 +20,7 @@ import travel.domain.FlightRepository;
 import travel.event.subscribe.FlightReservationCancelled;
 import travel.event.subscribe.FlightReservationRequested;
 import travel.exception.CustomException;
+import travel.exception.RollbackException;
 
 @Service
 public class FlightService {
@@ -76,7 +77,7 @@ public class FlightService {
     }
 
     // 예약 요청이 되었을 때 해당 항공편의 좌석수를 감소
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RollbackException.class)
     public void decreaseSeatCapacity(FlightReservationRequested flightReservationRequested) {
         try {
             Flight flight = flightRepository.findById(flightReservationRequested.getFlightId())
@@ -90,13 +91,13 @@ public class FlightService {
             throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST.value(), e.toString());
         } catch (Exception e) {
             logger.error("\n알 수 없는 오류로 해당 항공편의 좌석수를 감소하는데 실패했습니다\n");
-            throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e.toString());
+            throw new RollbackException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e.toString());
         }
     }
 
 
     // 예약 요청이 최소 되었을 때 해당 항공편의 좌석수를 증가
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RollbackException.class)
     public void increaseSeatCapacity(FlightReservationCancelled flightReservationCancelled) {
         try {
             Flight flight = flightRepository.findById(flightReservationCancelled.getFlightId())
@@ -110,7 +111,7 @@ public class FlightService {
             throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST.value(), e.toString());
         } catch (Exception e) {
             logger.error("\n알 수 없는 오류로 해당 항공편의 좌석수를 증가하는데 실패했습니다\n");
-            throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e.toString());
+            throw new RollbackException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e.toString());
         }
     }
     

@@ -33,10 +33,11 @@ public class LodgingController {
     public Flux<Lodging> search(@RequestParam(required = true) String areaCode,
             @RequestParam(required = false, defaultValue = "") String sigunguCode,
             @RequestParam(required = false, defaultValue = "1") int pageNo,
-            @RequestParam(required = false, defaultValue = "8") int numOfRows,
+            @RequestParam(required = false, defaultValue = "6") int numOfRows,
             @RequestParam(required = false, defaultValue = "json") String type) {
 
-        List<Lodging> lodgings = lodgingRepository.findAllByAreaCode(Long.valueOf(areaCode));
+        List<Lodging> lodgings = lodgingRepository.findAllByAreaCodeAndSigunguCode(Long.valueOf(areaCode), Long.valueOf(sigunguCode));
+        
         if (lodgings.isEmpty()) {
             logger.info("\nNo lodgings found in DB, searching...\n");
             return lodgingService.search(areaCode, sigunguCode, pageNo, numOfRows, type);

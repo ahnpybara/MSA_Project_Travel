@@ -8,7 +8,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import travel.domain.*;
 
 @RepositoryRestResource(collectionResourceRel = "lodgings", path = "lodgings")
-public interface LodgingRepository
-    extends PagingAndSortingRepository<Lodging, Long> {
+public interface LodgingRepository extends PagingAndSortingRepository<Lodging, Long> {
 
-    List<Lodging> findAllByAreaCode(Long areaCode);}
+    List<Lodging> findAllByAreaCodeAndSigunguCode(Long areaCode, Long sigunguCode);
+}

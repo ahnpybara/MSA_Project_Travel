@@ -27,8 +27,7 @@ public class Payment {
     private PaymentStatus status = PaymentStatus.결제전;
 
     public static PaymentRepository repository() {
-        PaymentRepository paymentRepository = PaymentApplication.applicationContext.getBean(
-            PaymentRepository.class);
+        PaymentRepository paymentRepository = PaymentApplication.applicationContext.getBean(PaymentRepository.class);
         return paymentRepository;
     }
 }

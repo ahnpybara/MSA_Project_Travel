@@ -10,8 +10,7 @@ public class LodgingReservationHateoasProcessor
         implements RepresentationModelProcessor<EntityModel<LodgingReservation>> {
 
     @Override
-    public EntityModel<LodgingReservation> process(
-            EntityModel<LodgingReservation> model) {
+    public EntityModel<LodgingReservation> process(EntityModel<LodgingReservation> model) {
         return model;
     }
 }

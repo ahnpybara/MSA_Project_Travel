@@ -2,7 +2,9 @@ package travel.service;
 
 import org.springframework.stereotype.Service;
 import java.net.URI;
+import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,24 +49,25 @@ public class LodgingService {
     // 숙소 API로 부터 숙소 정보를 요청해서 받아오는 메서드
     public Flux<Lodging> search(String areaCode, String sigunguCode, int pageNo, int numOfRows, String type) {
 
+        // 해당 지역과 시군구에 존재하는 숙소의 수를 요청하는 URL을 구성합니다
         String urlForTotalCount = String.format(
                 "https://apis.data.go.kr/B551011/KorService1/searchStay1?numOfRows=8&pageNo=1&MobileOS=%s&MobileApp=%s&_type=%s&listYN=N&arrange=%s&areaCode=%s&sigunguCode=%s&ServiceKey=%s",
                 mobileOS, mobileApp, type, arrange, areaCode, sigunguCode, serviceKey);
-        
+
         Mono<JsonNode> totalCountResponse = webClient.get()
                 .uri(URI.create(urlForTotalCount))
                 .header("Accept", "application/json")
                 .retrieve()
-                .bodyToMono(JsonNode.class);
+                .bodyToMono(JsonNode.class)
+                .timeout(Duration.ofSeconds(5));
 
+        // 페이지의 수를 구한 뒤, 각 페이지에 대한 요청을 보내는 URL을 구성하고 요청을 보냅니다
         return totalCountResponse.flatMapMany(totalCount -> {
-            int totalCnt = totalCount.get("response").get("body").get("items").get("item").get(0).get("totalCnt")
-                    .asInt();
+            int totalCnt = totalCount.get("response").get("body").get("items").get("item").get(0).get("totalCnt").asInt();
             int totalPages = (totalCnt + numOfRows - 1) / numOfRows;
 
             return Flux.range(1, totalPages)
                     .flatMap(page -> {
-
                         String urlForData = String.format(
                                 "http://apis.data.go.kr/B551011/KorService1/searchStay1?areaCode=%s&sigunguCode=%s&ServiceKey=%s&listYN=Y&MobileOS=%s&MobileApp=%s&arrange=%s&numOfRows=%d&pageNo=%d&_type=%s",
                                 areaCode, sigunguCode, serviceKey, mobileOS, mobileApp, arrange, numOfRows, page, type);
@@ -74,6 +77,7 @@ public class LodgingService {
                                 .header("Accept", "application/json")
                                 .retrieve()
                                 .bodyToMono(JsonNode.class)
+                                .timeout(Duration.ofSeconds(5))
                                 .flatMapMany(jsonNode -> Flux
                                         .fromIterable(
                                                 jsonNode.path("response").path("body").path("items").path("item")))
@@ -103,20 +107,24 @@ public class LodgingService {
         }
     }
 
-    // 예외 발생시 실행되는 예외 핸들러 메서드입니다
+    // 에러 처리 로직을 최적화한 handleError 메서드
     private Mono<Lodging> handleError(Throwable e) {
         if (e instanceof JsonTranferException) {
-            logger.error("\nJson 파싱 도중 예외가 발생했습니다.\n 오류 내용 : " + e);
-            return Mono.error(new JsonTranferException(e.getMessage()));
+            return logAndReturnError("Json 파싱 도중 예외가 발생했습니다.", e, new JsonTranferException(e.getMessage()));
         } else if (e instanceof SaveDataException) {
-            logger.error("\n숙소 정보를 저장하는 도중 오류가 발생했습니다.\n 오류 내용 : " + e);
-            return Mono.error(new SaveDataException(e.getMessage()));
+            return logAndReturnError("숙소 정보를 저장하는 도중 오류가 발생했습니다.", e, new SaveDataException(e.getMessage()));
         } else if (e instanceof WebClientResponseException) {
-            logger.error("\n숙소 API 서버와 연결을 할 수 없습니다.\n 오류 내용 : " + e);
-            return Mono.error(new RuntimeException("API 서버와 연결할 수 없습니다"));
-        } else {
-            logger.error("\n숙소 API를 불러오고 저장하는 도중 알 수 없는 오류가 발생했습니다.\n 오류 내용 : " + e);
-            return Mono.error(new Exception("알 수 없는 오류가 발생했습니다"));
+            return logAndReturnError("API 서버와 연결할 수 없습니다.", e, new RuntimeException("API 서버와 연결할 수 없습니다"));
+        } else if (e instanceof TimeoutException) {
+            return logAndReturnError("타임아웃이 발생했습니다.", e, new RuntimeException("API 서버와 연결할 수 없습니다"));
+        }else {
+            return logAndReturnError("알 수 없는 오류가 발생했습니다.", e, new Exception("알 수 없는 오류가 발생했습니다"));
         }
+    }
+
+    // 로그를 기록하고 에러를 반환하는 메서드
+    private <T> Mono<T> logAndReturnError(String logMessage, Throwable e, Exception returnException) {
+        logger.error("\n" + logMessage + "\n 오류 내용 : " + e);
+        return Mono.error(returnException);
     }
 }

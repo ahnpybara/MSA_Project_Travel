@@ -38,8 +38,7 @@ public class Flight {
     private Long seatCapacity = 100L;
 
     public static FlightRepository repository() {
-        FlightRepository flightRepository = FlightApplication.applicationContext.getBean(
-                FlightRepository.class);
+        FlightRepository flightRepository = FlightApplication.applicationContext.getBean(FlightRepository.class);
         return flightRepository;
     }
 }

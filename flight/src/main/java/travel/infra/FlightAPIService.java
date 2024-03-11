@@ -43,8 +43,6 @@ public class FlightAPIService {
                             "http://apis.data.go.kr/1613000/DmstcFlightNvgInfoService/getFlightOpratInfoList?serviceKey=%s&pageNo=%d&numOfRows=4&_type=json&depAirportId=%s&arrAirportId=%s&depPlandTime=%s&airlineId=",
                             serviceKey, page, depAirportId, arrAirportId, depPlandTime);
 
-                    // 각 페이지들의 URL에 HTTP GET 요청을 보내고 난 후, 응답 본문을 Mono<JsonNode>로 변환합니다.
-                    // 그리고 이 Mono<JsonNode>들은(응답 데이터들) 이후의 flatMap 연산자에 하나의 Flux로 합쳐지게 됩니다.
                     return webClient.get()
                             .uri(URI.create(urlForData))
                             .header("Accept", "application/json")

@@ -13,6 +13,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import travel.config.kafka.KafkaProcessor;
 import travel.domain.*;
+import travel.exception.RollbackException;
 import travel.infra.FlightService;
 
 @Service
@@ -28,7 +29,7 @@ public class PolicyHandler {
     private static final Logger logger = LoggerFactory.getLogger("MyLogger");
 
     // 항공편 취소 환불 실패 이벤트를 수신받아 해당 항공편의 좌석수를 1 증가하는 메서드입니다 
-    @Retryable(value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
+    @Retryable(value = RollbackException.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     @StreamListener(value = KafkaProcessor.INPUT, condition = "headers['type']=='FlightReservationCancelled' or headers['type']=='FlightReservationCancelRequested' or headers['type']=='FlightReservationFailed' or headers['type']=='FlightReservationRefunded'")
     public void wheneverFlightReservationCancelled(@Payload FlightReservationCancelled flightReservationCancelled) {
         logger.info("\n" + flightReservationCancelled.getFlightId() + "번 항공편의 좌석수를 1 증가합니다.\n");
@@ -36,7 +37,7 @@ public class PolicyHandler {
     }
 
     // 항공편 예약 이벤트를 수신받아 해당 항공편의 좌석수를 1 감소하는 메서드입니다 
-    @Retryable(value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
+    @Retryable(value = RollbackException.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     @StreamListener(value = KafkaProcessor.INPUT, condition = "headers['type']=='FlightReservationRequested'")
     public void wheneverFlightReservationRequested(@Payload FlightReservationRequested flightReservationRequested) {
         logger.info("\n" + flightReservationRequested.getFlightId() + "번 항공편의 좌석수를 1 감소합니다.\n");
@@ -46,6 +47,6 @@ public class PolicyHandler {
     // TODO 이걸 어떻게 SAGA로 해야햘까..?
     @Recover
     public void recover(RuntimeException e, Object flightInfo) {
-        logger.info("\n항공편의 좌석 정보 수정에 실패했습니다.\n");
+        logger.error("\n항공편의 좌석 정보 수정에 실패했습니다.\n");
     }
 }

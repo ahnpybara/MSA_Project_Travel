@@ -32,10 +32,9 @@ public class FlightController {
         Long startTimestamp = Long.parseLong(depPlandTime + "0000");
         Long endTimestamp = Long.parseLong(depPlandTime + "2359");
 
-        // 사용자가 요청한 항공편 정보가 먼저 DB에 있는지 확인합니다.
         List<Flight> flights = flightService.findFlights(depAirportId, arrAirportId, startTimestamp, endTimestamp);
 
-        if (!flights.isEmpty()) { // 만약 요청된 항공편의 정보가 DB에 없다면 항공편 API 요청을 통해서 저장을 하고 응답으로 줍니다
+        if (!flights.isEmpty()) {
             logger.info("\nFound flights in the database.\n");
             return Flux.fromIterable(flights);
         } else {

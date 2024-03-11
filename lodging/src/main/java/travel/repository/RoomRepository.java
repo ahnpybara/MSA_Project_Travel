@@ -5,5 +5,4 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import travel.domain.*;
 
 @RepositoryRestResource(collectionResourceRel = "rooms", path = "rooms")
-public interface RoomRepository
-    extends PagingAndSortingRepository<Room, Long> {}
+public interface RoomRepository extends PagingAndSortingRepository<Room, Long> {}

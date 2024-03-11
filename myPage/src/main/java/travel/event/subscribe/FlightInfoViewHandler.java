@@ -9,6 +9,7 @@ import org.springframework.retry.annotation.*;
 import org.springframework.stereotype.Service;
 import travel.config.kafka.KafkaProcessor;
 import travel.domain.*;
+import travel.exception.RollbackException;
 import travel.infra.FlightInfoService;
 
 @Service
@@ -24,7 +25,7 @@ public class FlightInfoViewHandler {
 
     // 사용자의 예약정보를 저장하는 메서드
     @StreamListener(KafkaProcessor.INPUT)
-    @Retryable(value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
+    @Retryable(value = RollbackException.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public void whenFlightReservationCompleted(@Payload FlightReservationCompleted flightReservationCompleted) {
 
         FlightInfo flightInfo = flightInfoRepository.findByReservationId(flightReservationCompleted.getId());
@@ -35,7 +36,7 @@ public class FlightInfoViewHandler {
 
     // 사용자의 예약정보 상태를 변경하는 메서드
     @StreamListener(KafkaProcessor.INPUT)
-    @Retryable(value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
+    @Retryable(value = RollbackException.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public void whenFlightReservationRefunded(@Payload FlightReservationRefunded flightReservationRefunded) {
 
         if (!flightReservationRefunded.validate()) return;
@@ -45,8 +46,8 @@ public class FlightInfoViewHandler {
 
     // 재시도를 해도 실패했을 경우 실행될 메서드를 정의합니다
     @Recover
-    public void flightInfoRecover(RuntimeException e, Object flightInfo) {
-        logger.info("\n예약된 항공편의 정보를 저장 및 수정하는데 실패했습니다. : " + flightInfo);
+    public void flightInfoRecover(RollbackException e, Object flightInfo) {
+        logger.error("\n예약된 항공편의 정보를 저장 및 수정하는데 실패했습니다. : " + flightInfo);
         flightInfoService.sendEmail(flightInfo);
     }
 }

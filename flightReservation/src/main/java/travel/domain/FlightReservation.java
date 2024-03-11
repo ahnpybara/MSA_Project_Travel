@@ -8,7 +8,6 @@ import travel.FlightReservationApplication;
 @Entity
 @Table(name = "FlightReservation_table")
 @Data
-//<<< DDD / Aggregate Root
 public class FlightReservation {
 
     @Id

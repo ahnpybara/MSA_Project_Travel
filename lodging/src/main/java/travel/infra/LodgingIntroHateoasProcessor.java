@@ -6,8 +6,7 @@ import org.springframework.stereotype.Component;
 import travel.domain.*;
 
 @Component
-public class LodgingIntroHateoasProcessor
-    implements RepresentationModelProcessor<EntityModel<LodgingIntro>> {
+public class LodgingIntroHateoasProcessor implements RepresentationModelProcessor<EntityModel<LodgingIntro>> {
 
     @Override
     public EntityModel<LodgingIntro> process(EntityModel<LodgingIntro> model) {

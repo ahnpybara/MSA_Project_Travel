@@ -134,6 +134,5 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
     }
 
     // 필터 설정을 위한 빈 클래스
-    public static class Config {
-    }
+    public static class Config {}
 }
