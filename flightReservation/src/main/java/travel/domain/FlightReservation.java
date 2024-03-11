@@ -41,6 +41,8 @@ public class FlightReservation {
     
     private String reservationHash;
 
+    private String category;
+
 
     public static FlightReservationRepository repository() {
         FlightReservationRepository flightReservationRepository = FlightReservationApplication.applicationContext.getBean(

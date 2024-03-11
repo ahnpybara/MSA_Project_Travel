@@ -23,6 +23,8 @@ public class FlightReservationRefundFailed extends AbstractEvent {
     private Long flightId;
     private String email;
     private String reservationHash;
+    private String category;
+
 
     public FlightReservationRefundFailed(FlightReservation aggregate) {
         super(aggregate);

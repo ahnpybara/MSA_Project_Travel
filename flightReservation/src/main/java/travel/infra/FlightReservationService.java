@@ -82,10 +82,10 @@ public class FlightReservationService {
             flightReservation.setName(flightReservationDTO.getName());
             flightReservation.setReservationHash(reservationHash);
             flightReservation.setStatus(Status.결제대기);
+            flightReservation.setCategory("F");
             flightReservation.setEmail(flightReservationDTO.getEmail());
 
             return flightReservationRepository.save(flightReservation);
-
         } catch (Exception e) {
             logger.error("\nDataAccessException 발생: \n", e);
             throw new RollBackException("예약 정보 저장 중 오류 발생" + e.getMessage());
@@ -111,11 +111,13 @@ public class FlightReservationService {
                     throw new ResponseException("결제 완료된 예매 내역이 존재 합니다.", HttpStatus.CONFLICT);
                 default:
                     checkSeatCapacity(flightReservationDTO.getFlightId());
-                    existing.setStatus(Status.결제대기);
+                    existing.setStatus(Status.결제완료);
                     flightReservationRepository.save(existing);
                     if(existing.getStatus() == Status.결제대기){
                     FlightReservationRequested flightReservationRequested = new FlightReservationRequested(existing);
                     flightReservationRequested.publishAfterCommit();
+                    }else{
+                        throw new RollBackException("예약 정보 저장 중 오류 발생");
                     }
                     logger.info("\n 항공예약의 상태가 결제대기로 바뀌었습니다. \n");
                     return existing;
