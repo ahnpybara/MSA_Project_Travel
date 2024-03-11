@@ -53,7 +53,7 @@ public class FlightReservationController {
         }
     }
 
-    @PostMapping("/flightReservations/cancel") // 예약 취소를 위한 컨트롤러 //TODO 프론트에 long ID만 달라고 요청하기.
+    @PostMapping("/flightReservations/cancel") // 예약 취소를 위한 컨트롤러 //TODO 프론트에 long flightReservaionId만 달라고 요청하기.
     public ResponseEntity<?> cancelFlightReservation(@Valid @RequestBody CancelReservationDTO cancelReservationDTO,
             BindingResult bindingResult) {
     

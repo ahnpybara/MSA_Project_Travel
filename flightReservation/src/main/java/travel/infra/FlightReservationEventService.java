@@ -1,6 +1,5 @@
 package travel.infra;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import travel.events.subscribe.PaymentFailed;
 import travel.events.subscribe.PaymentRefunded;
 import travel.events.subscribe.PaymentRefundFailed;
 import travel.exception.CustomException;
+import travel.exception.ResponseException;
 
 @Service
 public class FlightReservationEventService {
@@ -25,12 +25,11 @@ public class FlightReservationEventService {
     @Autowired
     private FlightReservationRepository flightReservationRepository;
 
-
-
     private static final Logger logger = LoggerFactory.getLogger("Logger");
 
     // paid 이벤트 수신 처리
     // 결제 완료 이벤트가 수신되었을 때 상태 변경.
+    // TODO IllegalArgumentException 부분 변경
     @Transactional(rollbackFor = CustomException.class)
     public void paymentComplete(Paid paid) {
         try {
@@ -42,7 +41,8 @@ public class FlightReservationEventService {
             logger.info("\nFlightReservaionId: " + paid.getReservationId() + " 결제 완료되어 예약이 확정되었습니다. \n");
         } catch (IllegalArgumentException e) {
             logger.error("\n message", e);
-            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST.value(), e.toString());
+            throw new ResponseException(e.getMessage(), HttpStatus.NOT_FOUND); // TODO 롤백이나 재시도를 할
+                                                                                                     // 필요없음
         } catch (Exception e) {
             logger.error("\n 알수없는 오류로 항공예약 상태를 변경하지 못하였습니다. \n");
             throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e.toString());
@@ -60,14 +60,16 @@ public class FlightReservationEventService {
                     .orElseThrow(() -> new IllegalArgumentException("항공 예약정보가 존재하지 않습니다."));
             flightReservation.setStatus(Status.환불완료);
             flightReservationRepository.save(flightReservation);
-            logger.info("\nFlightReservaionId: " + paymentRefunded.getReservationId() + " 환불 완료되어 예약이 취소되었습니다. \n");
 
-       
-            FlightReservationRefunded flightReservationRefunded = new FlightReservationRefunded(flightReservation);
-            flightReservationRefunded.publishAfterCommit();
+            if (flightReservation.getStatus() == Status.환불완료) {
+                logger.info("\nFlightReservaionId: " + paymentRefunded.getReservationId() + " 환불 완료되어 예약이 취소되었습니다. \n");
+                FlightReservationRefunded flightReservationRefunded = new FlightReservationRefunded(flightReservation);
+                flightReservationRefunded.publishAfterCommit();
+            }
+
         } catch (IllegalArgumentException e) {
             logger.error("\n message \n", e);
-            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST.value(), e.toString());
+            throw new ResponseException(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             logger.error("\n 알수없는 오류로 항공예약 상태를 변경하지 못하였습니다. \n");
             throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e.toString());
@@ -89,7 +91,7 @@ public class FlightReservationEventService {
 
         } catch (IllegalArgumentException e) {
             logger.error("\n message \n", e);
-            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST.value(), e.toString());
+            throw new ResponseException(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             logger.error("\n 알수없는 오류로 항공예약 상태를 변경하지 못하였습니다. \n");
             throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e.toString());
@@ -107,14 +109,16 @@ public class FlightReservationEventService {
                     .orElseThrow(() -> new IllegalArgumentException("항공 예약정보가 존재하지 않습니다."));
             flightReservation.setStatus(Status.결제취소);
             flightReservationRepository.save(flightReservation);
-            logger.info("\nFlightReservaionId: " + paymentCancelled.getReservationId() + " 결제를 취소 했습니다. \n");
 
-            FlightReservationCancelled flightReservationCancelled = new FlightReservationCancelled(flightReservation);
-            flightReservationCancelled.publishAfterCommit();
-
+            if (flightReservation.getStatus() == Status.결제취소) {
+                logger.info("\nFlightReservaionId: " + paymentCancelled.getReservationId() + " 결제를 취소 했습니다. \n");
+                FlightReservationCancelled flightReservationCancelled = new FlightReservationCancelled(
+                        flightReservation);
+                flightReservationCancelled.publishAfterCommit();
+            }
         } catch (IllegalArgumentException e) {
             logger.error("\n message \n", e);
-            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST.value(), e.toString());
+            throw new ResponseException(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             logger.error("\n 알수없는 오류로 항공예약 상태를 변경하지 못하였습니다. \n");
             throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e.toString());
@@ -132,14 +136,15 @@ public class FlightReservationEventService {
                     .orElseThrow(() -> new IllegalArgumentException("항공 예약정보가 존재하지 않습니다."));
             flightReservation.setStatus(Status.결제실패);
             flightReservationRepository.save(flightReservation);
-            logger.info("\nFlightReservaionId: " + paymentFailed.getReservationId() + " 결제가 실패 했습니다. \n");
 
-            FlightReservationFailed flightReservationFailed = new FlightReservationFailed(flightReservation);
-            flightReservationFailed.publishAfterCommit();
-
+            if (flightReservation.getStatus() == Status.결제실패) {
+                logger.info("\nFlightReservaionId: " + paymentFailed.getReservationId() + " 결제가 실패 했습니다. \n");
+                FlightReservationFailed flightReservationFailed = new FlightReservationFailed(flightReservation);
+                flightReservationFailed.publishAfterCommit();
+            }
         } catch (IllegalArgumentException e) {
             logger.error("\n message \n", e);
-            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST.value(), e.toString());
+            throw new ResponseException(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             logger.error("\n 알수없는 오류로 항공예약 상태를 변경하지 못하였습니다. \n");
             throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e.toString());

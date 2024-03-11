@@ -113,9 +113,10 @@ public class FlightReservationService {
                     checkSeatCapacity(flightReservationDTO.getFlightId());
                     existing.setStatus(Status.결제대기);
                     flightReservationRepository.save(existing);
-
+                    if(existing.getStatus() == Status.결제대기){
                     FlightReservationRequested flightReservationRequested = new FlightReservationRequested(existing);
                     flightReservationRequested.publishAfterCommit();
+                    }
                     logger.info("\n 항공예약의 상태가 결제대기로 바뀌었습니다. \n");
                     return existing;
             }
@@ -163,10 +164,12 @@ public class FlightReservationService {
                 if (flightReservation.getStatus() != Status.예약취소) {
                     flightReservation.setStatus(Status.예약취소);
                     flightReservationRepository.save(flightReservation);
-
+                    //TODO 상태변경을 확인하고 이벤트 발행을 하면 좋음.
+                    if(flightReservation.getStatus() == Status.예약취소){
                     FlightReservationCancelRequested flightReservationCancelRequested = new FlightReservationCancelRequested(flightReservation);
                     flightReservationCancelRequested.publishAfterCommit();
                     logger.info("\n예약취소에 성공했습니다.\n");
+                    }
                 } else {
                     logger.error("\n예약 취소된 상태 입니다.\n");
                     throw new ResponseException("예약 취소된 상태 입니다.", HttpStatus.CONFLICT);
