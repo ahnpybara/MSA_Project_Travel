@@ -1,5 +1,7 @@
 package travel.infra;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,6 @@ import travel.events.subscribe.PaymentFailed;
 import travel.events.subscribe.PaymentRefunded;
 import travel.events.subscribe.PaymentRefundFailed;
 import travel.exception.CustomException;
-import travel.exception.ResponseException;
 import travel.exception.RollBackException;
 
 @Service
@@ -30,21 +31,20 @@ public class FlightReservationEventService {
 
     // paid 이벤트 수신 처리
     // 결제 완료 이벤트가 수신되었을 때 상태 변경.
-    // TODO IllegalArgumentException 부분 변경
     @Transactional(rollbackFor = RollBackException.class)
     public void paymentComplete(Paid paid) {
         try {
-            FlightReservation flightReservation = flightReservationRepository
-                    .findById(paid.getReservationId())
-                    .orElseThrow(() -> new IllegalArgumentException("항공 예약정보가 존재하지 않습니다. \n"));
+            Optional<FlightReservation> optionalReservation = flightReservationRepository
+                    .findById(paid.getReservationId());
+            if (optionalReservation.isPresent() && "F".equals(paid.getCategory())) {
+                FlightReservation flightReservation = optionalReservation.get();
+                flightReservation.setStatus(Status.예약완료);
+                flightReservationRepository.save(flightReservation);
+                logger.info("\nFlightReservaionId: " + paid.getReservationId() + " 결제 완료되어 예약이 확정되었습니다. \n");
 
-            flightReservation.setStatus(Status.예약완료);
-            flightReservationRepository.save(flightReservation);
-            logger.info("\nFlightReservaionId: " + paid.getReservationId() + " 결제 완료되어 예약이 확정되었습니다. \n");
-
-        } catch (IllegalArgumentException e) {
-            logger.error("\n message", e);
-            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST.value(), e.toString());
+            } else {
+                logger.error("\n항공 예약정보가 존재하지 않습니다. 예약 ID: {}", paid.getReservationId());
+            }
         } catch (Exception e) {
             logger.error("\n 알수없는 오류로 항공예약 상태를 변경하지 못하였습니다. \n");
             throw new RollBackException(e.getMessage());
@@ -57,23 +57,25 @@ public class FlightReservationEventService {
     @Transactional(rollbackFor = RollBackException.class)
     public void paymentRefund(PaymentRefunded paymentRefunded) {
         try {
-            FlightReservation flightReservation = flightReservationRepository
-                    .findById(paymentRefunded.getReservationId())
-                    .orElseThrow(() -> new IllegalArgumentException("항공 예약정보가 존재하지 않습니다."));
+            Optional<FlightReservation> optionalReservation = flightReservationRepository
+                    .findById(paymentRefunded.getReservationId());
+            if (optionalReservation.isPresent() && "F".equals(paymentRefunded.getCategory())) {
+                FlightReservation flightReservation = optionalReservation.get();
+                flightReservation.setStatus(Status.환불완료);
+                flightReservationRepository.save(flightReservation);
 
-            flightReservation.setStatus(Status.환불실패);
-            flightReservationRepository.save(flightReservation);
-
-            if (flightReservation.getStatus() == Status.환불완료) {
-                logger.info("\nFlightReservaionId: " + paymentRefunded.getReservationId() + " 환불 완료되어 예약이 취소되었습니다. \n");
-                FlightReservationRefunded flightReservationRefunded = new FlightReservationRefunded(flightReservation);
-                flightReservationRefunded.publishAfterCommit();
+                if (flightReservation.getStatus() == Status.환불완료) {
+                    logger.info(
+                            "\nFlightReservaionId: " + paymentRefunded.getReservationId() + " 환불 완료되어 예약이 취소되었습니다. \n");
+                    FlightReservationRefunded flightReservationRefunded = new FlightReservationRefunded(
+                            flightReservation);
+                    flightReservationRefunded.publishAfterCommit();
+                } else {
+                    throw new RollBackException("예약 정보 저장 중 오류 발생");
+                }
             } else {
-                throw new RollBackException("예약 정보 저장 중 오류 발생");
+                logger.error("\n항공 예약정보가 존재하지 않습니다. 예약 ID: {}", paymentRefunded.getReservationId());
             }
-        } catch (IllegalArgumentException e) {
-            logger.error("\n message \n", e);
-            throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND.value(), e.toString());
         } catch (Exception e) {
             logger.error("\n 알수없는 오류로 항공예약 상태를 변경하지 못하였습니다. \n");
             throw new RollBackException(e.getMessage());
@@ -86,16 +88,16 @@ public class FlightReservationEventService {
     @Transactional(rollbackFor = RollBackException.class)
     public void paymentRefundFail(PaymentRefundFailed paymentRefundFailed) {
         try {
-            FlightReservation flightReservation = flightReservationRepository
-                    .findById(paymentRefundFailed.getReservationId())
-                    .orElseThrow(() -> new IllegalArgumentException("항공 예약정보가 존재하지 않습니다."));
-            flightReservation.setStatus(Status.환불실패);
-            flightReservationRepository.save(flightReservation);
-            logger.info("\nFlightReservaionId: " + paymentRefundFailed.getReservationId() + " 환불이 실패 했습니다. \n");
-
-        } catch (IllegalArgumentException e) {
-            logger.error("\n message \n", e);
-            throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND.value(), e.toString());
+            Optional<FlightReservation> optionalReservation = flightReservationRepository
+                    .findById(paymentRefundFailed.getReservationId());
+            if (optionalReservation.isPresent() && "F".equals(paymentRefundFailed.getCategory())) {
+                FlightReservation flightReservation = optionalReservation.get();
+                flightReservation.setStatus(Status.환불실패);
+                flightReservationRepository.save(flightReservation);
+                logger.info("\nFlightReservaionId: " + paymentRefundFailed.getReservationId() + " 환불이 실패 했습니다. \n");
+            } else {
+                logger.error("\n항공 예약정보가 존재하지 않습니다. 예약 ID: {}", paymentRefundFailed.getReservationId());
+            }
         } catch (Exception e) {
             logger.error("\n 알수없는 오류로 항공예약 상태를 변경하지 못하였습니다. \n");
             throw new RollBackException(e.getMessage());
@@ -108,22 +110,24 @@ public class FlightReservationEventService {
     @Transactional(rollbackFor = RollBackException.class)
     public void paymentCancel(PaymentCancelled paymentCancelled) {
         try {
-            FlightReservation flightReservation = flightReservationRepository
-                    .findById(paymentCancelled.getReservationId())
-                    .orElseThrow(() -> new IllegalArgumentException("항공 예약정보가 존재하지 않습니다."));
-            flightReservation.setStatus(Status.결제완료);
-            flightReservationRepository.save(flightReservation);
+            Optional<FlightReservation> optionalReservation = flightReservationRepository
+                    .findById(paymentCancelled.getReservationId());
+            if (optionalReservation.isPresent() && "F".equals(paymentCancelled.getCategory())) {
+                FlightReservation flightReservation = optionalReservation.get();
+                flightReservation.setStatus(Status.결제취소);
+                flightReservationRepository.save(flightReservation);
 
-            if (flightReservation.getStatus() == Status.결제취소) {
-                logger.info("\nFlightReservaionId: " + paymentCancelled.getReservationId() + " 결제를 취소 했습니다. \n");
-                FlightReservationCancelled flightReservationCancelled = new FlightReservationCancelled(flightReservation);
-                flightReservationCancelled.publishAfterCommit();
+                if (flightReservation.getStatus() == Status.결제취소) {
+                    logger.info("\nFlightReservaionId: " + paymentCancelled.getReservationId() + " 결제를 취소 했습니다. \n");
+                    FlightReservationCancelled flightReservationCancelled = new FlightReservationCancelled(
+                            flightReservation);
+                    flightReservationCancelled.publishAfterCommit();
+                } else {
+                    throw new RollBackException("예약 정보 저장 중 오류 발생");
+                }
             } else {
-                throw new RollBackException("예약 정보 저장 중 오류 발생");
+                logger.error("\n항공 예약정보가 존재하지 않습니다. 예약 ID: {}", paymentCancelled.getReservationId());
             }
-        } catch (IllegalArgumentException e) {
-            logger.error("\n message \n", e);
-            throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND.value(), e.toString());
         } catch (Exception e) {
             logger.error("\n 알수없는 오류로 항공예약 상태를 변경하지 못하였습니다. \n");
             throw new RollBackException(e.getMessage());
@@ -136,22 +140,24 @@ public class FlightReservationEventService {
     @Transactional(rollbackFor = RollBackException.class)
     public void paymentFail(PaymentFailed paymentFailed) {
         try {
-            FlightReservation flightReservation = flightReservationRepository
-                    .findById(paymentFailed.getReservationId())
-                    .orElseThrow(() -> new IllegalArgumentException("항공 예약정보가 존재하지 않습니다."));
-            flightReservation.setStatus(Status.결제완료);
-            flightReservationRepository.save(flightReservation);
+            Optional<FlightReservation> optionalReservation = flightReservationRepository
+                    .findById(paymentFailed.getReservationId());
+            if (optionalReservation.isPresent() && "F".equals(paymentFailed.getCategory())) {
+                FlightReservation flightReservation = optionalReservation.get();
+                flightReservation.setStatus(Status.결제실패);
+                flightReservationRepository.save(flightReservation);
 
-            if (flightReservation.getStatus() == Status.결제실패) {
-                logger.info("\nFlightReservaionId: " + paymentFailed.getReservationId() + " 결제가 실패 했습니다. \n");
-                FlightReservationFailed flightReservationFailed = new FlightReservationFailed(flightReservation);
-                flightReservationFailed.publishAfterCommit();
+                if (flightReservation.getStatus() == Status.결제실패) {
+                    logger.info("\nFlightReservaionId: " + paymentFailed.getReservationId() + " 결제가 실패 했습니다. \n");
+                    FlightReservationFailed flightReservationFailed = new FlightReservationFailed(flightReservation);
+                    flightReservationFailed.publishAfterCommit();
+                } else {
+                    throw new RollBackException("예약 정보 저장 중 오류 발생");
+                }
             } else {
-                throw new RollBackException("예약 정보 저장 중 오류 발생");
+                logger.error("\n항공 예약정보가 존재하지 않습니다. 예약 ID: {}", paymentFailed.getReservationId());
             }
-        } catch (IllegalArgumentException e) {
-            logger.error("\n message \n", e);
-            throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND.value(), e.toString());
+
         } catch (Exception e) {
             logger.error("\n 알수없는 오류로 항공예약 상태를 변경하지 못하였습니다. \n");
             throw new RollBackException(e.getMessage());

@@ -33,6 +33,7 @@ public class Payment {
     private String impUid;
 
     private String status;
+    private String category;
 
     @PostPersist
     public void onPostPersist() {

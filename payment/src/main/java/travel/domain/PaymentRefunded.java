@@ -18,6 +18,7 @@ public class PaymentRefunded extends AbstractEvent {
     private String name;
     private String impUid;
     private String status;
+    private String category;
 
     public PaymentRefunded(Payment aggregate) {
         super(aggregate);

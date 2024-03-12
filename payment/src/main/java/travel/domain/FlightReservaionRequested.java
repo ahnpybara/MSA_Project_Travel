@@ -23,4 +23,5 @@ public class FlightReservaionRequested extends AbstractEvent {
     private String name;
     private Long flightId;
     private String email;
+    private String category;
 }

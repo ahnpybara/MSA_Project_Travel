@@ -18,6 +18,7 @@ public class PaymentFailed extends AbstractEvent {
     private String name;
     private String impUid;
     private String status;
+    private String category;
 
     public PaymentFailed(Payment aggregate) {
         super(aggregate);

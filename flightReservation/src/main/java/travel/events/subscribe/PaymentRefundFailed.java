@@ -15,4 +15,5 @@ public class PaymentRefundFailed extends AbstractEvent {
     private String name;
     private String impUid;
     private String status;
+    private String category;
 }

@@ -24,6 +24,7 @@ public class PaymentController {
 public void checkEvent(@RequestBody Paid newpaid) {
     Paid paid = new Paid();
     paid.setReservationId(newpaid.getReservationId());
+    paid.setCategory(newpaid.getCategory());
     paid.publish();
 }
 
@@ -31,6 +32,7 @@ public void checkEvent(@RequestBody Paid newpaid) {
 public void checkEvent(@RequestBody PaymentRefunded paymentRefunded1) {
     PaymentRefunded paymentRefunded = new PaymentRefunded();
     paymentRefunded.setReservationId(paymentRefunded1.getReservationId());
+    paymentRefunded.setCategory(paymentRefunded1.getCategory());
     paymentRefunded.publish();
 }
 
@@ -38,6 +40,7 @@ public void checkEvent(@RequestBody PaymentRefunded paymentRefunded1) {
 public void checkEvent(@RequestBody PaymentRefundFailed paymentRefunded1) {
     PaymentRefundFailed paymentRefunded = new PaymentRefundFailed();
     paymentRefunded.setReservationId(paymentRefunded1.getReservationId());
+    paymentRefunded.setCategory(paymentRefunded1.getCategory());
     paymentRefunded.publish();
 }
 
@@ -45,6 +48,7 @@ public void checkEvent(@RequestBody PaymentRefundFailed paymentRefunded1) {
 public void checkEvent(@RequestBody PaymentCancelled paymentRefunded1) {
     PaymentCancelled paymentRefunded = new PaymentCancelled();
     paymentRefunded.setReservationId(paymentRefunded1.getReservationId());
+    paymentRefunded.setCategory(paymentRefunded1.getCategory());
     paymentRefunded.publish();
 }
 
@@ -52,6 +56,7 @@ public void checkEvent(@RequestBody PaymentCancelled paymentRefunded1) {
 public void checkEvent(@RequestBody PaymentFailed paymentRefunded1) {
     PaymentFailed paymentRefunded = new PaymentFailed();
     paymentRefunded.setReservationId(paymentRefunded1.getReservationId());
+    paymentRefunded.setCategory(paymentRefunded1.getCategory());
     paymentRefunded.publish();
 }
 

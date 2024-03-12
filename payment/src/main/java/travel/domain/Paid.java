@@ -17,6 +17,7 @@ public class Paid extends AbstractEvent {
     private Long reservationId;
     private String name;
     private String impUid;
+    private String category;
 
     public Paid(Payment aggregate) {
         super(aggregate);
