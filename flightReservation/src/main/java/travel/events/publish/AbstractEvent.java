@@ -10,7 +10,6 @@ import org.springframework.util.MimeTypeUtils;
 import travel.FlightReservationApplication;
 import travel.config.kafka.KafkaProcessor;
 
-//<<< Clean Arch / Outbound Adaptor
 public class AbstractEvent {
 
     String eventType;
@@ -27,9 +26,7 @@ public class AbstractEvent {
     }
 
     public void publish() {
-        /**
-         * spring streams 방식
-         */
+
         KafkaProcessor processor = FlightReservationApplication.applicationContext.getBean(
             KafkaProcessor.class
         );
@@ -78,4 +75,3 @@ public class AbstractEvent {
         return getEventType().equals(getClass().getSimpleName());
     }
 }
-//>>> Clean Arch / Outbound Adaptor

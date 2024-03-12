@@ -5,10 +5,8 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import travel.domain.*;
 import travel.events.publish.FlightReservationCancelled;
 import travel.events.publish.FlightReservationFailed;
@@ -18,7 +16,6 @@ import travel.events.subscribe.PaymentCancelled;
 import travel.events.subscribe.PaymentFailed;
 import travel.events.subscribe.PaymentRefunded;
 import travel.events.subscribe.PaymentRefundFailed;
-import travel.exception.CustomException;
 import travel.exception.RollBackException;
 
 @Service

@@ -8,7 +8,6 @@ import travel.FlightReservationApplication;
 @Entity
 @Table(name = "FlightReservation_table")
 @Data
-//<<< DDD / Aggregate Root
 public class FlightReservation {
 
     @Id
@@ -46,8 +45,7 @@ public class FlightReservation {
 
     public static FlightReservationRepository repository() {
         FlightReservationRepository flightReservationRepository = FlightReservationApplication.applicationContext.getBean(
-            FlightReservationRepository.class
-        );
+            FlightReservationRepository.class);
         return flightReservationRepository;
     }
 }
