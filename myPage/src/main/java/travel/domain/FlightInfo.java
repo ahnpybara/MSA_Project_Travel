@@ -1,6 +1,5 @@
 package travel.domain;
 
-import java.util.Date;
 import javax.persistence.*;
 import lombok.Data;
 
@@ -11,16 +10,20 @@ public class FlightInfo {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
+
     private Long id;
     private Long reservationId;
-    private Long userId;
-    private String name;
     private String airLine;
     private String arrAirport;
     private String depAirport;
-    private Date arrTime;
-    private Date depTime;
+    private Long arrTime;
+    private Long depTime;
     private Long charge;
     private String vihicleId;
+    private Long userId;
+    private String name;
+    private Long flightId;
+    private String email;
+    private String category;
     private FlightStatus status;
 }

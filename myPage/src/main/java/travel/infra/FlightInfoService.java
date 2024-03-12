@@ -34,7 +34,6 @@ public class FlightInfoService {
             FlightInfo flightInfo = new FlightInfo();
             flightInfo.setReservationId(flightReservationCompleted.getId());
             flightInfo.setUserId(flightReservationCompleted.getUserId());
-            flightInfo.setName(flightReservationCompleted.getName());
             flightInfo.setAirLine(flightReservationCompleted.getAirLine());
             flightInfo.setArrAirport(flightReservationCompleted.getArrAirport());
             flightInfo.setDepAirport(flightReservationCompleted.getDepAirport());
@@ -42,6 +41,10 @@ public class FlightInfoService {
             flightInfo.setDepTime(flightReservationCompleted.getDepTime());
             flightInfo.setCharge(flightReservationCompleted.getCharge());
             flightInfo.setVihicleId(flightReservationCompleted.getVihicleId());
+            flightInfo.setUserId(flightReservationCompleted.getUserId());
+            flightInfo.setName(flightReservationCompleted.getName());
+            flightInfo.setEmail(flightReservationCompleted.getEmail());
+            flightInfo.setCategory(flightReservationCompleted.getCategory());
             flightInfo.setStatus(FlightStatus.예약완료);
             flightInfoRepository.save(flightInfo);
         } catch (Exception e) {

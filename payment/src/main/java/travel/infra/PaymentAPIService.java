@@ -86,7 +86,7 @@ public class PaymentAPIService {
         }
     }
 
-    // 결제가 처리된 후 사후 검증 api를 호출하는 메서드
+    // 결제가 처리된 후 사후 검증 api를 호출하는 메서드(결제 사후 검증은 내부 로직이기 때문에 카테고리가 필요없습니다!!)
     @Transactional(rollbackFor = CustomException.class)
     public PaymentStatus validatePayment(AfterPaymentDTO request) {
         String reservationId = getReservationNumber(request.getMerchant_uid());

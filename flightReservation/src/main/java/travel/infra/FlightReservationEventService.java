@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import travel.domain.*;
 import travel.events.publish.FlightReservationCancelled;
+import travel.events.publish.FlightReservationCompleted;
 import travel.events.publish.FlightReservationFailed;
 import travel.events.publish.FlightReservationRefunded;
 import travel.events.subscribe.Paid;
@@ -38,7 +39,9 @@ public class FlightReservationEventService {
                 flightReservation.setStatus(Status.예약완료);
                 flightReservationRepository.save(flightReservation);
                 logger.info("\nFlightReservaionId: " + paid.getReservationId() + " 결제 완료되어 예약이 확정되었습니다. \n");
-
+                // TODO 상태가 제대로 변경된걸 확인 후 이벤트 발행을 해야함!!
+                FlightReservationCompleted flightReservationCompleted = new FlightReservationCompleted(flightReservation);
+                flightReservationCompleted.publishAfterCommit();
             } else {
                 logger.error("\n항공 예약정보가 존재하지 않습니다. 예약 ID: {}", paid.getReservationId());
             }
@@ -62,10 +65,8 @@ public class FlightReservationEventService {
                 flightReservationRepository.save(flightReservation);
 
                 if (flightReservation.getStatus() == Status.환불완료) {
-                    logger.info(
-                            "\nFlightReservaionId: " + paymentRefunded.getReservationId() + " 환불 완료되어 예약이 취소되었습니다. \n");
-                    FlightReservationRefunded flightReservationRefunded = new FlightReservationRefunded(
-                            flightReservation);
+                    logger.info("\nFlightReservaionId: " + paymentRefunded.getReservationId() + " 환불 완료되어 예약이 취소되었습니다. \n");
+                    FlightReservationRefunded flightReservationRefunded = new FlightReservationRefunded(flightReservation);
                     flightReservationRefunded.publishAfterCommit();
                 } else {
                     throw new RollBackException("예약 정보 저장 중 오류 발생");
@@ -116,8 +117,7 @@ public class FlightReservationEventService {
 
                 if (flightReservation.getStatus() == Status.결제취소) {
                     logger.info("\nFlightReservaionId: " + paymentCancelled.getReservationId() + " 결제를 취소 했습니다. \n");
-                    FlightReservationCancelled flightReservationCancelled = new FlightReservationCancelled(
-                            flightReservation);
+                    FlightReservationCancelled flightReservationCancelled = new FlightReservationCancelled(flightReservation);
                     flightReservationCancelled.publishAfterCommit();
                 } else {
                     throw new RollBackException("예약 정보 저장 중 오류 발생");

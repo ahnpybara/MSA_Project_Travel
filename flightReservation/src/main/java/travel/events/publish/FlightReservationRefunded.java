@@ -1,6 +1,5 @@
 package travel.events.publish;
 
-
 import lombok.*;
 import travel.domain.*;
 

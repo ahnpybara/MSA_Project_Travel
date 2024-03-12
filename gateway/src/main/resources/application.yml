@@ -12,7 +12,6 @@ spring:
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
 
-#<<< API Gateway / Routes
       routes:
         - id: payment
           uri: http://localhost:8082
@@ -36,11 +35,11 @@ spring:
         - id: myPage
           uri: http://localhost:8085
           predicates:
-            - Path=/flightInfos/**,
+            - Path=/reservationInfos/**,
           filters:
             - AuthorizationFilter
 
-        - id: screen
+        - id: flight
           uri: http://localhost:8086
           predicates:
             - Path=/flights/**
@@ -51,10 +50,9 @@ spring:
           uri: http://localhost:8087
           predicates:
             - Path=/lodgings/**
-          # filters:
-          #   - AuthorizationFilter
+          filters:
+            - AuthorizationFilter
       
-#>>> API Gateway / Routes
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -101,12 +99,12 @@ spring:
         - id: myPage
           uri: http://myPage:8080
           predicates:
-            - Path=
+            - Path=/reservationInfos/**
           filters:
             - AuthorizationFilter
 
-        - id: screen
-          uri: http://screen:8080
+        - id: flight
+          uri: http://flight:8080
           predicates:
             - Path=/flights/**,
           filters:
@@ -115,7 +113,10 @@ spring:
         - id: lodging
           uri: http://lodging:8080
           predicates:
-            - Path=/**
+            - Path=/lodgings/**
+          filters:
+            - AuthorizationFilter
+            
       globalcors:
         corsConfigurations:
           '[/**]':

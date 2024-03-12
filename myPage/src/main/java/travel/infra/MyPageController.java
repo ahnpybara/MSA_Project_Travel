@@ -7,15 +7,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import travel.domain.FlightInfo;
 import travel.domain.FlightInfoRepository;
 
 @RestController
-@Transactional
+@RequestMapping(value = "/reservationInfos")
 public class MyPageController {
 
     @Autowired
@@ -24,7 +24,7 @@ public class MyPageController {
     private static final Logger logger = LoggerFactory.getLogger("MyLogger");
 
     // 특정 사용자가 예약한 항공편의 정보를 반환하는 메서드입니다
-    @GetMapping("/flightInfos/{userId}")
+    @GetMapping("/flight/{userId}")
     public ResponseEntity<?> getAndSaveFlightData(@PathVariable Long userId) {
 
         try {
