@@ -6,7 +6,7 @@ import travel.event.publish.AbstractEvent;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @ToString
-public class FlightReservationRequested extends AbstractEvent {
+public class ReservationRequested extends AbstractEvent {
 
     private Long id;
     private Long charge;
@@ -14,4 +14,5 @@ public class FlightReservationRequested extends AbstractEvent {
     private String name;
     private Long flightId;
     private String email;
+    private String category;
 }

@@ -18,12 +18,14 @@ public class FlightReservationCompleted extends AbstractEvent {
     private Long depTime;
     private Long charge;
     private String vihicleId;
-    private String status;
+    private Status status;
     private Long userId;
     private String name;
     private Long flightId;
     private String email;
     private String reservationHash;
+    private String category;
+
 
     public FlightReservationCompleted(FlightReservation aggregate) {
         super(aggregate);

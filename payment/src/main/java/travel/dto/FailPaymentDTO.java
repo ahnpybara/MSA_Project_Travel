@@ -7,4 +7,7 @@ public class FailPaymentDTO {
 
     @NotBlank
     private String merchant_uid;
+
+    @NotBlank
+    private String category;
 }

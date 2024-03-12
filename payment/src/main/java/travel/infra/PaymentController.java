@@ -40,8 +40,8 @@ public class PaymentController {
     public ResponseEntity<String> checkPaymentInfo(@Valid @RequestBody CheckPaymentDTO request, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            bindingResult.getAllErrors().forEach(error -> {logger.error("\n예약 번호가 존재하지 않습니다.\n");});
-            return ResponseEntity.badRequest().body("예약 번호가 존재하지 않습니다.");
+            bindingResult.getAllErrors().forEach(error -> {logger.error("\n예약 번호와 카테고리가 존재하지 않습니다.\n");});
+            return ResponseEntity.badRequest().body("예약 번호와 카테고리가 존재하지 않습니다.");
         }    
 
         PaymentStatus paymentResult = paymentService.checkPaymentInfo(request);
@@ -60,8 +60,8 @@ public class PaymentController {
     public ResponseEntity<String> preparePayment(@Valid @RequestBody PreparePaymentDTO request, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            bindingResult.getAllErrors().forEach(error -> {logger.error("\n예약 번호와 가격이 존재하지 않습니다.\n");});
-            return ResponseEntity.badRequest().body("예약 번호와 가격이 존재하지 않습니다.");
+            bindingResult.getAllErrors().forEach(error -> {logger.error("\n예약 번호, 카테고리, 가격이 존재하지 않습니다.\n");});
+            return ResponseEntity.badRequest().body("예약 번호, 카테고리, 가격이 존재하지 않습니다.");
         }    
 
         PaymentStatus paymentResult = paymentService.preparePayment(request);
@@ -80,8 +80,8 @@ public class PaymentController {
     public ResponseEntity<String> validatePayment(@Valid @RequestBody AfterPaymentDTO request, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            bindingResult.getAllErrors().forEach(error -> {logger.error("\n예약 번호와 결제번호가 존재하지 않습니다.\n");});
-            return ResponseEntity.badRequest().body("예약 번호와 결제번호가 존재하지 않습니다.");
+            bindingResult.getAllErrors().forEach(error -> {logger.error("\n예약 번호, 카테고리, 결제번호가 존재하지 않습니다.\n");});
+            return ResponseEntity.badRequest().body("예약 번호, 카테고리, 결제번호가 존재하지 않습니다.");
         }   
 
         PaymentStatus paymentResult = paymentService.validatePayment(request);
@@ -100,8 +100,8 @@ public class PaymentController {
     public ResponseEntity<String> cancelPayment(@Valid @RequestBody RefundPaymentDTO request, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            bindingResult.getAllErrors().forEach(error -> {logger.error("\n예약 번호가 존재하지 않습니다.\n");});
-            return ResponseEntity.badRequest().body("예약 번호가 존재하지 않습니다.");
+            bindingResult.getAllErrors().forEach(error -> {logger.error("\n예약 번호와 카테고리가 존재하지 않습니다.\n");});
+            return ResponseEntity.badRequest().body("예약 번호와 카테고리가 존재하지 않습니다.");
         }   
 
         PaymentStatus paymentResult = paymentService.refundPayment(request);
@@ -120,8 +120,8 @@ public class PaymentController {
     public ResponseEntity<String> cancelPayment(@Valid @RequestBody FailPaymentDTO request, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            bindingResult.getAllErrors().forEach(error -> {logger.error("\n예약 번호가 존재하지 않습니다.\n");});
-            return ResponseEntity.badRequest().body("예약 번호가 존재하지 않습니다.");
+            bindingResult.getAllErrors().forEach(error -> {logger.error("\n예약 번호와 카테고리가 존재하지 않습니다.\n");});
+            return ResponseEntity.badRequest().body("예약 번호와 카테고리가 존재하지 않습니다.");
         }   
 
         PaymentStatus paymentResult = paymentService.cancelPayment(request);

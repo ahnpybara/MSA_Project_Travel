@@ -24,6 +24,8 @@ public class FlightReservationRequested extends AbstractEvent {
     private Long flightId;
     private String email;
     private String reservationHash;
+    private String category;
+
 
     public FlightReservationRequested(FlightReservation aggregate) {
         super(aggregate);

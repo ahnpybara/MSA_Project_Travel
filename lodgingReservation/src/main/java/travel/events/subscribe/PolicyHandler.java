@@ -23,7 +23,7 @@ public class PolicyHandler {
     @Autowired
     LodgingReservationEventService lodgingReservationEventService;
 
-    // TODO Retryable과 Rollback 을 위한 예외 설정 수정 필요합니다
+    // TODO Retryable과 Rollback 을 위한 예외 설정 수정 필요합니다 수정이 필요없을수도있음!! 
 
     // 결제 완료를 수신하는 메서드
     @Retryable(value = RollBackException.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))

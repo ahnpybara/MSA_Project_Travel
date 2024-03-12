@@ -13,4 +13,7 @@ public class PreparePaymentDTO {
 
     @NotNull
     private BigDecimal amount;
+
+    @NotBlank
+    private String category;
 }

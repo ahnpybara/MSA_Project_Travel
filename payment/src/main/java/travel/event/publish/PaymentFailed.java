@@ -14,6 +14,7 @@ public class PaymentFailed extends AbstractEvent {
     private Long reservationId;
     private String name;
     private String impUid;
+    private String category;
     private String status;
 
     public PaymentFailed(Payment aggregate) {

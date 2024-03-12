@@ -10,4 +10,7 @@ public class RefundPaymentDTO {
     private String merchant_uid;
 
     private String imp_uid;
+
+    @NotBlank
+    private String category;
 }

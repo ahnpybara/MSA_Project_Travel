@@ -23,6 +23,8 @@ public class Payment {
 
     private String impUid;
 
+    private String category;
+
     @Enumerated(EnumType.STRING)
     private PaymentStatus status = PaymentStatus.결제전;
 

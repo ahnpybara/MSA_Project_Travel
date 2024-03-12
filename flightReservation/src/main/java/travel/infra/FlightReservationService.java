@@ -82,10 +82,10 @@ public class FlightReservationService {
             flightReservation.setName(flightReservationDTO.getName());
             flightReservation.setReservationHash(reservationHash);
             flightReservation.setStatus(Status.결제대기);
+            flightReservation.setCategory("F");
             flightReservation.setEmail(flightReservationDTO.getEmail());
 
             return flightReservationRepository.save(flightReservation);
-
         } catch (Exception e) {
             logger.error("\nDataAccessException 발생: \n", e);
             throw new RollBackException("예약 정보 저장 중 오류 발생" + e.getMessage());
@@ -93,13 +93,12 @@ public class FlightReservationService {
     }
 
     // 예약과정을 검증하고 상태변환 시키는 메서드
-    @Transactional(rollbackFor = {  RollBackException.class })
+    @Transactional(rollbackFor = { RollBackException.class })
     public FlightReservation validateAndProcessReservation(String reservationHash,
             FlightReservationDTO flightReservationDTO) {
-            
- 
-         Optional<FlightReservation> existingReservation = flightReservationRepository
-                                                          .findByReservationHash(reservationHash);
+
+        Optional<FlightReservation> existingReservation = flightReservationRepository
+                .findByReservationHash(reservationHash);
 
         if (existingReservation.isPresent()) {
             FlightReservation existing = existingReservation.get();
@@ -113,14 +112,17 @@ public class FlightReservationService {
                     checkSeatCapacity(flightReservationDTO.getFlightId());
                     existing.setStatus(Status.결제대기);
                     flightReservationRepository.save(existing);
-
-                    FlightReservationRequested flightReservationRequested = new FlightReservationRequested(existing);
-                    flightReservationRequested.publishAfterCommit();
+                    if (existing.getStatus() == Status.결제대기) {
+                        FlightReservationRequested flightReservationRequested = new FlightReservationRequested(existing);
+                        flightReservationRequested.publishAfterCommit();
+                    } else {
+                        throw new RollBackException("예약 정보 저장 중 오류 발생");
+                    }
                     logger.info("\n 항공예약의 상태가 결제대기로 바뀌었습니다. \n");
                     return existing;
             }
-        } else { 
-            checkSeatCapacity(flightReservationDTO.getFlightId()); 
+        } else {
+            checkSeatCapacity(flightReservationDTO.getFlightId());
             FlightReservation flightReservation = createAndSaveFlightReservation(flightReservationDTO, reservationHash);
             logger.info("\n 항공 예약이 성공적으로 생성 되었습니다. \n");
             FlightReservationRequested flightReservationRequested = new FlightReservationRequested(flightReservation);
@@ -131,7 +133,7 @@ public class FlightReservationService {
     }
 
     // 해쉬값을 생성하는 메서드 (동일한 항공 예약을 검증 하기위함)
-    public String createHashKey(FlightReservationDTO flightReservationDTO) throws NoSuchAlgorithmException { 
+    public String createHashKey(FlightReservationDTO flightReservationDTO) throws NoSuchAlgorithmException {
 
         String input = flightReservationDTO.getUserId() + flightReservationDTO.getAirLine()
                 + flightReservationDTO.getDepAirport()
@@ -152,6 +154,7 @@ public class FlightReservationService {
         return hexString.toString();
 
     }
+
     // 항공예약 취소하는 메서드
     @Transactional(rollbackFor = { RollBackException.class })
     public void cancelFlightReservation(Long reservationId) {
@@ -160,23 +163,30 @@ public class FlightReservationService {
             Optional<FlightReservation> findReservation = flightReservationRepository.findById(reservationId);
             if (findReservation.isPresent()) {
                 FlightReservation flightReservation = findReservation.get();
-                if (flightReservation.getStatus() != Status.예약취소) {
+                if (flightReservation.getStatus() == Status.결제대기) {            
                     flightReservation.setStatus(Status.예약취소);
                     flightReservationRepository.save(flightReservation);
 
-                    FlightReservationCancelRequested flightReservationCancelRequested = new FlightReservationCancelRequested(flightReservation);
-                    flightReservationCancelRequested.publishAfterCommit();
-                    logger.info("\n예약취소에 성공했습니다.\n");
-                } else {
+                    if (flightReservation.getStatus() == Status.예약취소) {
+                        FlightReservationCancelRequested flightReservationCancelRequested = new FlightReservationCancelRequested(flightReservation);
+                        flightReservationCancelRequested.publishAfterCommit();
+                        logger.info("\n예약취소에 성공했습니다.\n");
+                    }else{
+                        throw new RollBackException("예약 저장중에 롤백이 발생");
+                    }
+                } else if (flightReservation.getStatus() == Status.예약취소) {
                     logger.error("\n예약 취소된 상태 입니다.\n");
                     throw new ResponseException("예약 취소된 상태 입니다.", HttpStatus.CONFLICT);
+                } else {
+                    logger.error("\n현재 상태는 예약 취소를 할 수 없습니다\n");
+                    throw new ResponseException("현재 상태는 예약 취소를 할 수 없습니다", HttpStatus.BAD_REQUEST);
                 }
             } else {
                 logger.error("\n예약 취소 내역을 찾지 못했습니다.\n");
                 throw new ResponseException("예약 취소 내역을 찾지 못했습니다.", HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
-            throw new RollBackException("예약 저장중에 롤백이 발생" + e.getMessage());
+            throw new RollBackException(e.getMessage());
         }
 
     }

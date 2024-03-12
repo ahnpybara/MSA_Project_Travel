@@ -9,4 +9,7 @@ public class AfterPaymentDTO {
 
     @NotBlank
     private String imp_uid; 
+
+    @NotBlank
+    private String category;
 }

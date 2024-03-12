@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // @ExceptionHandler 어노테이션을 통해 RollBackException가 발생했을때 해당 메서드가 실행되도록 설정합니다.
-    @ExceptionHandler(RuntimeException.class)
+    @ExceptionHandler(RollBackException.class)
     public ResponseEntity<String> handleRuntimeException(RollBackException e) {
 
         logger.error("\n예상치 못한 오류로 예약이 롤백 되었습니다\n", e.getMessage());

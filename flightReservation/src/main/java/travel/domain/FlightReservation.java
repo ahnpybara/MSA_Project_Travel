@@ -8,6 +8,7 @@ import travel.FlightReservationApplication;
 @Entity
 @Table(name = "FlightReservation_table")
 @Data
+//<<< DDD / Aggregate Root
 public class FlightReservation {
 
     @Id
@@ -39,6 +40,8 @@ public class FlightReservation {
     private String email;
     
     private String reservationHash;
+
+    private String category;
 
 
     public static FlightReservationRepository repository() {

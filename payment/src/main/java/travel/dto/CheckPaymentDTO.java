@@ -6,4 +6,7 @@ import javax.validation.constraints.NotBlank;
 public class CheckPaymentDTO {
     @NotBlank
     private String merchant_uid;
+    
+    @NotBlank
+    private String category;
 }

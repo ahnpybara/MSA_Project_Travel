@@ -13,6 +13,7 @@ public class Paid extends AbstractEvent {
     private Long userId;
     private Long reservationId;
     private String name;
+    private String category;
     private String impUid;
 
     public Paid(Payment aggregate) {

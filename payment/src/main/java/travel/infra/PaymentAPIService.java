@@ -62,15 +62,15 @@ public class PaymentAPIService {
         String reservationId = getReservationNumber(request.getMerchant_uid());
         travel.domain.Payment postPayment = null;
         try {
-            postPayment = paymentRepository.findByReservationId(Long.valueOf(reservationId));
+            postPayment = paymentRepository.findByReservationIdAndCategory(Long.valueOf(reservationId), request.getCategory());
             if (postPayment != null && postPayment.getStatus() != PaymentStatus.결제완료)
                 return PaymentStatus.성공;
             else
                 throw new IllegalAccessException("결제 정보가 존재하지 않습니다");
         } catch (IllegalAccessException e) {
-            return handlePaymentFailed(reservationId, e.getMessage(), PaymentStatus.결제실패);
+            return handlePaymentFailed(reservationId, e.getMessage(), PaymentStatus.결제실패, request.getCategory());
         } catch (Exception e) {
-            return handlePaymentFailed(reservationId, "알 수 없는 오류가 발생했습니다 : " + e, PaymentStatus.결제실패);
+            return handlePaymentFailed(reservationId, "알 수 없는 오류가 발생했습니다 : " + e, PaymentStatus.결제실패, request.getCategory());
         }
     }
 
@@ -82,7 +82,7 @@ public class PaymentAPIService {
             api.postPrepare(prepareData);
             return PaymentStatus.성공;
         } catch (Exception e) {
-            return handlePaymentFailed(reservationId, "결제 사전검증 도중 문제가 발생하였습니다 : " + e, PaymentStatus.결제실패);
+            return handlePaymentFailed(reservationId, "결제 사전검증 도중 문제가 발생하였습니다 : " + e, PaymentStatus.결제실패, request.getCategory());
         }
     }
 
@@ -94,7 +94,7 @@ public class PaymentAPIService {
         try {
 
             // 결제된 예약 id로 결제 테이블에서 결제 정보를 찾습니다
-            postPayment = paymentRepository.findByReservationId(Long.valueOf(reservationId));
+            postPayment = paymentRepository.findByReservationIdAndCategory(Long.valueOf(reservationId), request.getCategory());
             BigDecimal postAmount = BigDecimal.valueOf(postPayment.getCharge());
 
             // 포트원에서 결제처리된 결제정보를 가져옵니다
@@ -119,12 +119,13 @@ public class PaymentAPIService {
             }
 
         } catch (IllegalStateException e) {
-            return handlePaymentFailed(reservationId, e.getMessage(), PaymentStatus.결제실패);
+            return handlePaymentFailed(reservationId, e.getMessage(), PaymentStatus.결제실패, request.getCategory());
         } catch (RuntimeException e) {
-            handlePaymentFailed(reservationId, e.getMessage(), PaymentStatus.결제실패);
+            handlePaymentFailed(reservationId, e.getMessage(), PaymentStatus.결제실패, request.getCategory());
             throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e.toString());
         } catch (Exception e) {
-            return handlePaymentFailed(reservationId, "결제 사후검증 도중 알 수 없는 문제가 발생하였습니다 : " + e, PaymentStatus.결제실패);
+            handlePaymentFailed(reservationId, "결제 사후검증 도중 알 수 없는 문제가 발생하였습니다 : " + e, PaymentStatus.결제실패, request.getCategory());
+            throw new CustomException("결제 사후검증 도중 알 수 없는 문제가 발생하였습니다 : " + e, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.toString());
         }
     }
 
@@ -136,7 +137,7 @@ public class PaymentAPIService {
         IamportResponse<Payment> iamportResponse = null;
 
         try {
-            postPayment = paymentRepository.findByReservationId(Long.valueOf(reservationId));
+            postPayment = paymentRepository.findByReservationIdAndCategory(Long.valueOf(reservationId), request.getCategory());
 
             // 사후 검증이 실패했을 때 실행되는 결제 취소 요청인지, 별개의 환불요청인지 구분하기 위함
             if (request.getImp_uid() == null) {
@@ -163,10 +164,10 @@ public class PaymentAPIService {
                 throw new IllegalStateException("환불처리할 결제건이 아직 결제완료된 상태가 아니거나, 환불처리 상태 반영이 되지 않았습니다");
             }
         } catch (IllegalStateException e) {
-            handlePaymentFailed(reservationId, e.getMessage(), PaymentStatus.환불실패);
+            handlePaymentFailed(reservationId, e.getMessage(), PaymentStatus.환불실패, request.getCategory());
             throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e.toString());
         } catch (Exception e) {
-            return handlePaymentFailed(reservationId, "알 수 없는 이유로 환불처리에 실패했습니다. " + e, PaymentStatus.환불실패);
+            return handlePaymentFailed(reservationId, "알 수 없는 이유로 환불처리에 실패했습니다. " + e, PaymentStatus.환불실패, request.getCategory());
         }
     }
 
@@ -177,14 +178,13 @@ public class PaymentAPIService {
         travel.domain.Payment postPayment = null;
 
         try {
-            postPayment = paymentRepository.findByReservationId(Long.valueOf(reservationId));
+            postPayment = paymentRepository.findByReservationIdAndCategory(Long.valueOf(reservationId), request.getCategory());
             postPayment.setStatus(PaymentStatus.결제취소);
             travel.domain.Payment paymentStatus = paymentRepository.save(postPayment);
 
             // 결제에 실패했다는걸 알리기 위해 결제 실패 이벤트를 발행합니다(SAGA)
             if (paymentStatus.getStatus() == PaymentStatus.결제취소) {
-                PaymentCancelled paymentCancelled = new PaymentCancelled();
-                paymentCancelled.setReservationId(Long.valueOf(reservationId));
+                PaymentCancelled paymentCancelled = new PaymentCancelled(postPayment);
                 paymentCancelled.publishAfterCommit();
                 return PaymentStatus.성공;
             } else {
@@ -217,17 +217,19 @@ public class PaymentAPIService {
     }
 
     // 각 결제 단계에서 예외 발생시 이를 처리하고 실패 이벤트(보상 트랜잭션)를 발행하는 메서드(SAGA패턴)
-    private PaymentStatus handlePaymentFailed(String reservationId, String errorMessage, PaymentStatus status) {
+    private PaymentStatus handlePaymentFailed(String reservationId, String errorMessage, PaymentStatus status, String category) {
         AbstractEvent event;
         switch (status) {
             case 결제실패:
                 PaymentFailed paymentFailed = new PaymentFailed();
                 paymentFailed.setReservationId(Long.valueOf(reservationId));
+                paymentFailed.setCategory(category);
                 event = paymentFailed;
                 break;
             case 환불실패:
                 PaymentRefundFailed paymentRefundFailed = new PaymentRefundFailed();
                 paymentRefundFailed.setReservationId(Long.valueOf(reservationId));
+                paymentRefundFailed.setCategory(category);
                 event = paymentRefundFailed;
                 break;
             default:

@@ -24,6 +24,8 @@ public class FlightReservationFailed extends AbstractEvent {
     private Long flightId;
     private String email;
     private String reservationHash;
+    private String category;
+
 
     public FlightReservationFailed(FlightReservation aggregate) {
         super(aggregate);
