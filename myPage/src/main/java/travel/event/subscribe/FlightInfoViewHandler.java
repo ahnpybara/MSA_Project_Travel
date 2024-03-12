@@ -8,7 +8,6 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.retry.annotation.*;
 import org.springframework.stereotype.Service;
 import travel.config.kafka.KafkaProcessor;
-import travel.domain.*;
 import travel.exception.RollbackException;
 import travel.infra.FlightInfoService;
 
@@ -18,9 +17,6 @@ public class FlightInfoViewHandler {
     @Autowired
     private FlightInfoService flightInfoService;
 
-    @Autowired
-    private FlightInfoRepository flightInfoRepository;
-
     private static final Logger logger = LoggerFactory.getLogger("MyLogger");
 
     // 사용자의 예약정보를 저장하는 메서드
@@ -28,8 +24,7 @@ public class FlightInfoViewHandler {
     @Retryable(value = RollbackException.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public void whenFlightReservationCompleted(@Payload FlightReservationCompleted flightReservationCompleted) {
 
-        FlightInfo flightInfo = flightInfoRepository.findByReservationId(flightReservationCompleted.getId());
-        if (!flightReservationCompleted.validate() || flightInfo != null) return;
+        if (!flightReservationCompleted.validate()) return;
         logger.info("\n사용자의 예약 정보를 저장합니다.\n");
         flightInfoService.saveFlightInfo(flightReservationCompleted);
     }

@@ -236,7 +236,7 @@ public class PaymentAPIService {
                 throw new IllegalArgumentException("Invalid payment status: " + status);
         }
         event.publishAfterCommit();
-        logger.info(errorMessage);
+        logger.info("\n"+ errorMessage + "\n");
         return PaymentStatus.실패;
     }
 }

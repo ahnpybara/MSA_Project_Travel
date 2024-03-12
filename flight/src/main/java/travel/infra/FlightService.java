@@ -71,7 +71,7 @@ public class FlightService {
             logger.error("\n유효하지 않은 공항Id 입니다\n");
             throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST.value(), e.toString());
         } catch (Exception e) {
-            logger.error("\n항공편의 정보를 DB에서 찾는 도중 문제가 발생했습니다.\n 오류 내용 : " + e);
+            logger.error("\n항공편의 정보를 DB에서 찾는 도중 문제가 발생했습니다.\n 오류 내용 : " + e + "\n");
             throw new CustomException("항공편의 정보를 DB에서 찾는 도중 문제가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.toString());
         }
     }

@@ -45,7 +45,7 @@ public class FlightController {
 
     // 항공예약으로부터 좌석수 조회 API 호출을 받기 위한 메서드입니다
     @GetMapping("/flights/seatCapacity")
-    public ResponseEntity<Flight> getMethodName(@RequestParam("flightId") Long flightId) {
+    public ResponseEntity<Flight> getFlightSeatCapacity(@RequestParam("flightId") Long flightId) {
         logger.info("\n항공 예약서비스로 부터 API 호출이 되었습니다\n");
         Flight flight = flightService.findFlightAPI(flightId);
         return ResponseEntity.ok(flight);

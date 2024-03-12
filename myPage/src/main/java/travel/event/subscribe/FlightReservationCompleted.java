@@ -20,6 +20,5 @@ public class FlightReservationCompleted extends AbstractEvent {
     private String name;
     private Long flightId;
     private String email;
-    private String reservationHash;
     private String category;
 }

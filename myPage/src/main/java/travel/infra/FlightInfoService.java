@@ -31,26 +31,35 @@ public class FlightInfoService {
     public void saveFlightInfo(FlightReservationCompleted flightReservationCompleted) {
 
         try {
-            FlightInfo flightInfo = new FlightInfo();
-            flightInfo.setReservationId(flightReservationCompleted.getId());
-            flightInfo.setUserId(flightReservationCompleted.getUserId());
-            flightInfo.setAirLine(flightReservationCompleted.getAirLine());
-            flightInfo.setArrAirport(flightReservationCompleted.getArrAirport());
-            flightInfo.setDepAirport(flightReservationCompleted.getDepAirport());
-            flightInfo.setArrTime(flightReservationCompleted.getArrTime());
-            flightInfo.setDepTime(flightReservationCompleted.getDepTime());
-            flightInfo.setCharge(flightReservationCompleted.getCharge());
-            flightInfo.setVihicleId(flightReservationCompleted.getVihicleId());
-            flightInfo.setUserId(flightReservationCompleted.getUserId());
-            flightInfo.setName(flightReservationCompleted.getName());
-            flightInfo.setEmail(flightReservationCompleted.getEmail());
-            flightInfo.setCategory(flightReservationCompleted.getCategory());
-            flightInfo.setStatus(FlightStatus.예약완료);
-            flightInfoRepository.save(flightInfo);
+            FlightInfo exsistFlight = flightInfoRepository.findByReservationId(flightReservationCompleted.getId());
+
+            if (exsistFlight == null) {
+                FlightInfo flightInfo = new FlightInfo();
+                flightInfo.setReservationId(flightReservationCompleted.getId());
+                flightInfo.setUserId(flightReservationCompleted.getUserId());
+                flightInfo.setAirLine(flightReservationCompleted.getAirLine());
+                flightInfo.setArrAirport(flightReservationCompleted.getArrAirport());
+                flightInfo.setDepAirport(flightReservationCompleted.getDepAirport());
+                flightInfo.setArrTime(flightReservationCompleted.getArrTime());
+                flightInfo.setDepTime(flightReservationCompleted.getDepTime());
+                flightInfo.setCharge(flightReservationCompleted.getCharge());
+                flightInfo.setVihicleId(flightReservationCompleted.getVihicleId());
+                flightInfo.setUserId(flightReservationCompleted.getUserId());
+                flightInfo.setName(flightReservationCompleted.getName());
+                flightInfo.setEmail(flightReservationCompleted.getEmail());
+                flightInfo.setCategory(flightReservationCompleted.getCategory());
+                flightInfo.setStatus(FlightStatus.예약완료);
+            } else {
+                logger.info("\n"+ flightReservationCompleted.getId() + "번 예약 현황이 이미 존재하므로 상태만 예약 완료로 변경됩니다\n");
+                exsistFlight.setStatus(FlightStatus.예약완료);
+            }
+            
+            flightInfoRepository.save(exsistFlight);
+
         } catch (Exception e) {
             logger.error("\n예약된 정보를 저장하는 도중 문제가 발생했습니다 : " + e);
             throw new RollbackException("예약된 정보를 저장하는 도중 문제가 발생했습니다 : " + e);
-        }        
+        }
     }
 
     // 특정 예약정보의 상태를 변경하는 메서드입니다
@@ -59,8 +68,13 @@ public class FlightInfoService {
 
         try {
             FlightInfo flightInfo = flightInfoRepository.findByReservationId(flightReservationRefunded.getId());
-            flightInfo.setStatus(FlightStatus.예약취소);
-            flightInfoRepository.save(flightInfo);
+
+            if (flightInfo == null) {
+                logger.error("\n" + flightReservationRefunded.getId() + "번 예약 번호로 예약된 항공 정보가 존재하지 않습니다\n");
+            } else {
+                flightInfo.setStatus(FlightStatus.예약취소);
+                flightInfoRepository.save(flightInfo);
+            }
         } catch (Exception e) {
             logger.error("\n예약된 정보를 수정하는 도중 문제가 발생했습니다 : " + e);
             throw new RollbackException("예약된 정보를 수정하는 도중 문제가 발생했습니다 : " + e);
