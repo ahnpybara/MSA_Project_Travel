@@ -1,26 +1,16 @@
 package travel.exception;
 
+import org.springframework.http.HttpStatus;
+
 public class CustomException extends RuntimeException {
-    private int statusCode;
-    private String error;
-    private String exceptionName;
+    private HttpStatus httpStatus;
 
-    public CustomException(String message, int statusCode, String error) {
+    public CustomException(String message, HttpStatus httpStatus) {
         super(message);
-        this.statusCode = statusCode;
-        this.error = error;
-        this.exceptionName = this.getClass().getSimpleName();
+        this.httpStatus = httpStatus;
     }
 
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public String getExceptionName() {
-        return exceptionName;
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
     }
 }

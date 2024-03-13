@@ -7,6 +7,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource(collectionResourceRel = "flights", path = "flights")
 public interface FlightRepository extends PagingAndSortingRepository<Flight, Long> {
 
-    List<Flight> findByDepAirportNmAndArrAirportNmAndDepPlandTimeBetweenAndSeatCapacityGreaterThanEqual(
-            String depAirportNm, String arrAirportNm, Long startPlandTime, Long endPlandTime, long minSeatCapacity);
+    List<Flight> findByDepAirportAndArrAirportAndDepTimeBetweenAndSeatCapacityGreaterThanEqual(String depAirportNm,
+            String arrAirportNm, Long startTimestamp, Long endTimestamp, long minSeatCapacity);
 }

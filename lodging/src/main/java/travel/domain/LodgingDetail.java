@@ -1,6 +1,12 @@
 package travel.domain;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.PostPersist;
+import javax.persistence.Table;
+
 import lombok.Data;
 import travel.LodgingApplication;
 import travel.repository.LodgingDetailRepository;
@@ -8,10 +14,11 @@ import travel.repository.LodgingDetailRepository;
 @Entity
 @Table(name = "LodgingDetail_table")
 @Data
+//<<< DDD / Aggregate Root
 public class LodgingDetail {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long contentid;
@@ -28,7 +35,7 @@ public class LodgingDetail {
 
     private String telname;
 
-    private String homepage;
+    private String homePage;
 
     private String firstimage;
 
@@ -58,3 +65,4 @@ public class LodgingDetail {
         return lodgingDetailRepository;
     }
 }
+//>>> DDD / Aggregate Root

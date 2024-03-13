@@ -1,6 +1,7 @@
 package travel.domain;
 
 import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import travel.FlightApplication;
 
@@ -13,19 +14,24 @@ public class Flight {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String airlineNm;
+    @JsonProperty("airlineNm")
+    private String airLine;
 
-    private String arrAirportNm;
+    @JsonProperty("arrAirportNm")
+    private String arrAirport;
 
-    private String depAirportNm;
+    @JsonProperty("depAirportNm")
+    private String depAirport;
 
-    private Long arrPlandTime;
+    @JsonProperty("arrPlandTime")
+    private Long arrTime;
 
-    private Long depPlandTime;
+    @JsonProperty("depPlandTime")
+    private Long depTime;
 
-    private Long economyCharge;
+    private Long economyCharge = 57900L;
 
-    private Long prestigeCharge;
+    private Long prestigeCharge = 87900L;
 
     private String vihicleId;
 

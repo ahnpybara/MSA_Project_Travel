@@ -1,8 +1,6 @@
 package travel.infra;
 
 import java.net.URI;
-import java.time.Duration;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -38,50 +36,34 @@ public class FlightAPIService {
     // 항공편 API를 호출한 뒤, 이를 DB에 저장하는 메서드입니다.
     public Flux<Flight> callApi(String depAirportId, String arrAirportId, String depPlandTime) {
 
-        // 해당 옵션의 항공편의 총 개수를 구하기 위한 URL을 준비한 뒤, WebClient를 통해 요청을 보내고 응답을 받습니다
-        String urlForTotalCount = String.format(
-                "http://apis.data.go.kr/1613000/DmstcFlightNvgInfoService/getFlightOpratInfoList?serviceKey=%s&pageNo=1&numOfRows=0&_type=json&depAirportId=%s&arrAirportId=%s&depPlandTime=%s&airlineId=",
-                serviceKey, depAirportId, arrAirportId, depPlandTime);
+        // 1부터 4까지의 숫자를 포함하는 Flux를 생성합니다. 이때 Flux의 각 요소는 페이지 번호를 나타냅니다.
+        return Flux.range(1, 4)
+                .flatMap(page -> {
+                    String urlForData = String.format(
+                            "http://apis.data.go.kr/1613000/DmstcFlightNvgInfoService/getFlightOpratInfoList?serviceKey=%s&pageNo=%d&numOfRows=4&_type=json&depAirportId=%s&arrAirportId=%s&depPlandTime=%s&airlineId=",
+                            serviceKey, page, depAirportId, arrAirportId, depPlandTime);
 
-        Mono<JsonNode> totalCountResponse = webClient.get()
-                .uri(URI.create(urlForTotalCount))
-                .header("Accept", "application/json")
-                .retrieve()
-                .bodyToMono(JsonNode.class)
-                .timeout(Duration.ofSeconds(5));
-
-        // 전체페이지 수를 통해서 각 페이지에 대한 요청을 보낼 URL 구성하고, WebClient를 통해 요청을 보냅니다.
-        return totalCountResponse.flatMapMany(totalCount -> {
-            int totalCnt = totalCount.path("response").path("body").path("totalCount").asInt();
-            int totalPages = (totalCnt + 4 - 1) / 4; // numOfRows가 4이므로, 이를 기준으로 전체 페이지 수 계산
-            return Flux.range(1, totalPages)
-                    .flatMap(page -> {
-                        String urlForData = String.format(
-                                "http://apis.data.go.kr/1613000/DmstcFlightNvgInfoService/getFlightOpratInfoList?serviceKey=%s&pageNo=%d&numOfRows=4&_type=json&depAirportId=%s&arrAirportId=%s&depPlandTime=%s&airlineId=",
-                                serviceKey, page, depAirportId, arrAirportId, depPlandTime);
-
-                        return webClient.get()
-                                .uri(URI.create(urlForData))
-                                .header("Accept", "application/json")
-                                .retrieve()
-                                .bodyToMono(JsonNode.class)
-                                .timeout(Duration.ofSeconds(5))
-                                .flatMapMany(jsonNode -> {
-                                    JsonNode itemsNode = jsonNode.path("response").path("body").path("items").path("item");
-                                    if (itemsNode.isArray()) {
-                                        // 배열일 경우, 배열의 각 요소를 처리
-                                        return Flux.fromIterable(itemsNode);
-                                    } else {
-                                        // 단일 객체일 경우, 단일 객체만 포함하는 리스트를 생성하여 처리
-                                        return Flux.just(itemsNode);
-                                    }
-                                })
-                                .map(this::convertAndSaveFlight)
-                                .collectList() // 페이지 별로 데이터를 수집한 후, 한 번에 처리
-                                .flatMapMany(flights -> Flux.fromIterable(flights))
-                                .onErrorResume(this::handleError);
-                    }, totalPages); // 병렬 처리를 위해 totalPages를 제한값으로 설정
-        });
+                    return webClient.get()
+                            .uri(URI.create(urlForData))
+                            .header("Accept", "application/json")
+                            .retrieve()
+                            .bodyToMono(JsonNode.class)
+                            .flatMapMany(jsonNode -> {
+                                JsonNode itemsNode = jsonNode.path("response").path("body").path("items").path("item");
+                                if (itemsNode.isArray()) {
+                                    // 배열 형태일 때
+                                    return Flux.fromIterable(itemsNode);
+                                } else if (!itemsNode.isMissingNode()) {
+                                    // 단일 객체일 때
+                                    return Flux.just(itemsNode);
+                                } else {
+                                    // 빈 응답 또는 예상치 못한 형태일 때
+                                    return Flux.empty();
+                                }
+                            })
+                            .map(this::convertAndSaveFlight)
+                            .onErrorResume(this::handleError);
+                }, 4); // 병렬처리를 위해 4개의 쓰레드를 사용하도록 설정하였습니다.
     }
 
     // API 응답을 Flight 객체로 변환하고 DB에 저장하는 메서드입니다

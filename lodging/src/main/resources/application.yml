@@ -1,15 +1,12 @@
 api:
-  serviceKey: "O%2B0DdibyeRPwjChz%2BqSJN%2FEurIanim0THVar8SxizDrSwO9bDs%2BJWH5YxshTVo5qudULTKjhTOOUyxZSrjD9oQ%3D%3D"
+  serviceKey: "ODuuAffnnU7%2FagnE9Yd4pK1DYVmWJw%2FGJOKKXF7QGwU94Rgm%2BCSQycCHcHxN1R7oDVF7B6mbPFP%2BHc1PNsLgrw%3D%3D"
   mobileOS: "ETC"
   mobileApp: "AppTest"
   arrange: "A"
 
 server:
   port: 8080
-  error:
-    include-message: always
-    include-binding-errors: always
-    
+
 spring:
   application:
     name: lodging
@@ -20,7 +17,7 @@ spring:
   jpa:
     properties:
       hibernate:
-        show_sql: false
+        show_sql: true
         format_sql: true
         implicit_naming_strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
   cloud:
