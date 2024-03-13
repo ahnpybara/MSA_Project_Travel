@@ -65,7 +65,7 @@ public class FlightService {
         try {
             String depAirportNm = convertAirportIdToName(depAirportId);
             String arrAirportNm = convertAirportIdToName(arrAirportId);
-            return flightRepository.findByDepAirportAndArrAirportAndDepTimeBetweenAndSeatCapacityGreaterThanEqual(
+            return flightRepository.findByDepAirportNmAndArrAirportNmAndDepPlandTimeBetweenAndSeatCapacityGreaterThanEqual(
                     depAirportNm, arrAirportNm, startTimestamp, endTimestamp, 0L);
         } catch (IllegalArgumentException e) {
             logger.error("\n유효하지 않은 공항Id 입니다\n");

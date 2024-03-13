@@ -20,6 +20,7 @@ import travel.event.publish.Paid;
 import travel.event.publish.PaymentCancelled;
 import travel.event.publish.PaymentFailed;
 import travel.event.publish.PaymentRefundFailed;
+import travel.event.publish.PaymentRefunded;
 import travel.exception.CustomException;
 import travel.exception.RetryException;
 
@@ -157,8 +158,8 @@ public class PaymentAPIService {
             if (paymentState) {
                 CancelData cancelData = new CancelData(payment.getImpUid(), true);
                 api.cancelPaymentByImpUid(cancelData);
-                PaymentCancelled paymentCancelled = new PaymentCancelled(postPayment);
-                paymentCancelled.publishAfterCommit();
+                PaymentRefunded paymentRefunded = new PaymentRefunded(postPayment);
+                paymentRefunded.publishAfterCommit();
                 return PaymentStatus.성공;
             } else {
                 throw new IllegalStateException("환불처리할 결제건이 아직 결제완료된 상태가 아니거나, 환불처리 상태 반영이 되지 않았습니다");

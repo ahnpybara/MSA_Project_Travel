@@ -49,13 +49,12 @@ public class FlightInfoService {
                 flightInfo.setEmail(flightReservationCompleted.getEmail());
                 flightInfo.setCategory(flightReservationCompleted.getCategory());
                 flightInfo.setStatus(FlightStatus.예약완료);
+                flightInfoRepository.save(flightInfo);
             } else {
                 logger.info("\n"+ flightReservationCompleted.getId() + "번 예약 현황이 이미 존재하므로 상태만 예약 완료로 변경됩니다\n");
                 exsistFlight.setStatus(FlightStatus.예약완료);
+                flightInfoRepository.save(exsistFlight);
             }
-            
-            flightInfoRepository.save(exsistFlight);
-
         } catch (Exception e) {
             logger.error("\n예약된 정보를 저장하는 도중 문제가 발생했습니다 : " + e);
             throw new RollbackException("예약된 정보를 저장하는 도중 문제가 발생했습니다 : " + e);
