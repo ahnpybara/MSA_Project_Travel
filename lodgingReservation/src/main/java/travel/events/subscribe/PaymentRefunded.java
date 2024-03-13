@@ -14,4 +14,5 @@ public class PaymentRefunded extends AbstractEvent {
     private Long reservationId;
     private String name;
     private String impUid;
+    private String category;
 }

@@ -42,9 +42,13 @@ spring:
 
 logging:
   level:
-    org.hibernate.type: trace
-    org.springframework.cloud: debug
+    org.hibernate.type: info
+    org.springframework.cloud: info
 
+api:
+  url: 
+    lodgingReservation: localhost:8088
+    lodging: localhost:8087
 
 server:
   port: 8088
@@ -82,3 +86,7 @@ spring:
           contentType: application/json
 
 
+api:
+  url: 
+    lodgingReservation: lodgingReservation:8088
+    lodging: lodging:8087

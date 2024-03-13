@@ -6,6 +6,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,11 +36,14 @@ public class LodgingReservationController {
         if (bindingResult.hasErrors()) {
             bindingResult.getAllErrors().forEach(error -> {logger.error("\n" + error.getDefaultMessage() + "\n");});
             return ResponseEntity.badRequest().body("\n유효하지 않은 파라미터 입니다.");
-        }    
+        }
+
+        LodgingReservation lodgingReservation = lodgingReservationService.validateAndProcessReservation(lodgingReservationDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(lodgingReservation);
+     
     }
 
     // 예약 취소를 위한 컨트롤러
-    //TODO 프론트에 long flightReservaionId만 달라고 요청하기.
     @PostMapping("/cancel")
     public ResponseEntity<?> cancelLodgingReservation(@Valid @RequestBody CancelReservationDTO cancelReservationDTO, BindingResult bindingResult) {
         
@@ -47,5 +51,8 @@ public class LodgingReservationController {
             bindingResult.getAllErrors().forEach(error -> {logger.error("\n" + error.getDefaultMessage() + "\n");});
             return ResponseEntity.badRequest().body("\n유효하지 않은 파라미터 입니다.");
         }
+
+        lodgingReservationService.cancelLodgingReservation(cancelReservationDTO.getLodgingReservationId());
+        return ResponseEntity.ok("예약 취소 완료");
     }
 }
