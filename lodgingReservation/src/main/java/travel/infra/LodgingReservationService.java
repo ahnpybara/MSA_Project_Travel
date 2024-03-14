@@ -44,13 +44,13 @@ public class LodgingReservationService {
         if (existingReservation.isPresent()) {
             LodgingReservation existing = existingReservation.get();
             if (existing.getStatus() == Status.결제대기) {
-                logger.info("결제 대기중인 요청이 있습니다.");
+                logger.info("\n결제 대기중인 요청이 있습니다.\n");
                 throw new CustomException("결제 대기중인 요청이 있습니다.", HttpStatus.CONFLICT.value());
             } else if (existing.getStatus() == Status.결제완료 || existing.getStatus() == Status.예약완료) {
-                logger.info("결제 완료된 예약 내역이 존재 합니다.");
-                throw new CustomException("결제 완료된 예약 내역이 존재 합니다.", HttpStatus.CONFLICT.value());
+                logger.info("\n결제 완료 및 예약완료된 예약 내역이 존재 합니다.\n");
+                throw new CustomException("결제 완료 및 예약완료된 예약 내역이 존재 합니다.", HttpStatus.CONFLICT.value());
             } else {
-                checkRoomCapacity(lodgingReservationDTO.getRoomCode(),lodgingReservationDTO.getReservationDate());
+                //checkRoomCapacity(lodgingReservationDTO.getRoomCode(), lodgingReservationDTO.getReservationDate());
                 existing.setStatus(Status.결제대기);
                 lodgingReservationRepository.save(existing);
                 if (existing.getStatus() == Status.결제대기) {
@@ -63,7 +63,7 @@ public class LodgingReservationService {
                 return existing;
             }
         }
-        checkRoomCapacity(lodgingReservationDTO.getRoomCode(), lodgingReservationDTO.getReservationDate());
+        //checkRoomCapacity(lodgingReservationDTO.getRoomCode(), lodgingReservationDTO.getReservationDate());
         LodgingReservation lodgingReservation = createAndSaveLodgingReservation(lodgingReservationDTO);
         logger.info("\n 숙소 예약이 성공적으로 생성 되었습니다. \n");
         LodgingReservationRequested lodgingReservationRequested = new LodgingReservationRequested(lodgingReservation);
@@ -134,7 +134,7 @@ public class LodgingReservationService {
 
                     if (lodgingReservation.getStatus() == Status.예약취소) {
                         LodgingReservationCancelRequested lodgingReservationCancelRequested = new LodgingReservationCancelRequested(
-                            lodgingReservation);
+                                lodgingReservation);
                         lodgingReservationCancelRequested.publishAfterCommit();
                         logger.info("\n예약취소에 성공했습니다.\n");
                     } else {

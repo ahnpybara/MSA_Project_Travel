@@ -2,6 +2,7 @@ package travel.events.publish;
 
 import lombok.*;
 import travel.domain.LodgingReservation;
+import travel.domain.Status;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
@@ -9,6 +10,13 @@ import travel.domain.LodgingReservation;
 public class LodgingReservationCancelRequested extends AbstractEvent {
 
     private Long id;
+    private String name;
+    private Long reservationDate;
+    private String email;
+    private String category;
+    private Long charge;
+    private Long roomCode;
+    private Status status;
 
     public LodgingReservationCancelRequested(LodgingReservation aggregate) {
         super(aggregate);

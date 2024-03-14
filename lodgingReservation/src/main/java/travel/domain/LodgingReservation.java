@@ -27,7 +27,7 @@ public class LodgingReservation {
 
     private Status status;
 
-
+    private Long userId;
 
     public static LodgingReservationRepository repository() {
         LodgingReservationRepository lodgingReservationRepository = LodgingReservationApplication.applicationContext.getBean(LodgingReservationRepository.class);

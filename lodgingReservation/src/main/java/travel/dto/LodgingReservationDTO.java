@@ -10,7 +10,7 @@ public class LodgingReservationDTO {
     private Long id;
     @NotBlank(message = "\nname cannot be null or empty\n")
     private String name;
-    @NotBlank(message = "\nreservationDate cannot be null or empty\n")
+    @NotNull(message = "\nreservationDate cannot be null or empty\n")
     private Long reservationDate;
     @NotBlank(message = "\nemail cannot be null or empty\n")
     private String email;
@@ -18,8 +18,8 @@ public class LodgingReservationDTO {
     private Long charge;
     @NotNull(message = "\nroomCode cannot be null or empty\n")
     private Long roomCode;
+    @NotNull(message = "\nuserId cannot be null or empty\n")
+    private Long userId;
 
-    @NotNull(message = "\nflightId cannot be null or empty\n")
-    private Long flightId;
 
 }
