@@ -1,0 +1,149 @@
+
+  
+server:
+  port: 8088
+
+---
+
+spring:
+  profiles: default
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+
+      routes:
+        - id: payment
+          uri: http://localhost:8082
+          predicates:
+            - Path=/payments/**
+          filters:
+            - AuthorizationFilter
+             
+        - id: flightReservation
+          uri: http://localhost:8083
+          predicates:
+            - Path=/flightReservations/**
+          filters:
+            - AuthorizationFilter
+
+        - id: user
+          uri: http://localhost:8084
+          predicates:
+            - Path=/users/**,
+            
+        - id: myPage
+          uri: http://localhost:8085
+          predicates:
+            - Path=/reservationInfos/**,
+          filters:
+            - AuthorizationFilter
+
+        - id: flight
+          uri: http://localhost:8086
+          predicates:
+            - Path=/flights/**
+          filters:
+            - AuthorizationFilter
+            
+        - id: lodging
+          uri: http://localhost:8087
+          predicates:
+            - Path=/lodgings/**
+          # filters:
+          #   - AuthorizationFilter
+
+        - id: lodgingReservation
+          uri: http://localhost:8089
+          predicates:
+            - Path=/lodgingReservations/**
+          # filters:
+          #   - AuthorizationFilter
+      
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "*"
+            allowedMethods:
+              - "*"
+            allowedHeaders:
+              - "*"
+            exposedHeaders:
+              - "Authorization"
+            allowCredentials: true
+
+
+---
+
+spring:
+  profiles: docker
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+
+      routes:
+        - id: payment
+          uri: http://payment:8080
+          predicates:
+            - Path=/payments/**
+          filters:
+            - AuthorizationFilter
+
+        - id: flightReservation
+          uri: http://flightreservation:8080
+          predicates:
+            - Path=/flightReservations/**
+          filters:
+            - AuthorizationFilter
+
+        - id: user
+          uri: http://user:8080
+          predicates:
+            - Path=/users/**, 
+            
+        - id: myPage
+          uri: http://mypage:8080
+          predicates:
+            - Path=/reservationInfos/**
+          filters:
+            - AuthorizationFilter
+
+        - id: flight
+          uri: http://flight:8080
+          predicates:
+            - Path=/flights/**,
+          filters:
+            - AuthorizationFilter
+
+        - id: lodging
+          uri: http://lodging:8080
+          predicates:
+            - Path=/lodgings/**
+          filters:
+            - AuthorizationFilter
+        
+        - id: lodgingReservation
+          uri: http://lodgingreservation:8080
+          predicates:
+            - Path=/lodgingReservations/**
+          filters:
+            - AuthorizationFilter
+            
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"
+            allowedMethods:
+              - "*"
+            allowedHeaders:
+              - "*"
+            exposedHeaders:
+              - "Authorization"
+
+            allowCredentials: true
+
+server:
+  port: 8080

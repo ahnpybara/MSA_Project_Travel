@@ -1,0 +1,108 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: mypage
+---
+
+spring:
+  profiles: default
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ahnpybara7627@gmail.com
+    password: xwal fsih otqg ophi
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  jpa:
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: true
+        implicit_naming_strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+        streams:
+          binder:
+            configuration:
+              default:
+                key:
+                  serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+                value:
+                  serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+      bindings:
+        event-in:
+          group: myPage
+#<<< EDA / Topic Name
+          destination: travel
+#>>> EDA / Topic Name
+          contentType: application/json
+        event-out:
+#<<< EDA / Topic Name
+          destination: travel
+#>>> EDA / Topic Name
+          contentType: application/json
+
+logging:
+  level:
+    org.hibernate.type: info
+    org.springframework.cloud: info
+
+server:
+  port: 8085
+
+---
+
+spring:
+  profiles: docker
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ahnpybara7627@gmail.com
+    password: xwal fsih otqg ophi
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  jpa:
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: true
+        implicit_naming_strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: my-kafka:9092
+        streams:
+          binder:
+            configuration:
+              default:
+                key:
+                  serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+                value:
+                  serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+      bindings:
+        event-in:
+          group: myPage
+          destination: travel
+          contentType: application/json
+        event-out:
+          destination: travel
+          contentType: application/json
+
+logging:
+  level:
+    org.hibernate.type: info
+    org.springframework.cloud: info
