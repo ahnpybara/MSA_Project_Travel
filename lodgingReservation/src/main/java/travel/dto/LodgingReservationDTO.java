@@ -16,8 +16,8 @@ public class LodgingReservationDTO {
     private String email;
     @NotNull(message = "\ncharge cannot be null or empty\n")
     private Long charge;
-    @NotNull(message = "\nroomCode cannot be null or empty\n")
-    private Long roomCode;
+    @NotNull(message = "\nroomcode cannot be null or empty\n")
+    private Long roomcode;
     @NotNull(message = "\nuserId cannot be null or empty\n")
     private Long userId;
 

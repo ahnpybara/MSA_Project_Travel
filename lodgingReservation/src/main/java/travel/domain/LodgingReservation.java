@@ -23,7 +23,7 @@ public class LodgingReservation {
 
     private Long charge;
 
-    private Long roomCode;
+    private Long roomcode;
 
     private Status status;
 

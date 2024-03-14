@@ -9,7 +9,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 public interface LodgingReservationRepository
         extends PagingAndSortingRepository<LodgingReservation, Long> {
 
-        Optional<LodgingReservation> findByNameAndReservationDateAndEmailAndRoomCode(String name, Long reservationDate, String email, Long roomCode);
+        Optional<LodgingReservation> findByNameAndReservationDateAndEmailAndRoomcode(String name, Long reservationDate, String email, Long roomCode);
 
         Optional<LodgingReservation> findById(Long Id);
 }

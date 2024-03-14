@@ -15,8 +15,9 @@ public class LodgingReservationFailed extends AbstractEvent {
     private String email;
     private String category;
     private Long charge;
-    private Long roomCode;
+    private Long roomcode;
     private Status status;
+    private Long userId;
 
     public LodgingReservationFailed(LodgingReservation aggregate) {
         super(aggregate);

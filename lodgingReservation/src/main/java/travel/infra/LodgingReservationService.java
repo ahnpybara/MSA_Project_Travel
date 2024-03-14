@@ -36,9 +36,9 @@ public class LodgingReservationService {
     public LodgingReservation validateAndProcessReservation(LodgingReservationDTO lodgingReservationDTO) {
 
         Optional<LodgingReservation> existingReservation = lodgingReservationRepository
-                .findByNameAndReservationDateAndEmailAndRoomCode(
+                .findByNameAndReservationDateAndEmailAndRoomcode(
                         lodgingReservationDTO.getName(), lodgingReservationDTO.getReservationDate(),
-                        lodgingReservationDTO.getEmail(), lodgingReservationDTO.getRoomCode());
+                        lodgingReservationDTO.getEmail(), lodgingReservationDTO.getRoomcode());
 
         if (existingReservation.isPresent()) {
             LodgingReservation existing = existingReservation.get();
@@ -49,7 +49,7 @@ public class LodgingReservationService {
                 logger.info("\n결제 완료 및 예약완료된 예약 내역이 존재 합니다.\n");
                 throw new CustomException("결제 완료 및 예약완료된 예약 내역이 존재 합니다.", HttpStatus.CONFLICT.value());
             } else {
-                checkRoomCapacity(lodgingReservationDTO.getRoomCode(), lodgingReservationDTO.getReservationDate());
+                checkRoomCapacity(lodgingReservationDTO.getRoomcode(), lodgingReservationDTO.getReservationDate());
                 existing.setStatus(Status.결제대기);
                 lodgingReservationRepository.save(existing);
                 if (existing.getStatus() == Status.결제대기) {
@@ -62,7 +62,7 @@ public class LodgingReservationService {
                 return existing;
             }
         }
-        checkRoomCapacity(lodgingReservationDTO.getRoomCode(), lodgingReservationDTO.getReservationDate());
+        checkRoomCapacity(lodgingReservationDTO.getRoomcode(), lodgingReservationDTO.getReservationDate());
         LodgingReservation lodgingReservation = createAndSaveLodgingReservation(lodgingReservationDTO);
         logger.info("\n 숙소 예약이 성공적으로 생성 되었습니다. \n");
         LodgingReservationRequested lodgingReservationRequested = new LodgingReservationRequested(lodgingReservation);
@@ -80,7 +80,7 @@ public class LodgingReservationService {
             lodgingReservation.setReservationDate(lodgingReservationDTO.getReservationDate());
             lodgingReservation.setEmail(lodgingReservationDTO.getEmail());
             lodgingReservation.setCharge(lodgingReservationDTO.getCharge());
-            lodgingReservation.setRoomCode(lodgingReservationDTO.getRoomCode());
+            lodgingReservation.setRoomcode(lodgingReservationDTO.getRoomcode());
             lodgingReservation.setUserId(lodgingReservationDTO.getUserId());
             lodgingReservation.setCategory("L");
             lodgingReservation.setStatus(Status.결제대기);

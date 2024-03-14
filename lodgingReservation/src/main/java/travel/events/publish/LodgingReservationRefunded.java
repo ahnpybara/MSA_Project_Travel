@@ -15,8 +15,9 @@ public class LodgingReservationRefunded extends AbstractEvent {
     private String email;
     private String category;
     private Long charge;
-    private Long roomCode;
+    private Long roomcode;
     private Status status;
+    private Long userId;
 
     public LodgingReservationRefunded(LodgingReservation aggregate) {
         super(aggregate);
