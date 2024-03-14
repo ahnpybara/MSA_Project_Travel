@@ -16,3 +16,5 @@ public interface LodgingDetailRepository
     extends PagingAndSortingRepository<LodgingDetail, Long> {
 
     Optional<LodgingDetail> findByContentid(Long contentid);}
+
+  

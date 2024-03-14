@@ -4,11 +4,11 @@ import java.net.URI;
 import java.net.UnknownHostException;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 import javax.persistence.RollbackException;
 
@@ -32,7 +32,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import travel.domain.Room;
-import travel.events.subscribe.LodgingReservationCancelled;
+import travel.events.subscribe.LodgingReservationCancelRequested;
 import travel.events.subscribe.LodgingReservationRequested;
 import travel.exception.CustomException;
 import travel.exception.RetryExhaustedException;
@@ -104,36 +104,40 @@ public class RoomService {
                 throwable instanceof UnknownHostException;
     }
 
-    //객실 수를 감소하는 메서드
+    public Long getRoomCapacityByDate(Long roomCode, Long reservationDate) {
+        try {
+            Room room = roomRepository.findByRoomcode(roomCode)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 roomCode를 찾을수 없습니다. " + roomCode));
+
+            logger.info("\n 해당 숙소를 찾았습니다.");
+            String dateString = String.valueOf(reservationDate);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+            LocalDate localReservationDate = LocalDate.parse(dateString, formatter);
+            Map<LocalDate, Long> roomCapacity = room.getRoomCapacity();
+
+            return roomCapacity.getOrDefault(localReservationDate, -1L);
+        } catch (IllegalArgumentException e) {
+            logger.error("예약된 객실을 찾을 수 없습니다.");
+            throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            throw new RuntimeException("알수 없는 오류 발생", e);
+        }
+    }
+
+    // 객실 수를 감소하는 메서드
     @Transactional(rollbackFor = { RollbackException.class })
     public void decreaseRoomCapacity(LodgingReservationRequested lodgingReservationRequested) {
         try {
-            //Long 타입으로 받은 예약 날짜를 String으로 변환, DateTimeFormatter를 사용하려면 Long을 사용할 수 없기 때문
             String dateString = String.valueOf(lodgingReservationRequested.getReservationDate());
-            
-            //날짜 패턴을 yyyyMMdd로 설정, 각각 일치하는 자리에 맞게 날짜로 인식합니다. 
-            //20240314라는 문자열을 yyyyMMdd 패턴 적용 예시
-            //yyyy MM dd
-            //2024 03 14 로 패턴 적용
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-            
-            //문자열에 패턴을 적용시켜 LocalDate 타입으로 변환
             LocalDate reservationDate = LocalDate.parse(dateString, formatter);
 
-            //객실의 코드로 예약하고자 하는 객실을 조회
             Room room = roomRepository.findByRoomcode(
                     lodgingReservationRequested.getRoomCode())
                     .orElseThrow(() -> new IllegalArgumentException("예약 요청된 방의 정보를 확인할 수 없습니다."));
 
-            //roomCapacity 데이터를 불러옴
-            Map<LocalDate, Long> roomCapacity = room.getRoomCapacity(); 
+            Map<LocalDate, Long> roomCapacity = room.getRoomCapacity();
 
-            //compute 는 키의 값을 재설정하는 메서드
-            //(key, value)는 람다 형식으로 compute 메서드에 정의된 일반적인 표현 방식
-            //key는 reservationDate를 나타내며 value는 값을 나타냄
-            //reservationDate와 일치하는 키의 값을 재설정
-            //값이 null이거나 0보다 작으면 예외 발생
-            //존재한다면 값을 value -1 하고 저장
             roomCapacity.compute(reservationDate, (key, value) -> {
                 if (value == null || value <= 0) {
                     throw new IllegalStateException("예약 가능한 객실이 없습니다.");
@@ -141,7 +145,7 @@ public class RoomService {
                 return value - 1;
             });
 
-            room.setRoomCapacity(roomCapacity); 
+            room.setRoomCapacity(roomCapacity);
             roomRepository.save(room);
         } catch (IllegalArgumentException | IllegalStateException e) {
             logger.error("예약된 객실을 찾을 수 없거나, 남은 객실의 수가 부족합니다.");
@@ -152,23 +156,22 @@ public class RoomService {
         }
     }
 
-    //객실 수를 증가하는 메서드
+    // 객실 수를 증가하는 메서드
     @Transactional(rollbackFor = RollbackException.class)
-    public void IncreaseRoomCapacity(LodgingReservationCancelled lodgingReservationCancelled) {
+    public void IncreaseRoomCapacity(LodgingReservationCancelRequested lodgingReservationCancelRequested) {
         try {
-            
-            String dateString = String.valueOf(lodgingReservationCancelled.getReservationDate());
 
+            String dateString = String.valueOf(lodgingReservationCancelRequested.getReservationDate());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
             LocalDate reservationDate = LocalDate.parse(dateString, formatter);
 
             Room room = roomRepository.findByRoomcode(
-                    lodgingReservationCancelled.getRoomCode())
+                    lodgingReservationCancelRequested.getRoomCode())
                     .orElseThrow(() -> new IllegalArgumentException("예약 취소 요청된 객실의 정보를 확인할 수 없습니다."));
 
-            Map<LocalDate, Long> roomCapacity = room.getRoomCapacity(); 
+            Map<LocalDate, Long> roomCapacity = room.getRoomCapacity();
             roomCapacity.compute(reservationDate, (key, value) -> {
-                if (value >= 10) {
+                if (value >= 1) {
                     throw new IllegalStateException("객실의 수가 MAX입니다.");
                 }
                 return value + 1;
@@ -206,23 +209,14 @@ public class RoomService {
         try {
             logger.info("룸 요청 완료, DB에 저장 시작");
             Room room = objectMapper.treeToValue(jsonNode, Room.class);
-
-            //Map 타입으로 객체 생성, !!ConcurrentHashMap 이건 아직 몰라서 공부하고 있는데 멀티 스레드 환경 좋은 동시성 테이블이라고 합니다.!!
             Map<LocalDate, Long> roomCapacity = new ConcurrentHashMap<>();
 
-            //년과 월을 나타내는 클래스, 인자를 (2024, 3)으로 지정함으로 yearMonth은 2024-03이 됨
-            YearMonth yearMonth = YearMonth.of(2024, 3);
-            //lengthOfMonth을 사용해 2024년 3월의 일수를 계산
-            int daysInMonth = yearMonth.lengthOfMonth();
+            LocalDate startDate = LocalDate.now();
+            LocalDate endDate = startDate.plusDays(29); 
 
-            //병렬처리 방식
-            //1에서 daysInMonth를 포함한 정수 스트림을 생성 ex) (1, 4) 라면 1, 2, 3, 4 로 4를 포함
-            //parallel() 병렬처리 메서드
-            IntStream.rangeClosed(1, daysInMonth).parallel().forEach(day -> {
-                //atDay, yearMonth에 day를 결합
-                LocalDate date = yearMonth.atDay(day);
-                //roomCapacity는 Map 객체이기 때문에 put으로 키와 값을 설정, date라는 날짜에 10개의 객실 수를 지정, L은 long이라는 타입
-                roomCapacity.put(date, 10L);
+            LongStream.rangeClosed(0, ChronoUnit.DAYS.between(startDate, endDate)).parallel().forEach(day -> {
+                LocalDate date = startDate.plusDays(day);
+                roomCapacity.put(date, 1L); 
             });
 
             room.setRoomCapacity(roomCapacity);
@@ -233,6 +227,5 @@ public class RoomService {
             logger.error("Json 변환 중 오류 발생", e);
             throw new RuntimeException("Json 변환 중 오류가 발생했습니다 : " + e.getMessage());
         }
-
     }
 }

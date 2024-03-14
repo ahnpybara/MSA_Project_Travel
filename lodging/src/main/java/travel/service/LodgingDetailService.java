@@ -62,9 +62,9 @@ public class LodgingDetailService {
         String overviewYN = "Y";
 
         String urlDetailLodging = String.format(
-                "http://apis.data.go.kr/B551011/KorService1/detailCommon1?ServiceKey=%s&contentTypeId=%s&contentId=%s&MobileOS=%s&MobileApp=%s&defaultYN=%s&firstImageYN=%s&areacodeYN=%s&catcodeYN=%s&addrinfoYN=%s&mapinfoYN=%s&overviewYN=%s&_type=%s",
+                "http://apis.data.go.kr/B551011/KorService1/detailCommon1?ServiceKey=%s&contentTypeId=%s&contentId=%s&MobileOS=%s&MobileApp=%s&defaultYN=%s&firstImageYN=%s&areacodeYN=%s&catcodeYN=%s&addrinfoYN=%s&mapinfoYN=%s&overviewYN=%s&_type=json",
                 serviceKey, contenttypeid, contentid, mobileOS, mobileApp, defaultYN, firstImageYN, areacodeYN,
-                catcodeYN, addrinfoYN, mapinfoYN, overviewYN, type);
+                catcodeYN, addrinfoYN, mapinfoYN, overviewYN);
 
         Retry retry = createRetrySpec();
 

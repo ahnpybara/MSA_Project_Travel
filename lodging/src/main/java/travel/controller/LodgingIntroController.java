@@ -30,7 +30,7 @@ public class LodgingIntroController {
 
     private final static Logger logger = LoggerFactory.getLogger(LodgingIntro.class);
 
-    // 숙소 인트로 소개
+    //숙소 인트로 소개
     @GetMapping("/lodgings/searchIntro/{contentid}")
     public Mono<LodgingIntro> searchDeatil(@PathVariable String contentid,
             @RequestParam(required = false, defaultValue = "32") String contenttypeid,

@@ -46,7 +46,7 @@ public class PolicyHandler {
 
     // TODO 이걸 어떻게 SAGA로 해야햘까..? -> 일단 재시도로 처리
     @Recover
-    public void recover(RuntimeException e, Object flightInfo) {
+    public void recover(RollbackException e, Object flightInfo) {
         logger.error("\n항공편의 좌석 정보 수정에 실패했습니다.\n");
     }
 }
