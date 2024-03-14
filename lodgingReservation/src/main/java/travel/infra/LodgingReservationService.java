@@ -97,28 +97,28 @@ public class LodgingReservationService {
 
             ResponseEntity<Long> room = roomService.searchRooms(roomCode, reservationDate); 
                                                                                             
-            logger.info("\n해당하는 항공편을 찾았습니다. \n");
+            logger.info("\n해당하는 숙소를 찾았습니다. \n");
             return room.getBody().longValue();
 
         } catch (FeignException.NotFound e) {
-            logger.error("\n비행 일정을 찾을 수 없습니다. \n");
+            logger.error("\n숙소를 을 찾을 수 없습니다. \n");
             throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND.value(), e.toString());
         } catch (FeignException e) {
-            logger.error("\n항공 서비스 접근에 에러 발생 하였습니다. \n");
+            logger.error("\n숙소 서비스 접근에 에러 발생 하였습니다. \n");
             throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST.value(), e.toString());
         }
     }
 
-    // 해당 항공편 좌석이 있는지 확인하는 메서드
+    // 해당 숙소편 좌석이 있는지 확인하는 메서드
     public void checkRoomCapacity(Long roomCode, Long reservationDate) {
 
         Long roomCapacity = searchFlight(roomCode, reservationDate);
 
         if (roomCapacity <= 0) {
-            logger.error("\n좌석이 부족합니다. \n");
-            throw new CustomException("좌석이 부족합니다.", HttpStatus.BAD_REQUEST.value());
+            logger.error("\n객실이 부족합니다. \n");
+            throw new CustomException("객실이 부족합니다.", HttpStatus.BAD_REQUEST.value());
         }
-        logger.info("\n좌석이 존재합니다. \n");
+        logger.info("\n객실이 존재합니다. \n");
     }
 
     @Transactional(rollbackFor = { RollBackException.class })

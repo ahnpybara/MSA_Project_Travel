@@ -52,7 +52,7 @@ public class LodgingReservationEventService {
     }
 
     // paymentRefund 이벤트 수신 처리 + flightReservaionRefunded 이벤트 발행.
-    // 결제 환불 이벤트가 수신 되었을때 해당 항공예약 상태 변경 후 이벤트 발행
+    // 결제 환불 이벤트가 수신 되었을때 해당 숙소예약 상태 변경 후 이벤트 발행
     @Transactional(rollbackFor = RollBackException.class)
     public void paymentRefund(PaymentRefunded paymentRefunded) {
         try {
@@ -73,10 +73,10 @@ public class LodgingReservationEventService {
                     throw new RollBackException("예약 정보 저장 중 오류 발생");
                 }
             } else {
-                logger.error("\n항공 예약정보가 존재하지 않습니다. 예약 ID: {}", paymentRefunded.getReservationId());
+                logger.error("\n숙소 예약정보가 존재하지 않습니다. 예약 ID: {}", paymentRefunded.getReservationId());
             }
         } catch (Exception e) {
-            logger.error("\n 알수없는 오류로 항공예약 상태를 변경하지 못하였습니다. \n");
+            logger.error("\n 알수없는 오류로 숙소예약 상태를 변경하지 못하였습니다. \n");
             throw new RollBackException(e.getMessage());
         }
 
@@ -105,7 +105,7 @@ public class LodgingReservationEventService {
     }
 
     // paymentCancel 이벤트 수신 처리 + flightReservationCancelled 이벤트 발행
-    // 결제 취소 이벤트가 수신 되었을때 해당 항공예약 상태 변경 후 이벤트 발행
+    // 결제 취소 이벤트가 수신 되었을때 해당 숙소예약 상태 변경 후 이벤트 발행
     @Transactional(rollbackFor = RollBackException.class)
     public void paymentCancel(PaymentCancelled paymentCancelled) {
         try {
@@ -128,14 +128,14 @@ public class LodgingReservationEventService {
                 logger.error("\n숙소 예약정보가 존재하지 않습니다. 예약 ID: {}", paymentCancelled.getReservationId());
             }
         } catch (Exception e) {
-            logger.error("\n 알수없는 오류로 항공예약 상태를 변경하지 못하였습니다. \n");
+            logger.error("\n 알수없는 오류로 숙소예약 상태를 변경하지 못하였습니다. \n");
             throw new RollBackException(e.getMessage());
         }
 
     }
 
     // paymentFail 이벤트 수신 처리 + FlightReservationFailed 이벤트 발행
-    // 결제 실패 이벤트가 수신 되었을때 해당 항공 예약상태 변경 후 이벤트 발행
+    // 결제 실패 이벤트가 수신 되었을때 해당 숙소 예약상태 변경 후 이벤트 발행
     @Transactional(rollbackFor = RollBackException.class)
     public void paymentFail(PaymentFailed paymentFailed) {
         try {
@@ -159,7 +159,7 @@ public class LodgingReservationEventService {
             }
 
         } catch (Exception e) {
-            logger.error("\n 알수없는 오류로 항공예약 상태를 변경하지 못하였습니다. \n");
+            logger.error("\n 알수없는 오류로 숙소예약 상태를 변경하지 못하였습니다. \n");
             throw new RollBackException(e.getMessage());
         }
 
