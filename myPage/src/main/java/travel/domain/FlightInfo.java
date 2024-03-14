@@ -25,5 +25,5 @@ public class FlightInfo {
     private Long flightId;
     private String email;
     private String category;
-    private FlightStatus status;
+    private ReservationStatus status;
 }

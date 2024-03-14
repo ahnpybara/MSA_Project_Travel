@@ -60,7 +60,7 @@ spring:
   jpa:
     properties:
       hibernate:
-        show_sql: true
+        show_sql: false
         format_sql: true
         implicit_naming_strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
   cloud:
@@ -89,4 +89,9 @@ api:
   url: 
     flightReservation: flightReservation:8080 
     flight: localhost:8080
+
+logging:
+  level:
+    org.hibernate.type: info
+    org.springframework.cloud: info
 

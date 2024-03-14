@@ -8,18 +8,20 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import travel.domain.FlightInfo;
-import travel.domain.FlightInfoRepository;
+import travel.domain.LodgingInfo;
+import travel.domain.LodgingInfoRepository;
 import travel.domain.ReservationStatus;
 import travel.event.subscribe.FlightReservationCompleted;
 import travel.event.subscribe.FlightReservationRefunded;
+import travel.event.subscribe.LodgingReservationCompleted;
+import travel.event.subscribe.LodgingReservationRefunded;
 import travel.exception.RollbackException;
 
 @Service
-public class FlightInfoService {
+public class LodgingInfoService {
 
     @Autowired
-    private FlightInfoRepository flightInfoRepository;
+    private LodgingInfoRepository lodgingInfoRepository;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -28,31 +30,27 @@ public class FlightInfoService {
 
     // 예약된 항공편 정보를 저장하는 메서드 입니다.
     @Transactional(rollbackFor = RollbackException.class)
-    public void saveFlightInfo(FlightReservationCompleted flightReservationCompleted) {
+    public void saveLodgingInfo(LodgingReservationCompleted lodgingReservationCompleted) {
 
         try {
-            FlightInfo exsistFlight = flightInfoRepository.findByReservationId(flightReservationCompleted.getId());
+            LodgingInfo exsistLodging = lodgingInfoRepository.findByReservationId(lodgingReservationCompleted.getId());
 
-            if (exsistFlight == null) {
-                FlightInfo flightInfo = new FlightInfo();
-                flightInfo.setReservationId(flightReservationCompleted.getId());
-                flightInfo.setUserId(flightReservationCompleted.getUserId());
-                flightInfo.setVihicleId(flightReservationCompleted.getVihicleId());
-                flightInfo.setAirLine(flightReservationCompleted.getAirLine());
-                flightInfo.setArrAirport(flightReservationCompleted.getArrAirport());
-                flightInfo.setDepAirport(flightReservationCompleted.getDepAirport());
-                flightInfo.setArrTime(flightReservationCompleted.getArrTime());
-                flightInfo.setDepTime(flightReservationCompleted.getDepTime());
-                flightInfo.setCharge(flightReservationCompleted.getCharge());
-                flightInfo.setName(flightReservationCompleted.getName());
-                flightInfo.setEmail(flightReservationCompleted.getEmail());
-                flightInfo.setCategory(flightReservationCompleted.getCategory());
-                flightInfo.setStatus(ReservationStatus.예약완료);
-                flightInfoRepository.save(flightInfo);
+            if (exsistLodging == null) {
+                LodgingInfo lodgingInfo = new LodgingInfo();
+                lodgingInfo.setReservationId(lodgingReservationCompleted.getId());
+                lodgingInfo.setUserId(lodgingReservationCompleted.getUserId());
+                lodgingInfo.setCharge(lodgingReservationCompleted.getCharge());
+                lodgingInfo.setRoomCode(lodgingReservationCompleted.getRoomCode());
+                lodgingInfo.setReservationDate(lodgingReservationCompleted.getReservationDate());;
+                lodgingInfo.setName(lodgingReservationCompleted.getName());
+                lodgingInfo.setEmail(lodgingReservationCompleted.getEmail());
+                lodgingInfo.setCategory(lodgingReservationCompleted.getCategory());
+                lodgingInfo.setStatus(ReservationStatus.예약완료);
+                lodgingInfoRepository.save(lodgingInfo);
             } else {
-                logger.info("\n"+ flightReservationCompleted.getId() + "번 예약 현황이 이미 존재하므로 상태만 예약 완료로 변경됩니다\n");
-                exsistFlight.setStatus(ReservationStatus.예약완료);
-                flightInfoRepository.save(exsistFlight);
+                logger.info("\n"+ lodgingReservationCompleted.getId() + "번 예약 현황이 이미 존재하므로 상태만 예약 완료로 변경됩니다\n");
+                exsistLodging.setStatus(ReservationStatus.예약완료);
+                lodgingInfoRepository.save(exsistLodging);
             }
         } catch (Exception e) {
             logger.error("\n예약된 정보를 저장하는 도중 문제가 발생했습니다 : " + e);
@@ -62,16 +60,16 @@ public class FlightInfoService {
 
     // 특정 예약정보의 상태를 변경하는 메서드입니다
     @Transactional(rollbackFor = RollbackException.class)
-    public void updateFlightInfo(FlightReservationRefunded flightReservationRefunded) {
+    public void updateLodgingInfo(LodgingReservationRefunded lodgingReservationRefunded) {
 
         try {
-            FlightInfo flightInfo = flightInfoRepository.findByReservationId(flightReservationRefunded.getId());
+            LodgingInfo lodgingInfo = lodgingInfoRepository.findByReservationId(lodgingReservationRefunded.getId());
 
-            if (flightInfo == null) {
-                logger.error("\n" + flightReservationRefunded.getId() + "번 예약 번호로 예약된 항공 정보가 존재하지 않습니다\n");
+            if (lodgingInfo == null) {
+                logger.error("\n" + lodgingReservationRefunded.getId() + "번 예약 번호로 예약된 항공 정보가 존재하지 않습니다\n");
             } else {
-                flightInfo.setStatus(ReservationStatus.예약취소);
-                flightInfoRepository.save(flightInfo);
+                lodgingInfo.setStatus(ReservationStatus.예약취소);
+                lodgingInfoRepository.save(lodgingInfo);
             }
         } catch (Exception e) {
             logger.error("\n예약된 정보를 수정하는 도중 문제가 발생했습니다 : " + e);

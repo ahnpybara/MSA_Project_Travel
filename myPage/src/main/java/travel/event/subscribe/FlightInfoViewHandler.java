@@ -25,7 +25,7 @@ public class FlightInfoViewHandler {
     public void whenFlightReservationCompleted(@Payload FlightReservationCompleted flightReservationCompleted) {
 
         if (!flightReservationCompleted.validate()) return;
-        logger.info("\n사용자의 예약 정보를 저장합니다.\n");
+        logger.info("\n사용자의 항공 예약 정보를 저장합니다.\n");
         flightInfoService.saveFlightInfo(flightReservationCompleted);
     }
 
@@ -35,7 +35,7 @@ public class FlightInfoViewHandler {
     public void whenFlightReservationRefunded(@Payload FlightReservationRefunded flightReservationRefunded) {
 
         if (!flightReservationRefunded.validate()) return;
-        logger.info("\n사용자의 예약 정보를 수정합니다.\n");
+        logger.info("\n사용자의 항공 예약 정보를 수정합니다.\n");
         flightInfoService.updateFlightInfo(flightReservationRefunded);
     }
 

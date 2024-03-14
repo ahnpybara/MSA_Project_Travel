@@ -17,7 +17,7 @@ spring:
   jpa:
     properties:
       hibernate:
-        show_sql: true
+        show_sql: false
         format_sql: true
         implicit_naming_strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
   cloud:
@@ -62,7 +62,7 @@ spring:
   jpa:
     properties:
       hibernate:
-        show_sql: true
+        show_sql: false
         format_sql: true
         implicit_naming_strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
   cloud:
@@ -87,4 +87,7 @@ spring:
           destination: travel
           contentType: application/json
 
-
+logging:
+  level:
+    org.hibernate.type: info
+    org.springframework.cloud: info

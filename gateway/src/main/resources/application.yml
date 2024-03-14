@@ -52,6 +52,13 @@ spring:
             - Path=/lodgings/**
           filters:
             - AuthorizationFilter
+
+        - id: lodgingReservation
+          uri: http://localhost:8089
+          predicates:
+            - Path=/lodgingReservations/**
+          filters:
+            - AuthorizationFilter
       
       globalcors:
         corsConfigurations:
@@ -85,7 +92,7 @@ spring:
             - AuthorizationFilter
 
         - id: flightReservation
-          uri: http://flightReservation:8080
+          uri: http://flightreservation:8080
           predicates:
             - Path=/flightReservations/**
           filters:
@@ -97,7 +104,7 @@ spring:
             - Path=/users/**, 
             
         - id: myPage
-          uri: http://myPage:8080
+          uri: http://mypage:8080
           predicates:
             - Path=/reservationInfos/**
           filters:
@@ -114,6 +121,13 @@ spring:
           uri: http://lodging:8080
           predicates:
             - Path=/lodgings/**
+          filters:
+            - AuthorizationFilter
+        
+        - id: lodgingReservation
+          uri: http://lodgingreservation:8080
+          predicates:
+            - Path=/lodgingReservations/**
           filters:
             - AuthorizationFilter
             
