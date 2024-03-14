@@ -19,7 +19,6 @@ import travel.events.publish.LodgingReservationCancelRequested;
 import travel.events.publish.LodgingReservationRequested;
 import travel.exception.CustomException;
 import travel.exception.RollBackException;
-import travel.external.Room;
 import travel.external.RoomService;
 
 @Service
@@ -50,7 +49,7 @@ public class LodgingReservationService {
                 logger.info("\n결제 완료 및 예약완료된 예약 내역이 존재 합니다.\n");
                 throw new CustomException("결제 완료 및 예약완료된 예약 내역이 존재 합니다.", HttpStatus.CONFLICT.value());
             } else {
-                //checkRoomCapacity(lodgingReservationDTO.getRoomCode(), lodgingReservationDTO.getReservationDate());
+                checkRoomCapacity(lodgingReservationDTO.getRoomCode(), lodgingReservationDTO.getReservationDate());
                 existing.setStatus(Status.결제대기);
                 lodgingReservationRepository.save(existing);
                 if (existing.getStatus() == Status.결제대기) {
@@ -63,7 +62,7 @@ public class LodgingReservationService {
                 return existing;
             }
         }
-        //checkRoomCapacity(lodgingReservationDTO.getRoomCode(), lodgingReservationDTO.getReservationDate());
+        checkRoomCapacity(lodgingReservationDTO.getRoomCode(), lodgingReservationDTO.getReservationDate());
         LodgingReservation lodgingReservation = createAndSaveLodgingReservation(lodgingReservationDTO);
         logger.info("\n 숙소 예약이 성공적으로 생성 되었습니다. \n");
         LodgingReservationRequested lodgingReservationRequested = new LodgingReservationRequested(lodgingReservation);
@@ -77,11 +76,12 @@ public class LodgingReservationService {
 
         try {
             LodgingReservation lodgingReservation = new LodgingReservation();
-            lodgingReservation.setName(lodgingReservationDTO.getName()); // TODO name 보내달라고하기. 프론트에
+            lodgingReservation.setName(lodgingReservationDTO.getName()); 
             lodgingReservation.setReservationDate(lodgingReservationDTO.getReservationDate());
             lodgingReservation.setEmail(lodgingReservationDTO.getEmail());
             lodgingReservation.setCharge(lodgingReservationDTO.getCharge());
             lodgingReservation.setRoomCode(lodgingReservationDTO.getRoomCode());
+            lodgingReservation.setUserId(lodgingReservationDTO.getUserId());
             lodgingReservation.setCategory("L");
             lodgingReservation.setStatus(Status.결제대기);
 
@@ -95,10 +95,10 @@ public class LodgingReservationService {
     public Long searchFlight(Long roomCode, Long reservationDate) {
         try {
 
-            ResponseEntity<Room> room = roomService.searchRooms(roomCode, reservationDate); // TODO 어떻게 좌석 조절 하는지 코드 보고
-                                                                                            // 변경하기
+            ResponseEntity<Long> room = roomService.searchRooms(roomCode, reservationDate); 
+                                                                                            
             logger.info("\n해당하는 항공편을 찾았습니다. \n");
-            return room.getBody().getRoomCapacity();
+            return room.getBody().longValue();
 
         } catch (FeignException.NotFound e) {
             logger.error("\n비행 일정을 찾을 수 없습니다. \n");

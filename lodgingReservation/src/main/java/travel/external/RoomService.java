@@ -17,5 +17,5 @@ public interface RoomService {
     public Room getRoom(@PathVariable("id") Long id);
 
     @GetMapping(path = "/rooms/roomCapacity")
-    public ResponseEntity<Room> searchRooms (@RequestParam("roomCode") Long roomCode , @RequestParam("reservationDate") Long ReservationDate);
+    public ResponseEntity<Long> searchRooms (@RequestParam("roomCode") Long roomCode , @RequestParam("reservationDate") Long ReservationDate);
 }
