@@ -7,9 +7,11 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.MimeTypeUtils;
+
 import travel.LodgingApplication;
 import travel.config.kafka.KafkaProcessor;
 
+//<<< Clean Arch / Outbound Adaptor
 public class AbstractEvent {
 
     String eventType;
@@ -26,6 +28,9 @@ public class AbstractEvent {
     }
 
     public void publish() {
+        /**
+         * spring streams 방식
+         */
         KafkaProcessor processor = LodgingApplication.applicationContext.getBean(
             KafkaProcessor.class
         );
@@ -74,3 +79,4 @@ public class AbstractEvent {
         return getEventType().equals(getClass().getSimpleName());
     }
 }
+//>>> Clean Arch / Outbound Adaptor

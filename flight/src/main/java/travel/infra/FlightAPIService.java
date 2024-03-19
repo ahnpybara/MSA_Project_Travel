@@ -48,9 +48,19 @@ public class FlightAPIService {
                             .header("Accept", "application/json")
                             .retrieve()
                             .bodyToMono(JsonNode.class)
-                            .flatMapMany(jsonNode -> Flux
-                                    .fromIterable(
-                                            jsonNode.path("response").path("body").path("items").path("item")))
+                            .flatMapMany(jsonNode -> {
+                                JsonNode itemsNode = jsonNode.path("response").path("body").path("items").path("item");
+                                if (itemsNode.isArray()) {
+                                    // 배열 형태일 때
+                                    return Flux.fromIterable(itemsNode);
+                                } else if (!itemsNode.isMissingNode()) {
+                                    // 단일 객체일 때
+                                    return Flux.just(itemsNode);
+                                } else {
+                                    // 빈 응답 또는 예상치 못한 형태일 때
+                                    return Flux.empty();
+                                }
+                            })
                             .map(this::convertAndSaveFlight)
                             .onErrorResume(this::handleError);
                 }, 4); // 병렬처리를 위해 4개의 쓰레드를 사용하도록 설정하였습니다.
@@ -72,16 +82,16 @@ public class FlightAPIService {
     // 예외 발생시 실행되는 예외 핸들러 메서드입니다
     private Mono<Flight> handleError(Throwable e) {
         if (e instanceof JsonTranferException) {
-            logger.error("\nJson 파싱 도중 예외가 발생했습니다.\n 오류 내용 : " + e);
+            logger.error("\nJson 파싱 도중 예외가 발생했습니다.\n 오류 내용 : " + e + "\n");
             return Mono.error(new JsonTranferException(e.getMessage()));
         } else if (e instanceof SaveDataException) {
-            logger.error("\n항공편 정보를 저장하는 도중 오류가 발생했습니다.\n 오류 내용 : " + e);
+            logger.error("\n항공편 정보를 저장하는 도중 오류가 발생했습니다.\n 오류 내용 : " + e + "\n");
             return Mono.error(new SaveDataException(e.getMessage()));
         } else if (e instanceof WebClientResponseException) {
-            logger.error("\n항공편 API 서버와 연결을 할 수 없습니다.\n 오류 내용 : " + e);
+            logger.error("\n항공편 API 서버와 연결을 할 수 없습니다.\n 오류 내용 : " + e + "\n");
             return Mono.error(new RuntimeException("API 서버와 연결할 수 없습니다"));
         } else {
-            logger.error("\n항공편 API를 불러오고 저장하는 도중 알 수 없는 오류가 발생했습니다.\n 오류 내용 : " + e);
+            logger.error("\n항공편 API를 불러오고 저장하는 도중 알 수 없는 오류가 발생했습니다.\n 오류 내용 : " + e + "\n");
             return Mono.error(new Exception("알 수 없는 오류가 발생했습니다"));
         }
     }

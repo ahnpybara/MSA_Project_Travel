@@ -6,19 +6,14 @@ import travel.event.publish.AbstractEvent;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class FlightReservationRefunded extends AbstractEvent {
+public class LodgingReservationCompleted extends AbstractEvent {
 
     private Long id;
-    private String airLine;
-    private String arrAirport;
-    private String depAirport;
-    private Long arrTime;
-    private Long depTime;
-    private Long charge;
-    private String vihicleId;
     private Long userId;
     private String name;
-    private Long flightId;
+    private Long reservationDate;
     private String email;
     private String category;
+    private Long charge;
+    private Long roomCode;
 }

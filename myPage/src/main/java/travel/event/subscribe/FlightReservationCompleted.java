@@ -1,6 +1,5 @@
 package travel.event.subscribe;
 
-import java.util.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import travel.event.publish.AbstractEvent;
@@ -13,12 +12,13 @@ public class FlightReservationCompleted extends AbstractEvent {
     private String airLine;
     private String arrAirport;
     private String depAirport;
-    private Date arrTime;
-    private Date depTime;
+    private Long arrTime;
+    private Long depTime;
     private Long charge;
     private String vihicleId;
     private Long userId;
     private String name;
-    private Long FlightId;
+    private Long flightId;
     private String email;
+    private String category;
 }

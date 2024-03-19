@@ -65,4 +65,9 @@ public class FlightReservationController {
 
     }
 
+    @GetMapping("/healthy")
+    public String healthCheck() {
+        logger.info("Health check passed");
+        return "OK";
+    }
 }
